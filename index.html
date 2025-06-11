@@ -302,9 +302,6 @@
         // --- Funzioni di logica principali ---
         
         async function performBrandAnalysis(brandName) {
-            // *** PUNTO CHIAVE PER SVILUPPO FUTURO ***
-            // Qui andrà la vera chiamata all'API di Intellimark.ai.
-            // Per ora, simuliamo un'attesa e restituiamo dati fittizi.
             console.log(`Avvio analisi per: ${brandName}`);
             await new Promise(resolve => setTimeout(resolve, 2500)); // Simula 2.5s di analisi AI
 
@@ -322,10 +319,17 @@
             const brandName = brandSearchInput.value.trim() || "NomeBrand";
             showLoading();
             
-            const results = await performBrandAnalysis(brandName);
-            
-            hideLoading();
-            displayResults(brandName, results);
+            try {
+                const results = await performBrandAnalysis(brandName);
+                displayResults(brandName, results);
+            } catch (error) {
+                console.error("Si è verificato un errore durante l'analisi:", error);
+                // In un'app reale, qui si mostrerebbe un messaggio di errore all'utente.
+            } finally {
+                // Questo blocco viene eseguito SEMPRE, sia che ci sia un errore o no.
+                // Garantisce che il caricamento venga nascosto.
+                hideLoading();
+            }
         }
 
         function displayResults(brandName, results) {
