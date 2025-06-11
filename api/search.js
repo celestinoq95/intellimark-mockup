@@ -1,50 +1,44 @@
 // Questo file deve trovarsi in: /api/search.js
-// ULTIMO TENTATIVO CON SCOPE SPECIFICO E DIAGNOSTICA AVANZATA
+// Aggiunge la logica per chiamare Gemini e generare un giudizio sintetico.
 
 const fetch = require('node-fetch');
 
-// Funzione helper per ottenere il token di accesso
+// Funzione per ottenere il token di accesso EUIPO (invariata)
 async function getAccessToken(clientId, clientSecret) {
     const tokenUrl = 'https://euipo.europa.eu/cas-server-webapp/oidc/accessToken';
     const basicAuth = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
-    console.log('Tentativo di ottenere il token di accesso con lo scope SPECIFICO...');
-
-    // *** LA CORREZIONE DEFINITIVA È QUI ***
-    // Tentiamo di usare lo scope più specifico menzionato nella documentazione,
-    // invece di quello generico 'uid'.
     const body = new URLSearchParams();
     body.append('grant_type', 'client_credentials');
     body.append('scope', 'trademark-search.trademarks.read');
-
-    try {
-        const response = await fetch(tokenUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'Authorization': `Basic ${basicAuth}`,
-            },
-            body: body,
-        });
-
-        const responseData = await response.json();
-        if (!response.ok) {
-            console.error('ERRORE dall\'endpoint del token:', JSON.stringify(responseData, null, 2));
-            throw new Error('Autenticazione fallita. Verificare che le credenziali EUIPO siano corrette e abilitate per questo scope.');
-        }
-
-        console.log('Token di accesso ottenuto con successo.');
-        return responseData.access_token;
-    } catch (error) {
-        console.error('Errore di rete critico nella richiesta del token:', error);
-        throw new Error('Impossibile contattare il server di autenticazione EUIPO.');
-    }
+    
+    const response = await fetch(tokenUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Authorization': `Basic ${basicAuth}` },
+        body: body,
+    });
+    const responseData = await response.json();
+    if (!response.ok) throw new Error('Autenticazione EUIPO fallita.');
+    return responseData.access_token;
 }
 
-// Funzione helper per analizzare la risposta (invariata)
+// Funzione per cercare marchi su EUIPO (invariata)
+async function searchEuipoTrademarks(brandName, accessToken, clientId) {
+    const searchApiUrl = `https://api.euipo.europa.eu/trademark-search/trademarks`;
+    const rsqlQuery = `wordMarkSpecification.verbalElement==*${brandName}*`;
+    const urlWithQuery = `${searchApiUrl}?query=${encodeURIComponent(rsqlQuery)}&size=10`;
+    
+    const searchResponse = await fetch(urlWithQuery, {
+        method: 'GET',
+        headers: { 'Authorization': `Bearer ${accessToken}`, 'X-IBM-Client-Id': clientId },
+    });
+    if (!searchResponse.ok) throw new Error('Ricerca EUIPO fallita.');
+    return await searchResponse.json();
+}
+
+// Funzione per analizzare i risultati di EUIPO (invariata)
 function parseEuipoResponse(jsonResponse) {
     const similarMarks = [];
     const records = jsonResponse?.trademarks || [];
-    console.log(`Trovati ${records.length} record nella risposta.`);
     for (const record of records) {
         similarMarks.push({
             name: record.wordMarkSpecification?.verbalElement || 'N/D',
@@ -57,67 +51,94 @@ function parseEuipoResponse(jsonResponse) {
     return { similarMarks };
 }
 
-// Funzione principale del backend (invariata)
+// *** FUNZIONE AGGIORNATA: GENERAZIONE GIUDIZIO TRAMITE GEMINI ***
+async function getSyntheticJudgment(payload, euipoResults) {
+    const { brandName, selectedClasses, selectedCountries } = payload;
+    const { similarMarks } = euipoResults;
+
+    // Costruiamo un prompt dettagliato per l'AI
+    let prompt = `Sei un esperto avvocato specializzato in proprietà intellettuale. Analizza i seguenti dati per fornire un giudizio sintetico (massimo 30 righe, usa un tono professionale e chiaro) sul rischio di confondibilità per un nuovo marchio.
+
+**Dati del Nuovo Marchio:**
+- **Nome Proposto:** "${brandName}"
+- **Classi di Nizza Selezionate:** ${selectedClasses.join(', ')}
+- **Territori di Interesse:** ${selectedCountries.join(', ')}
+
+**Marchi Simili Trovati nella Banca Dati EUIPO:**
+`;
+
+    if (similarMarks.length > 0) {
+        prompt += similarMarks.map(mark => `- Nome: "${mark.name}", Titolare: ${mark.owner}, Stato: ${mark.status}, Classi: ${mark.classes}`).join('\n');
+    } else {
+        prompt += "- Nessun marchio simile trovato. Questo è un fattore molto positivo.";
+    }
+
+    prompt += `
+
+**Analisi Richiesta:**
+Valuta il rischio di confondibilità considerando, in ordine di importanza:
+1.  **Somiglianza:** Analizza la somiglianza fonetica e concettuale tra "${brandName}" e i marchi trovati.
+2.  **Affinità Merceologica:** Valuta la sovrapposizione tra le classi selezionate (${selectedClasses.join(', ')}) e le classi dei marchi trovati. Se le classi sono identiche o molto affini (es. 3 (cosmetici) e 5 (farmaceutici)), il rischio è molto più alto.
+3.  **Sovrapposizione Territoriale:** Considera se i marchi confrontati coprono gli stessi territori. Valuta l'impatto di questo sulla selezione dei territori dell'utente.
+
+Concludi con una valutazione finale del rischio (Basso, Moderato, Medio, Alto, Molto Alto) e un breve consiglio strategico.`;
+    
+    // Chiamata all'API di Gemini con chiave API inserita direttamente.
+    const geminiApiKey = "AIzaSyBcRHmCYBvw_9Ya4b3Q0jLWNyD9fwyhvwI";
+    
+    // Utilizzo del modello gemini-2.0-flash
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiApiKey}`;
+    
+    const geminiResponse = await fetch(geminiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+    });
+
+    if (!geminiResponse.ok) {
+        const errorData = await geminiResponse.json();
+        console.error("Errore da Gemini:", errorData);
+        throw new Error("Il servizio AI non è riuscito a generare un giudizio.");
+    }
+
+    const geminiData = await geminiResponse.json();
+    return geminiData.candidates[0].content.parts[0].text;
+}
+
+
+// Funzione principale del backend, ora orchestra tutto
 module.exports = async (request, response) => {
-    console.log('--- Inizio esecuzione backend CommonJS /api/search ---');
     response.setHeader('Access-Control-Allow-Origin', '*');
-    response.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-    response.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
-    if (request.method === 'OPTIONS') {
-        return response.status(200).end();
-    }
-
-    const { brandName } = request.body;
-    if (!brandName) {
-        return response.status(400).json({ message: 'Il nome del brand è richiesto.' });
-    }
-    console.log(`Ricerca per il brand: "${brandName}"`);
-
-    const CLIENT_ID = process.env.EUIPO_CLIENT_ID;
-    const CLIENT_SECRET = process.env.EUIPO_CLIENT_SECRET;
-
-    if (!CLIENT_ID || !CLIENT_SECRET) {
-        const msg = 'Errore di configurazione del server: EUIPO_CLIENT_ID e/o EUIPO_CLIENT_SECRET non sono impostati su Vercel.';
-        console.error(msg);
-        return response.status(500).json({ message: msg });
-    }
+    if (request.method === 'OPTIONS') return response.status(200).end();
 
     try {
-        const accessToken = await getAccessToken(CLIENT_ID, CLIENT_SECRET);
-        console.log('Token ricevuto, procedo con la ricerca del marchio...');
-
-        const searchApiUrl = `https://api.euipo.europa.eu/trademark-search/trademarks`;
-        const rsqlQuery = `wordMarkSpecification.verbalElement==*${brandName}*`;
-        const urlWithQuery = `${searchApiUrl}?query=${encodeURIComponent(rsqlQuery)}&size=20`;
-        console.log(`URL di ricerca costruito: ${urlWithQuery}`);
-
-        const searchResponse = await fetch(urlWithQuery, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${accessToken}`,
-                'X-IBM-Client-Id': CLIENT_ID,
-            },
-        });
+        const payload = request.body;
+        if (!payload.brandName) return response.status(400).json({ message: 'Dati mancanti.' });
         
-        const responseText = await searchResponse.text();
-
-        if (!searchResponse.ok) {
-            console.error(`ERRORE dalla ricerca EUIPO: Status ${searchResponse.status}`);
-            console.error(`Testo della risposta di errore: ${responseText}`);
-            throw new Error(`Il server EUIPO ha risposto con un errore. Controllare i log di Vercel per i dettagli.`);
+        // La variabile GEMINI_API_KEY non viene più letta da process.env
+        // ma è inserita direttamente nella funzione getSyntheticJudgment.
+        const { EUIPO_CLIENT_ID, EUIPO_CLIENT_SECRET } = process.env;
+        if (!EUIPO_CLIENT_ID || !EUIPO_CLIENT_SECRET) {
+            throw new Error('Credenziali EUIPO non configurate.');
         }
 
-        console.log('Risposta dalla ricerca EUIPO ottenuta con successo.');
-        const resultJSON = JSON.parse(responseText);
-        const parsedResults = parseEuipoResponse(resultJSON);
+        // 1. Chiamata a EUIPO
+        const accessToken = await getAccessToken(EUIPO_CLIENT_ID, EUIPO_CLIENT_SECRET);
+        const euipoJson = await searchEuipoTrademarks(payload.brandName, accessToken, EUIPO_CLIENT_ID);
+        const euipoResults = parseEuipoResponse(euipoJson);
 
-        console.log('--- Fine esecuzione backend (Successo) ---');
-        return response.status(200).json(parsedResults);
+        // 2. Chiamata a Gemini per il giudizio
+        const syntheticJudgment = await getSyntheticJudgment(payload, euipoResults);
+
+        // 3. Invio della risposta combinata al frontend
+        return response.status(200).json({
+            similarMarks: euipoResults.similarMarks,
+            syntheticJudgment: syntheticJudgment
+        });
 
     } catch (error) {
-        console.error("ERRORE CRITICO nel blocco principale del backend:", error);
-        console.log('--- Fine esecuzione backend (Fallimento) ---');
-        return response.status(500).json({ message: error.message || 'Errore interno del server non gestito.' });
+        console.error("ERRORE CRITICO nel backend:", error);
+        return response.status(500).json({ error: true, message: error.message });
     }
 };
+
