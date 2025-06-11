@@ -3,34 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Intellimark.ai - Beta con Analisi AI</title>
-    <!-- Versione 10.0 - Aggiunti filtri avanzati e giudizio AI -->
+    <title>Intellimark.ai - Beta con Analisi AI Avanzata</title>
+    <!-- Versione 12.0 - UX Semplificata con Classificazione AI -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Aggiunta libreria per selettori avanzati -->
     <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root { --color-primary-start: #0A2A5B; --color-primary-end: #4A0E69; --color-green: #28A745; --color-yellow: #FFC107; --color-red: #DC3545; }
-        body { font-family: 'Figtree', sans-serif; background-color: #F8F9FA; }
+        :root {
+            --color-primary-start: #0A2A5B;
+            --color-primary-end: #4A0E69;
+            --color-green: #16a34a;
+            --color-yellow: #facc15;
+            --color-red: #dc2626;
+        }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
         .gradient-text { background: linear-gradient(to right, var(--color-primary-start), var(--color-primary-end)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .btn-gradient { background: linear-gradient(to right, var(--color-primary-start), var(--color-primary-end)); }
         .hidden { display: none !important; }
-        #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(248, 249, 250, 0.8); backdrop-filter: blur(5px); z-index: 100; display: flex; align-items: center; justify-content: center; }
+        #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(248, 250, 252, 0.8); backdrop-filter: blur(5px); z-index: 100; display: flex; align-items: center; justify-content: center; }
         .spinner { border: 6px solid #e2e8f0; border-top: 6px solid var(--color-primary-start); border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        /* Stile per i selettori Tom-Select */
-        .ts-control { border-radius: 9999px !important; border: 2px solid transparent !important; padding: 0.8rem 1rem !important; }
-        .ts-control:focus, .ts-wrapper.focus .ts-control { box-shadow: 0 0 0 2px #3b82f6 !important; border-color: transparent !important; }
+        .ts-control { border-radius: 0.5rem !important; border: 1px solid #e5e7eb !important; padding: 0.8rem 1rem !important; }
+        .ts-control:focus, .ts-wrapper.focus .ts-control { box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4) !important; border-color: #3b82f6 !important; }
+        .ts-control > .item { background-color: var(--color-primary-start) !important; color: white !important; border-radius: 0.25rem !important; }
+        .result-card { background-color: white; border-radius: 0.75rem; border: 1px solid #e5e7eb; padding: 1.5rem; box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.05); }
     </style>
 </head>
-<body class="antialiased text-gray-800">
-    <div id="loading-overlay" class="hidden"> <div class="text-center"> <div class="spinner mx-auto"></div> <p class="mt-4 text-lg font-semibold font-inter text-gray-700">Analisi in corso...</p> </div> </div>
+<body class="antialiased text-slate-700">
+    <div id="loading-overlay" class="hidden"> <div class="text-center"> <div class="spinner mx-auto"></div> <p class="mt-4 text-lg font-semibold text-slate-800">Analisi AI in corso...</p> </div> </div>
     <div id="app-container">
-        <header id="main-header" class="bg-white/80 backdrop-blur-sm sticky top-0 z-40 border-b border-gray-200/80">
+        <header class="bg-white/80 backdrop-blur-sm sticky top-0 z-40 border-b border-slate-200/80">
             <div class="container mx-auto px-6 py-4 flex justify-between items-center">
                 <a href="#" class="font-inter font-bold text-2xl gradient-text" onclick="location.reload(); return false;" aria-label="Homepage di Intellimark.ai"> Intellimark.ai </a>
             </div>
@@ -38,39 +44,44 @@
         <main>
             <section id="home-screen" class="fade-in">
                 <div class="container mx-auto px-6 py-16 md:py-24 text-center">
-                    <h1 class="text-4xl md:text-6xl font-extrabold font-inter text-gray-900 leading-tight">Il tuo brand ha <span class="gradient-text">potenziale?</span></h1>
-                    <div class="mt-10 max-w-3xl mx-auto space-y-4">
-                        <div class="shadow-lg rounded-full">
-                            <input id="brand-search-input" type="text" placeholder="1. Inserisci il nome del tuo brand..." class="w-full py-4 px-6 rounded-full text-lg border-2 border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <h1 class="text-4xl md:text-6xl font-extrabold text-slate-900 leading-tight">Il tuo brand ha <span class="gradient-text">potenziale?</span></h1>
+                    <p class="mt-4 max-w-2xl mx-auto text-lg text-slate-600">Ottieni un'analisi strategica basata sui dati ufficiali e sul giudizio della nostra AI.</p>
+                    <div class="mt-10 max-w-3xl mx-auto space-y-4 text-left">
+                        <div class="bg-white p-6 rounded-xl shadow-md border border-slate-200">
+                            <label for="brand-search-input" class="block text-sm font-semibold text-slate-700 mb-2">1. Inserisci il nome del brand</label>
+                            <input id="brand-search-input" type="text" placeholder="Es. Intellimark" class="w-full p-3 rounded-md text-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
                         </div>
-                        <div class="grid md:grid-cols-2 gap-4">
-                            <div class="shadow-lg rounded-full">
-                                <select id="select-classes" multiple placeholder="2. Seleziona le Classi di Nizza..."></select>
-                            </div>
-                            <div class="shadow-lg rounded-full">
-                                <select id="select-countries" multiple placeholder="3. Seleziona i territori..."></select>
-                            </div>
+                        <div class="bg-white p-6 rounded-xl shadow-md border border-slate-200">
+                             <label for="product-description" class="block text-sm font-semibold text-slate-700 mb-2">2. Descrivi i prodotti o servizi da registrare</label>
+                             <textarea id="product-description" rows="3" placeholder="Es. abbigliamento, scarpe, borse in pelle, servizi di pulizia per uffici..." class="w-full p-3 rounded-md text-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
                         </div>
-                        <div>
-                            <button id="start-search-btn" class="w-full md:w-auto btn-gradient text-white font-bold py-4 px-10 rounded-full text-lg shadow-lg hover:shadow-xl transition-shadow">Analizza Ora</button>
+                        <div class="bg-white p-6 rounded-xl shadow-md border border-slate-200">
+                            <label for="select-countries" class="block text-sm font-semibold text-slate-700 mb-2">3. Seleziona i territori di registrazione</label>
+                            <select id="select-countries" multiple></select>
+                        </div>
+                        <div class="text-center pt-4">
+                            <button id="start-search-btn" class="w-full md:w-auto btn-gradient text-white font-bold py-4 px-10 rounded-full text-lg shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5">Analizza Ora</button>
                         </div>
                     </div>
                 </div>
             </section>
             <section id="results-screen" class="hidden" aria-live="polite">
-                <div class="bg-white border-b border-gray-200/80">
-                    <div class="container mx-auto px-6 py-4"><h2 class="text-xl font-semibold">Risultati Analisi per: <span id="searched-brand-name" class="font-bold gradient-text"></span></h2></div>
+                <div class="bg-white border-b border-slate-200/80">
+                    <div class="container mx-auto px-6 py-4"><h2 class="text-xl font-semibold text-slate-800">Risultati Analisi per: <span id="searched-brand-name" class="font-bold gradient-text"></span></h2></div>
                 </div>
                 <div class="container mx-auto px-6 py-12">
-                    <div class="grid lg:grid-cols-3 gap-8">
-                        <div class="lg:col-span-1 bg-white p-6 md:p-8 rounded-2xl shadow-sm border">
-                            <h3 class="text-2xl font-bold font-inter text-center">Brand Potential Score™</h3>
-                             <div class="relative w-full max-w-[300px] mx-auto h-[150px] md:h-[200px]"> <canvas id="brandScoreChart"></canvas> <div class="absolute inset-0 flex flex-col items-center justify-center font-inter"> <span id="score-value" class="text-5xl font-extrabold text-gray-800"></span> <span class="text-lg font-semibold text-gray-500">/ 100</span> </div> </div>
-                            <div class="mt-8 space-y-6"> <div><div class="flex justify-between font-semibold mb-1"><span>Rischio di Confusione</span><span id="pillar2-value" class="font-bold"></span></div><div class="w-full bg-gray-200 rounded-full h-3"><div id="pillar2-bar" class="h-3 rounded-full transition-all duration-500"></div></div></div> </div>
+                    <div class="grid lg:grid-cols-12 gap-8">
+                        <div class="lg:col-span-4">
+                            <div class="result-card text-center sticky top-24">
+                                <h3 class="text-xl font-bold text-slate-800">Brand Risk Score™</h3>
+                                <p class="text-sm text-slate-500 mb-4">Un punteggio basso indica un rischio minore</p>
+                                <div class="relative w-full max-w-[250px] mx-auto h-[125px]"> <canvas id="brandScoreChart"></canvas> <div class="absolute inset-0 flex flex-col items-center justify-center font-inter"> <span id="score-value" class="text-5xl font-extrabold text-slate-800"></span> <span class="text-lg font-semibold text-slate-500">/ 100</span> </div> </div>
+                                <div id="ai-classes-container" class="mt-6 text-left"></div>
+                            </div>
                         </div>
-                        <div class="lg:col-span-2 space-y-6">
-                            <div class="bg-white p-6 rounded-2xl shadow-sm border"><h4 class="text-xl font-bold font-inter mb-3">Giudizio Sintetico AI</h4><p id="synthetic-judgment" class="text-gray-700 whitespace-pre-line leading-relaxed"></p></div>
-                            <div class="bg-white p-6 rounded-2xl shadow-sm border"><h4 class="text-xl font-bold font-inter mb-3">Marchi Simili Trovati (Banca Dati EUIPO)</h4><div id="anteriority-results-container"><p class="text-gray-500">I risultati della ricerca di anteriorità appariranno qui...</p></div></div>
+                        <div class="lg:col-span-8 space-y-6">
+                            <div class="result-card"><h4 class="text-xl font-bold text-slate-800 mb-3">Giudizio Sintetico AI</h4><p id="synthetic-judgment" class="text-slate-700 whitespace-pre-line leading-relaxed"></p></div>
+                            <div class="result-card"><h4 class="text-xl font-bold text-slate-800 mb-3">Marchi Simili Trovati (Banca Dati EUIPO)</h4><div id="anteriority-results-container"><p class="text-slate-500">I risultati della ricerca di anteriorità appariranno qui...</p></div></div>
                             <div id="error-box" class="hidden bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-lg" role="alert"> <p class="font-bold">Errore di comunicazione</p> <p id="error-message"></p> </div>
                         </div>
                     </div>
@@ -81,19 +92,20 @@
 
     <script>
     const AppController = (function() {
-        const state = { brandScoreChart: null, tomSelectClasses: null, tomSelectCountries: null };
+        const state = { brandScoreChart: null, tomSelectCountries: null };
         const elements = {
             homeScreen: document.getElementById('home-screen'),
             resultsScreen: document.getElementById('results-screen'),
             startSearchBtn: document.getElementById('start-search-btn'),
             brandSearchInput: document.getElementById('brand-search-input'),
+            productDescription: document.getElementById('product-description'),
             searchedBrandName: document.getElementById('searched-brand-name'),
             loadingOverlay: document.getElementById('loading-overlay'),
             scoreValue: document.getElementById('score-value'),
             brandScoreChartCanvas: document.getElementById('brandScoreChart'),
-            pillars: { p2: { value: document.getElementById('pillar2-value'), bar: document.getElementById('pillar2-bar') } },
             anteriorityContainer: document.getElementById('anteriority-results-container'),
             syntheticJudgment: document.getElementById('synthetic-judgment'),
+            aiClassesContainer: document.getElementById('ai-classes-container'),
             errorBox: document.getElementById('error-box'),
             errorMessage: document.getElementById('error-message'),
         };
@@ -122,53 +134,67 @@
                 
                 if (results.error) {
                     this.showError(results.message);
+                    elements.syntheticJudgment.textContent = 'Impossibile generare il giudizio a causa di un errore.';
                     this.updateAnteriorityWithError();
-                    elements.syntheticJudgment.textContent = 'Impossibile generare il giudizio a causa di un errore nella ricerca.';
                     this.updateMetrics([]);
                 } else {
                     this.hideError();
                     this.updateAnteriorityResults(results.similarMarks);
                     this.updateSyntheticJudgment(results.syntheticJudgment);
+                    this.updateAiIdentifiedClasses(results.identifiedClasses);
                     this.updateMetrics(results.similarMarks);
                 }
             },
             updateAnteriorityResults(similarMarks) {
-                elements.anteriorityContainer.innerHTML = ''; 
+                const container = elements.anteriorityContainer;
+                container.innerHTML = ''; 
                 if (!similarMarks || similarMarks.length === 0) {
-                    elements.anteriorityContainer.innerHTML = `<p class="text-green-700 font-semibold">🎉 Ottima notizia! Nessun marchio simile trovato nella banca dati EUIPO.</p>`;
+                    container.innerHTML = `<div class="text-center p-6 bg-green-50 border border-green-200 rounded-lg"><p class="font-semibold text-green-800">🎉 Ottima notizia!</p><p class="text-green-700">Nessun marchio simile trovato nelle banche dati per le classi identificate.</p></div>`;
                     return;
                 }
-                let html = `<p class="text-gray-600 mb-4">Trovati <span class="font-bold">${similarMarks.length} marchi registrati</span> con potenziale di conflitto:</p><div class="space-y-3 max-h-[40rem] overflow-y-auto pr-2">`;
+                let html = `<p class="text-slate-600 mb-4">Trovati <span class="font-bold">${similarMarks.length} marchi registrati</span> con potenziale di conflitto:</p><div class="space-y-4">`;
                 similarMarks.forEach(mark => {
-                    html += `<div class="p-4 border rounded-lg bg-gray-50/50"><div class="flex justify-between items-start gap-4"><div class="flex-grow"><p class="font-bold text-lg">${mark.name}</p><p class="text-sm text-gray-500 mt-1">Titolare: ${mark.owner}</p></div><span class="font-semibold text-xs text-right whitespace-nowrap px-2 py-1 rounded-full bg-gray-200">${mark.status}</span></div><div class="mt-2 pt-2 border-t border-gray-200 flex justify-between text-sm text-gray-600"><span>Classi di Nizza: <b>${mark.classes}</b></span><span>N°: ${mark.applicationNumber}</span></div></div>`;
+                    const statusInfo = this.getStatusInfo(mark.status);
+                    html += `<div class="p-4 border border-slate-200 rounded-lg bg-slate-50/50"><div class="flex justify-between items-start gap-4"><div class="flex-grow"><p class="font-bold text-lg text-slate-800">${mark.name}</p><p class="text-sm text-slate-500 mt-1">Titolare: ${mark.owner}</p></div><span class="font-semibold text-xs text-right whitespace-nowrap px-2.5 py-1 rounded-full ${statusInfo.classes}">${statusInfo.text}</span></div><div class="mt-3 pt-3 border-t border-slate-200 flex justify-between text-sm text-slate-600"><span>Classi di Nizza: <b>${mark.classes}</b></span><span>N°: ${mark.applicationNumber}</span></div></div>`;
                 });
                 html += `</div>`;
-                elements.anteriorityContainer.innerHTML = html;
+                container.innerHTML = html;
+            },
+            getStatusInfo(status) {
+                const s = (status || "").toLowerCase();
+                if (s.includes('registered')) return { text: 'REGISTRATO', classes: 'bg-green-100 text-green-800' };
+                if (s.includes('refused') || s.includes('expired') || s.includes('cancelled') || s.includes('withdrawn')) return { text: 'NON ATTIVO', classes: 'bg-red-100 text-red-800' };
+                return { text: status.toUpperCase(), classes: 'bg-yellow-100 text-yellow-800' };
             },
             updateSyntheticJudgment(judgment) {
                 elements.syntheticJudgment.textContent = judgment || "Non è stato possibile generare un giudizio sintetico.";
             },
+             updateAiIdentifiedClasses(classes) {
+                const container = elements.aiClassesContainer;
+                container.innerHTML = '';
+                if (!classes || classes.length === 0) {
+                    container.innerHTML = `<p class="text-sm text-red-600">L'AI non è riuscita a identificare classi pertinenti dalla tua descrizione.</p>`;
+                    return;
+                }
+                let html = `<h4 class="font-semibold text-slate-800 mb-2">Classi identificate dall'AI:</h4><div class="flex flex-wrap gap-2">`;
+                classes.forEach(c => {
+                    html += `<span class="bg-blue-100 text-blue-800 text-sm font-medium px-2.5 py-1 rounded-full">Classe ${c}</span>`;
+                });
+                html += `</div>`;
+                container.innerHTML = html;
+            },
             updateMetrics(similarMarks = []) {
                 const riskScore = 100 - (similarMarks.length * 8);
                 const score = Math.max(10, riskScore);
-                const update = (pillarId, value, labels) => {
-                    let label = value > 75 ? labels[0] : (value > 40 ? labels[1] : labels[2]);
-                    let color = ui.getScoreColor(value);
-                    elements.pillars[pillarId].value.textContent = `${value}% (${label})`;
-                    elements.pillars[pillarId].bar.style.width = `${value}%`;
-                    elements.pillars[pillarId].bar.style.backgroundColor = color;
-                };
-                update('p2', score, ['Basso', 'Medio', 'Alto']);
                 this.createOrUpdateChart(score);
             },
             createOrUpdateChart(score) {
-                const scoreColor = ui.getScoreColor(score);
-                elements.scoreValue.textContent = score;
-                elements.scoreValue.style.color = scoreColor;
-                const data = { datasets: [{ data: [score, 100 - score], backgroundColor: [scoreColor, '#E5E7EB'], borderWidth: 0, circumference: 180, rotation: 270 }] };
-                const options = { responsive: true, maintainAspectRatio: false, cutout: '80%', plugins: { tooltip: { enabled: false } }, events: [] };
+                const scoreColor = ui.getScoreColor(score, true);
+                const chartCanvas = elements.brandScoreChartCanvas;
                 if (state.brandScoreChart) state.brandScoreChart.destroy();
-                state.brandScoreChart = new Chart(elements.brandScoreChartCanvas, { type: 'doughnut', data, options });
+                state.brandScoreChart = new Chart(chartCanvas, { type: 'doughnut', data: { datasets: [{ data: [100 - score, score], backgroundColor: [scoreColor, '#e2e8f0'], borderWidth: 0, circumference: 180, rotation: 270 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '80%', plugins: { tooltip: { enabled: false } } } });
+                elements.scoreValue.textContent = 100 - score;
+                elements.scoreValue.style.color = scoreColor;
             },
             showError(message) {
                 elements.errorMessage.textContent = `Dettaglio: ${message}`;
@@ -180,61 +206,45 @@
         const ui = {
             showLoading() { elements.loadingOverlay.classList.remove('hidden'); },
             hideLoading() { elements.loadingOverlay.classList.add('hidden'); },
-            getScoreColor: score => score < 40 ? 'var(--color-red)' : (score < 75 ? 'var(--color-yellow)' : 'var(--color-green)'),
-            async handleSearch() {
-                const brandName = elements.brandSearchInput.value.trim();
-                const selectedClasses = state.tomSelectClasses.getValue();
-                const selectedCountries = state.tomSelectCountries.getValue();
-
-                if (!brandName) { alert('Per favore, inserisci un nome per il brand.'); return; }
-                if (selectedClasses.length === 0) { alert('Per favore, seleziona almeno una Classe di Nizza.'); return; }
-                if (selectedCountries.length === 0) { alert('Per favore, seleziona almeno un territorio di registrazione.'); return; }
-                
-                const payload = { brandName, selectedClasses, selectedCountries };
-                
-                ui.showLoading();
-                try {
-                    const results = await api.getAnalysis(payload);
-                    render.fullResultsPage(brandName, results);
-                } catch (error) {
-                    render.fullResultsPage(brandName, { error: true, message: error.message });
-                } finally {
-                    ui.hideLoading();
-                }
+            getScoreColor: (score, isRisk = false) => {
+                let effectiveScore = isRisk ? 100 - score : score;
+                if (effectiveScore < 40) return 'var(--color-red)';
+                if (effectiveScore < 75) return 'var(--color-yellow)';
+                return 'var(--color-green)';
             },
+            async handleSearch() {
+                 const brandName = elements.brandSearchInput.value.trim();
+                 const productDescription = elements.productDescription.value.trim();
+                 const selectedCountries = state.tomSelectCountries.getValue();
+                 if (!brandName || !productDescription || selectedCountries.length === 0) {
+                     alert('Per favore, compila tutti i campi di ricerca.');
+                     return;
+                 }
+                 ui.showLoading();
+                 try {
+                     const results = await api.getAnalysis({ brandName, productDescription, selectedCountries });
+                     render.fullResultsPage(brandName, results);
+                 } catch (error) {
+                     render.fullResultsPage(brandName, { error: true, message: error.message });
+                 } finally {
+                     ui.hideLoading();
+                 }
+            }
         };
-
-        function setupTomSelect() {
-            // Dati per le Classi di Nizza (1-45)
-            const niceClassesOptions = Array.from({length: 45}, (_, i) => ({ value: i + 1, text: `Classe ${i + 1}` }));
-            
-            // Dati per i Paesi/Regioni
+        
+        function initializeApp() {
+            document.getElementById('loading-overlay').classList.add('hidden');
             const countryOptions = [
                 {value: 'IT', text: 'Italia'}, {value: 'EU', text: 'Unione Europea'}, {value: 'DE', text: 'Germania'},
-                {value: 'FR', text: 'Francia'}, {value: 'ES', text: 'Spagna'}, {value: 'UK', text: 'Regno Unito'},
+                {value: 'FR', text: 'Francia'}, {value: 'ES', text: 'Spagna'}, {value: 'GB', text: 'Regno Unito'},
                 {value: 'US', text: 'Stati Uniti'}, {value: 'CN', text: 'Cina'}, {value: 'JP', text: 'Giappone'},
-                {value: 'WIPO', text: 'Internazionale (WIPO)'}
+                {value: 'WO', text: 'Internazionale (WIPO)'}
             ];
-
-            state.tomSelectClasses = new TomSelect('#select-classes', {
-                plugins: ['remove_button'],
-                options: niceClassesOptions,
-                maxItems: 10
-            });
-            state.tomSelectCountries = new TomSelect('#select-countries', {
-                plugins: ['remove_button'],
-                options: countryOptions,
-                maxItems: 5
-            });
-        }
-
-        function init() {
-            elements.loadingOverlay.classList.add('hidden');
-            setupTomSelect();
+            state.tomSelectCountries = new TomSelect('#select-countries', { plugins: ['remove_button'], maxItems: 5, placeholder: "Es. Italia, EU...", options: countryOptions });
             elements.startSearchBtn.addEventListener('click', ui.handleSearch);
         }
-        
-        return { init };
+
+        return { init: initializeApp };
     })();
 
     document.addEventListener('DOMContentLoaded', AppController.init);
@@ -243,50 +253,90 @@
 </html>
 ```
 
-### 2. Il Backend con "Cervello" AI: `api/search.js`
+### 3. Il Backend Potenziato con AI a due Fasi
 
-Questo backend è stato potenziato enormemente. Ora non solo chiama l'EUIPO, ma usa i risultati per costruire un prompt dettagliato e lo invia all'API di Gemini per ottenere il suo giudizio di confondibilità.
+Questo backend è il vero motore della nuova funzionalità. È stato profondamente modificato per gestire il flusso di classificazione e giudizio.
 
 
 ```javascript
-// Questo file deve trovarsi in: /api/search.js
-// Aggiunge la logica per chiamare Gemini e generare un giudizio sintetico.
+// File: /api/search.js
+// Logica del backend che esegue un'analisi AI a due fasi.
 
 const fetch = require('node-fetch');
 
-// Funzione per ottenere il token di accesso EUIPO (invariata)
+// --- DATABASE DELLE CLASSI DI NIZZA (dal suo PDF) ---
+const NICE_CLASSES_KNOWLEDGE_BASE = `
+Classe 1: Prodotti chimici per industria, scienze, fotografia, agricoltura, orticoltura, silvicoltura; resine artificiali e materie plastiche grezze; composizioni per estinguere incendi; preparati per tempera e saldatura metalli; sostanze per concia; adesivi industriali; compost, concimi.
+Classe 2: Pitture, vernici, lacche; prodotti preservanti da ruggine e deterioramento del legno; coloranti, tinte; inchiostri per stampa; resine naturali grezze; metalli in fogli e polvere per pittura e decorazione.
+Classe 3: Cosmetici e preparati per toeletta non medicati; dentifrici non medicati; profumeria, oli essenziali; preparati per sbianca e bucato; preparati per pulire, lucidare, sgrassare e abradere.
+Classe 4: Oli e grassi industriali, cera; lubrificanti; prodotti per assorbire polvere; combustibili e materie illuminanti; candele e stoppini.
+Classe 5: Prodotti farmaceutici, medici e veterinari; preparazioni sanitarie per uso medico; alimenti e sostanze dietetiche per uso medico o veterinario, alimenti per neonati; integratori alimentari; cerotti, materiali per medicazioni; disinfettanti; fungicidi, erbicidi.
+Classe 6: Metalli comuni e loro leghe, minerali; materiali metallici per edilizia; costruzioni trasportabili metalliche; cavi e fili non elettrici; chincaglieria metallica; contenitori metallici; casseforti.
+Classe 7: Macchine, macchine-utensili, utensili a corrente; motori (eccetto per veicoli terrestri); giunti e organi di trasmissione; strumenti agricoli (non manuali); incubatrici per uova; distributori automatici.
+Classe 8: Utensili e strumenti manuali; coltelleria, forchette e cucchiai; armi bianche; rasoi.
+Classe 9: Apparecchi e strumenti scientifici, di ricerca, di navigazione, geodetici, fotografici, cinematografici, audiovisivi, ottici, di pesata, di misura, di segnalazione, di salvataggio; software; computer; mute da sub; estintori.
+Classe 10: Apparecchi e strumenti chirurgici, medici, dentari e veterinari; membra, occhi e denti artificiali; articoli ortopedici; materiali di sutura; dispositivi per attività sessuali.
+Classe 11: Apparecchi per illuminazione, riscaldamento, cottura, refrigerazione, essiccamento, ventilazione, distribuzione d'acqua e impianti sanitari.
+Classe 12: Veicoli; apparecchi di locomozione terrestri, aerei o nautici.
+Classe 13: Armi da fuoco; munizioni e proiettili; esplosivi; fuochi d'artificio.
+Classe 14: Metalli preziosi e loro leghe; gioielleria, pietre preziose; orologeria e strumenti cronometrici.
+Classe 15: Strumenti musicali e loro accessori.
+Classe 16: Carta e cartone; stampati; articoli per legatoria; fotografie; cartoleria e articoli per ufficio; adesivi; materiale per disegno e artisti; pennelli; materiale per istruzione; fogli e buste in plastica per imballaggio.
+Classe 17: Caucciù, gomma, e succedanei; materie plastiche e resine semilavorate; materie per turare, stoppare e isolare; tubi flessibili non metallici.
+Classe 18: Cuoio e sue imitazioni; pelli di animali; bagagli, borse, ombrelli; bastoni da passeggio; fruste, selleria; collari e indumenti per animali.
+Classe 19: Materiali da costruzione non metallici; tubi rigidi non metallici per costruzione; asfalto, pece, bitume; costruzioni trasportabili non metalliche; monumenti non metallici.
+Classe 20: Mobili, specchi, cornici; contenitori non metallici; osso, corno, balena, madreperla; conchiglie; ambra.
+Classe 21: Utensili e recipienti per casa e cucina; pentole e vasellame; pettini e spugne; spazzole; materiali per pulizia; vetro grezzo; vetreria, porcellana, maiolica.
+Classe 22: Corde, stringhe, reti, tende, vele, sacchi; materiale per imbottitura; materie tessili fibrose grezze.
+Classe 23: Fili e filati per uso tessile.
+Classe 24: Tessuti e loro succedanei; biancheria da casa; tende in materia tessile o plastica.
+Classe 25: Articoli di abbigliamento, scarpe, cappelleria.
+Classe 26: Merletti, pizzi, ricami, nastri, lacci; bottoni, ganci, spille, aghi; fiori artificiali; decorazioni per capelli; capelli finti.
+Classe 27: Tappeti, zerbini, stuoie, linoleum e altri rivestimenti per pavimenti; tappezzerie non tessili.
+Classe 28: Giochi, giocattoli; apparecchi di videogiochi; articoli per ginnastica e sport; decorazioni per alberi di Natale.
+Classe 29: Carne, pesce, pollame, selvaggina; estratti di carne; frutta e ortaggi conservati, congelati, essiccati e cotti; gelatine, marmellate; uova; latte e latticini; oli e grassi per alimenti.
+Classe 30: Caffè, tè, cacao; riso, pasta; farine e preparati di cereali; pane, pasticceria, dolciumi; cioccolato; gelati; zucchero, miele; lievito; sale, condimenti, spezie; aceto, salse.
+Classe 31: Prodotti agricoli, acquacoltura, orticoli e forestali grezzi; granaglie e sementi; frutta e ortaggi freschi, erbe fresche; piante e fiori naturali; animali vivi; alimenti per animali; malto.
+Classe 32: Birre; bevande analcoliche; acque minerali e gassose; bevande di frutta e succhi; sciroppi per bevande.
+Classe 33: Bevande alcoliche (eccetto le birre); preparati alcolici per bevande.
+Classe 34: Tabacco e succedanei; articoli per fumatori; fiammiferi; sigarette elettroniche.
+Classe 35: Pubblicità; gestione, organizzazione e amministrazione aziendale; lavori d'ufficio.
+Classe 36: Servizi finanziari, monetari e bancari; servizi di assicurazioni; servizi immobiliari.
+Classe 37: Servizi di costruzione; servizi di installazione e riparazione; estrazioni minerarie.
+Classe 38: Servizi di telecomunicazioni.
+Classe 39: Trasporto; imballaggio e deposito di merci; organizzazione di viaggi.
+Classe 40: Trattamento di materiali; riciclaggio; purificazione aria e trattamento acqua; servizi di stampa; conservazione alimenti.
+Classe 41: Educazione; formazione; divertimento; attività sportive e culturali.
+Classe 42: Servizi scientifici e tecnologici, ricerca e progettazione; servizi di analisi e ricerche industriali; progettazione e sviluppo di hardware e software.
+Classe 43: Servizi di ristorazione (alimentazione); alloggi temporanei.
+Classe 44: Servizi medici; servizi veterinari; cure d'igiene e di bellezza per persone o animali; servizi di agricoltura, acquacoltura, orticoltura, silvicoltura.
+Classe 45: Servizi giuridici; servizi di sicurezza; servizi di incontri, social network online; servizi di pompe funebri; babysitting.
+`;
+
+// --- FUNZIONI HELPER ---
+
+// Ottiene il token di accesso dall'EUIPO (invariato)
 async function getAccessToken(clientId, clientSecret) {
     const tokenUrl = 'https://euipo.europa.eu/cas-server-webapp/oidc/accessToken';
     const basicAuth = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
-    const body = new URLSearchParams();
-    body.append('grant_type', 'client_credentials');
-    body.append('scope', 'trademark-search.trademarks.read');
-    
-    const response = await fetch(tokenUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Authorization': `Basic ${basicAuth}` },
-        body: body,
-    });
-    const responseData = await response.json();
-    if (!response.ok) throw new Error('Autenticazione EUIPO fallita.');
-    return responseData.access_token;
+    const body = new URLSearchParams({ grant_type: 'client_credentials', scope: 'trademark-search.trademarks.read' });
+    const response = await fetch(tokenUrl, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Authorization': `Basic ${basicAuth}` }, body });
+    const data = await response.json();
+    if (!response.ok) throw new Error('Autenticazione EUIPO fallita: ' + (data.error_description || 'Errore sconosciuto'));
+    return data.access_token;
 }
 
-// Funzione per cercare marchi su EUIPO (invariata)
-async function searchEuipoTrademarks(brandName, accessToken, clientId) {
+// Cerca marchi su EUIPO usando le classi identificate
+async function searchEuipoTrademarks(brandName, classes, accessToken, clientId) {
     const searchApiUrl = `https://api.euipo.europa.eu/trademark-search/trademarks`;
-    const rsqlQuery = `wordMarkSpecification.verbalElement==*${brandName}*`;
+    const rsqlQuery = `wordMarkSpecification.verbalElement==*${brandName}* and niceClasses=in=(${classes.join(',')})`;
     const urlWithQuery = `${searchApiUrl}?query=${encodeURIComponent(rsqlQuery)}&size=10`;
-    
-    const searchResponse = await fetch(urlWithQuery, {
-        method: 'GET',
-        headers: { 'Authorization': `Bearer ${accessToken}`, 'X-IBM-Client-Id': clientId },
-    });
-    if (!searchResponse.ok) throw new Error('Ricerca EUIPO fallita.');
-    return await searchResponse.json();
+    const response = await fetch(urlWithQuery, { headers: { 'Authorization': `Bearer ${accessToken}`, 'X-IBM-Client-Id': clientId } });
+    if (!response.ok) throw new Error('Ricerca EUIPO fallita.');
+    return response.json();
 }
 
-// Funzione per analizzare i risultati di EUIPO (invariata)
+// Analizza i risultati EUIPO (invariato)
 function parseEuipoResponse(jsonResponse) {
     const similarMarks = [];
     const records = jsonResponse?.trademarks || [];
@@ -302,87 +352,85 @@ function parseEuipoResponse(jsonResponse) {
     return { similarMarks };
 }
 
-// *** NUOVA FUNZIONE: GENERAZIONE GIUDIZIO TRAMITE GEMINI ***
-async function getSyntheticJudgment(payload, euipoResults) {
-    const { brandName, selectedClasses, selectedCountries } = payload;
-    const { similarMarks } = euipoResults;
-
-    // Costruiamo un prompt dettagliato per l'AI
-    let prompt = `Sei un esperto avvocato specializzato in proprietà intellettuale. Analizza i seguenti dati per fornire un giudizio sintetico (massimo 30 righe, usa un tono professionale e chiaro) sul rischio di confondibilità per un nuovo marchio.
-
-**Dati del Nuovo Marchio:**
-- **Nome Proposto:** "${brandName}"
-- **Classi di Nizza Selezionate:** ${selectedClasses.join(', ')}
-- **Territori di Interesse:** ${selectedCountries.join(', ')}
-
-**Marchi Simili Trovati nella Banca Dati EUIPO:**
-`;
-
-    if (similarMarks.length > 0) {
-        prompt += similarMarks.map(mark => `- Nome: "${mark.name}", Titolare: ${mark.owner}, Stato: ${mark.status}, Classi: ${mark.classes}`).join('\n');
-    } else {
-        prompt += "- Nessun marchio simile trovato. Questo è un fattore molto positivo.";
-    }
-
-    prompt += `
-
-**Analisi Richiesta:**
-Valuta il rischio di confondibilità considerando, in ordine di importanza:
-1.  **Somiglianza:** Analizza la somiglianza fonetica e concettuale tra "${brandName}" e i marchi trovati.
-2.  **Affinità Merceologica:** Valuta la sovrapposizione tra le classi selezionate (${selectedClasses.join(', ')}) e le classi dei marchi trovati. Se le classi sono identiche o molto affini (es. 3 (cosmetici) e 5 (farmaceutici)), il rischio è molto più alto.
-3.  **Sovrapposizione Territoriale:** Considera che i marchi EUIPO coprono tutti i territori dell'Unione Europea. Valuta l'impatto di questo sulla selezione dei territori dell'utente.
-
-Concludi con una valutazione finale del rischio (Basso, Medio, Alto) e un breve consiglio strategico.`;
-    
-    // Chiamata all'API di Gemini
-    const geminiApiKey = process.env.GEMINI_API_KEY; // Chiave API per Gemini, da impostare su Vercel
-    if (!geminiApiKey) throw new Error('API Key di Gemini non configurata sul server.');
-    
+// Funzione generica per chiamare l'API di Gemini
+async function callGeminiAPI(prompt) {
+    const geminiApiKey = "AIzaSyBcRHmCYBvw_9Ya4b3Q0jLWNyD9fwyhvwI";
     const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${geminiApiKey}`;
-    
-    const geminiResponse = await fetch(geminiUrl, {
+
+    const response = await fetch(geminiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
     });
 
-    if (!geminiResponse.ok) {
-        const errorData = await geminiResponse.json();
+    if (!response.ok) {
+        const errorData = await response.json();
         console.error("Errore da Gemini:", errorData);
-        throw new Error("Il servizio AI non è riuscito a generare un giudizio.");
+        throw new Error("Il servizio AI non è riuscito a rispondere.");
     }
 
-    const geminiData = await geminiResponse.json();
-    return geminiData.candidates[0].content.parts[0].text;
+    const data = await response.json();
+    return data.candidates[0].content.parts[0].text;
 }
 
 
-// Funzione principale del backend, ora orchestra tutto
+// --- FLUSSO PRINCIPALE DEL BACKEND ---
 module.exports = async (request, response) => {
     response.setHeader('Access-Control-Allow-Origin', '*');
     if (request.method === 'OPTIONS') return response.status(200).end();
 
     try {
         const payload = request.body;
-        if (!payload.brandName) return response.status(400).json({ message: 'Dati mancanti.' });
+        if (!payload.brandName || !payload.productDescription) {
+            return response.status(400).json({ message: 'Dati mancanti.' });
+        }
         
         const { EUIPO_CLIENT_ID, EUIPO_CLIENT_SECRET } = process.env;
         if (!EUIPO_CLIENT_ID || !EUIPO_CLIENT_SECRET) {
             throw new Error('Credenziali EUIPO non configurate.');
         }
 
-        // 1. Chiamata a EUIPO
+        // FASE 1: Classificazione AI dei prodotti/servizi
+        const classificationPrompt = `Sei un esperto di Classificazione di Nizza. Analizza la seguente descrizione di prodotti e servizi fornita da un utente e restituisci SOLO un elenco di numeri di classe pertinenti, separati da virgole, senza alcun testo aggiuntivo. Usa la seguente base di conoscenza per la tua analisi:\n\n${NICE_CLASSES_KNOWLEDGE_BASE}\n\nDescrizione Utente: "${payload.productDescription}"\n\nClassi pertinenti:`;
+        const identifiedClassesString = await callGeminiAPI(classificationPrompt);
+        const identifiedClasses = identifiedClassesString.split(',').map(c => parseInt(c.trim())).filter(c => !isNaN(c));
+
+        if (identifiedClasses.length === 0) {
+            throw new Error("L'AI non è riuscita a identificare classi pertinenti dalla descrizione fornita.");
+        }
+
+        // FASE 2: Ricerca EUIPO basata sulle classi identificate
         const accessToken = await getAccessToken(EUIPO_CLIENT_ID, EUIPO_CLIENT_SECRET);
-        const euipoJson = await searchEuipoTrademarks(payload.brandName, accessToken, EUIPO_CLIENT_ID);
+        const euipoJson = await searchEuipoTrademarks(payload.brandName, identifiedClasses, accessToken, EUIPO_CLIENT_ID);
         const euipoResults = parseEuipoResponse(euipoJson);
 
-        // 2. Chiamata a Gemini per il giudizio
-        const syntheticJudgment = await getSyntheticJudgment(payload, euipoResults);
+        // FASE 3: Giudizio AI basato su tutti i dati raccolti
+        let judgmentPrompt = `Sei un esperto avvocato specializzato in proprietà intellettuale. Fornisci un giudizio sintetico (massimo 30 righe, tono professionale e chiaro) sul rischio di confondibilità.
 
-        // 3. Invio della risposta combinata al frontend
+**Dati del Nuovo Marchio:**
+- Nome Proposto: "${payload.brandName}"
+- Descrizione Utente: "${payload.productDescription}"
+- Classi Identificate dall'AI: ${identifiedClasses.join(', ')}
+- Territori di Interesse: ${payload.selectedCountries.join(', ')}
+
+**Marchi Simili Trovati:**
+`;
+        if (euipoResults.similarMarks.length > 0) {
+            judgmentPrompt += euipoResults.similarMarks.map(mark => `- Nome: "${mark.name}", Stato: ${mark.status}, Classi: ${mark.classes}`).join('\n');
+        } else {
+            judgmentPrompt += "- Nessun marchio simile trovato. Questo è un fattore molto positivo.";
+        }
+        judgmentPrompt += `
+
+**Analisi Richiesta:**
+Valuta il rischio di confondibilità considerando somiglianza fonetica/concettuale, affinità merceologica (tra classi identificate e quelle dei marchi trovati) e sovrapposizione territoriale. Concludi con una valutazione finale del rischio (Basso, Moderato, Medio, Alto) e un consiglio strategico.`;
+        const syntheticJudgment = await callGeminiAPI(judgmentPrompt);
+
+        // FASE 4: Invio della risposta combinata
         return response.status(200).json({
             similarMarks: euipoResults.similarMarks,
-            syntheticJudgment: syntheticJudgment
+            syntheticJudgment: syntheticJudgment,
+            identifiedClasses: identifiedClasses
         });
 
     } catch (error) {
@@ -390,4 +438,3 @@ module.exports = async (request, response) => {
         return response.status(500).json({ error: true, message: error.message });
     }
 };
-
