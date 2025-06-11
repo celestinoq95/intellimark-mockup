@@ -3,22 +3,36 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/celestinoq95/intellimark-mockup.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
-  "bugs": {
-    "url": "https://github.com/celestinoq95/intellimark-mockup/issues"
-  },
-  "homepage": "https://github.com/celestinoq95/intellimark-mockup#readme",
   "dependencies": {
     "xml-js": "^1.6.11"
   }
 }
+```
+
+**2. Carichi la Modifica su GitHub**
+Ora, apra il suo terminale nella cartella del progetto e carichi questa piccola ma fondamentale modifica.
+
+```bash
+# Aggiunge la modifica al file package.json
+git add .
+
+# Crea il commit (il salvataggio)
+git commit -m "Configuro il progetto per usare ES Modules"
+
+# Carica su GitHub
+git push
+```
+
+**3. Test Finale**
+Vercel rileverà automaticamente questo aggiornamento e avvierà un nuovo deploy. Questa volta, il server capirà il "dialetto" del suo file `api/search.js` e non andrà più in crash.
+
+Attenda 1-2 minuti, vada sul suo sito Vercel (facendo una ricarica forzata con `Ctrl+F5` o `Cmd+Shift+R` per sicurezza) e provi a fare una ricerca.
+
+Questa volta dovrebbe essere quella buona. Abbiamo dato al server l'istruzione che manca
