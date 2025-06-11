@@ -1,19 +1,20 @@
 // Questo file deve trovarsi in: /api/search.js
-// Riscritto con sintassi CommonJS per massima compatibilità con Vercel.
+// ULTIMO TENTATIVO CON SCOPE SPECIFICO E DIAGNOSTICA AVANZATA
 
-// Usiamo 'require' invece di 'import'
 const fetch = require('node-fetch');
 
 // Funzione helper per ottenere il token di accesso
 async function getAccessToken(clientId, clientSecret) {
     const tokenUrl = 'https://euipo.europa.eu/cas-server-webapp/oidc/accessToken';
     const basicAuth = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
-    console.log('Tentativo di ottenere il token di accesso con lo scope corretto...');
+    console.log('Tentativo di ottenere il token di accesso con lo scope SPECIFICO...');
 
-    // Aggiungiamo lo scope richiesto dalla documentazione
+    // *** LA CORREZIONE DEFINITIVA È QUI ***
+    // Tentiamo di usare lo scope più specifico menzionato nella documentazione,
+    // invece di quello generico 'uid'.
     const body = new URLSearchParams();
     body.append('grant_type', 'client_credentials');
-    body.append('scope', 'uid');
+    body.append('scope', 'trademark-search.trademarks.read');
 
     try {
         const response = await fetch(tokenUrl, {
@@ -28,7 +29,7 @@ async function getAccessToken(clientId, clientSecret) {
         const responseData = await response.json();
         if (!response.ok) {
             console.error('ERRORE dall\'endpoint del token:', JSON.stringify(responseData, null, 2));
-            throw new Error('Autenticazione fallita. Verificare le credenziali EUIPO su Vercel.');
+            throw new Error('Autenticazione fallita. Verificare che le credenziali EUIPO siano corrette e abilitate per questo scope.');
         }
 
         console.log('Token di accesso ottenuto con successo.');
@@ -39,7 +40,7 @@ async function getAccessToken(clientId, clientSecret) {
     }
 }
 
-// Funzione helper per analizzare la risposta
+// Funzione helper per analizzare la risposta (invariata)
 function parseEuipoResponse(jsonResponse) {
     const similarMarks = [];
     const records = jsonResponse?.trademarks || [];
@@ -56,7 +57,7 @@ function parseEuipoResponse(jsonResponse) {
     return { similarMarks };
 }
 
-// Funzione principale del backend
+// Funzione principale del backend (invariata)
 module.exports = async (request, response) => {
     console.log('--- Inizio esecuzione backend CommonJS /api/search ---');
     response.setHeader('Access-Control-Allow-Origin', '*');
