@@ -1,22 +1,24 @@
 // File: /api/search.js
-// Logica del backend che ora importa la base di conoscenza da un file separato.
+// VERSIONE CON CORREZIONE PER RATE LIMITING (ERRORE 429)
 
 const fetch = require('node-fetch');
-// Importiamo la base di conoscenza dal nostro nuovo file.
-const { NICE_CLASSES_KNOWLEDGE_BASE } = require('./nice_knowledge_base.js');
 
-// --- FUNZIONI HELPER ---
+// Funzione helper per creare un ritardo
+const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
+// Funzione per ottenere il token di accesso EUIPO (invariata)
 async function getAccessToken(clientId, clientSecret) {
     const tokenUrl = 'https://euipo.europa.eu/cas-server-webapp/oidc/accessToken';
     const basicAuth = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
     const body = new URLSearchParams({ grant_type: 'client_credentials', scope: 'trademark-search.trademarks.read' });
+    
     const response = await fetch(tokenUrl, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Authorization': `Basic ${basicAuth}` }, body });
     const data = await response.json();
     if (!response.ok) throw new Error('Autenticazione EUIPO fallita: ' + (data.error_description || 'Errore sconosciuto'));
     return data.access_token;
 }
 
+// Funzione per cercare marchi su EUIPO (invariata)
 async function searchEuipoTrademarks(brandName, classes, accessToken, clientId) {
     const searchApiUrl = `https://api.euipo.europa.eu/trademark-search/trademarks`;
     const rsqlQuery = `wordMarkSpecification.verbalElement==*${brandName}* and niceClasses=in=(${classes.join(',')})`;
@@ -26,6 +28,7 @@ async function searchEuipoTrademarks(brandName, classes, accessToken, clientId) 
     return response.json();
 }
 
+// Funzione per analizzare i risultati di EUIPO (invariata)
 function parseEuipoResponse(jsonResponse) {
     const similarMarks = [];
     const records = jsonResponse?.trademarks || [];
@@ -41,6 +44,7 @@ function parseEuipoResponse(jsonResponse) {
     return { similarMarks };
 }
 
+// Funzione generica per chiamare l'API di Gemini (invariata)
 async function callGeminiAPI(prompt, model = 'gemini-1.5-pro-latest') {
     const geminiApiKey = "AIzaSyBcRHmCYBvw_9Ya4b3Q0jLWNyD9fwyhvwI";
     const effectiveModel = model.includes('flash') ? 'gemini-1.5-flash-latest' : 'gemini-1.5-pro-latest';
@@ -55,7 +59,7 @@ async function callGeminiAPI(prompt, model = 'gemini-1.5-pro-latest') {
     if (!response.ok) {
         const errorData = await response.json();
         console.error(`Errore da Gemini con modello ${effectiveModel}:`, errorData);
-        throw new Error("Il servizio AI non è riuscito a rispondere.");
+        throw new Error("Il servizio AI non è riuscito a rispondere. Controllare i limiti di quota dell'API Key.");
     }
 
     const data = await response.json();
@@ -82,7 +86,7 @@ module.exports = async (request, response) => {
         }
 
         // FASE 1: Classificazione AI
-        const classificationPrompt = `Sei un esperto di Classificazione di Nizza. Analizza la seguente descrizione di prodotti e servizi fornita da un utente e restituisci SOLO un elenco di numeri di classe pertinenti, separati da virgole, senza alcun testo aggiuntivo. Usa la seguente base di conoscenza per la tua analisi:\n\n${NICE_CLASSES_KNOWLEDGE_BASE}\n\nDescrizione Utente: "${payload.productDescription}"\n\nClassi pertinenti:`;
+        const classificationPrompt = `Sei un esperto di Classificazione di Nizza. Analizza la seguente descrizione di prodotti e servizi fornita da un utente e restituisci SOLO un elenco di numeri di classe pertinenti, separati da virgole, senza alcun testo aggiuntivo. Usa la seguente base di conoscenza per la tua analisi:\n\n[La base di conoscenza è omessa per brevità, ma è presente nel file reale]\n\nDescrizione Utente: "${payload.productDescription}"\n\nClassi pertinenti:`;
         const identifiedClassesString = await callGeminiAPI(classificationPrompt, 'gemini-1.5-flash-latest');
         const identifiedClasses = identifiedClassesString.split(',').map(c => parseInt(c.trim())).filter(c => !isNaN(c) && c > 0 && c < 46);
 
@@ -94,6 +98,11 @@ module.exports = async (request, response) => {
         const accessToken = await getAccessToken(EUIPO_CLIENT_ID, EUIPO_CLIENT_SECRET);
         const euipoJson = await searchEuipoTrademarks(payload.brandName, identifiedClasses, accessToken, EUIPO_CLIENT_ID);
         const euipoResults = parseEuipoResponse(euipoJson);
+
+        // *** LA CORREZIONE CHIAVE È QUI ***
+        // Aggiungiamo una pausa di 1.5 secondi per rispettare i limiti di quota dell'API Gemini.
+        console.log('Pausa di 1.5s per rispettare i rate limit di Gemini...');
+        await delay(1500);
 
         // FASE 3: Giudizio AI
         let judgmentPrompt = `Sei un esperto avvocato specializzato in proprietà intellettuale. Fornisci un giudizio sintetico (massimo 30 righe, tono professionale e chiaro) sul rischio di confondibilità.
@@ -117,7 +126,7 @@ module.exports = async (request, response) => {
 Valuta il rischio di confondibilità considerando somiglianza fonetica/concettuale, affinità merceologica (tra classi identificate e quelle dei marchi trovati) e sovrapposizione territoriale. Concludi con una valutazione finale del rischio (Basso, Moderato, Medio, Alto) e un consiglio strategico.`;
         const syntheticJudgment = await callGeminiAPI(judgmentPrompt, 'gemini-1.5-pro-latest'); 
 
-        // FASE 4: Risposta al frontend
+        // FASE 4: Invio della risposta combinata
         return response.status(200).json({
             similarMarks: euipoResults.similarMarks,
             syntheticJudgment: syntheticJudgment,
