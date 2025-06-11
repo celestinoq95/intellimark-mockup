@@ -3,50 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Intellimark.ai - Mockup Interattivo</title>
-    <!-- Chosen Palette: Primario: Gradiente Blu Profondo (#0A2A5B -> Viola), Sfondi: Grigio Chiarissimo (#F8F9FA), Colori di Stato: Verde (#28A745), Giallo (#FFC107), Rosso (#DC3545). -->
-    <!-- Application Structure Plan: È stata scelta una struttura a pagina singola (SPA) con sezioni distinte per 'Home', 'Risultati' e un modale per la 'Prenotazione'. Questa architettura offre un'esperienza utente fluida e veloce, senza ricaricamenti di pagina, essenziale per mantenere l'utente coinvolto. La navigazione è gestita via JS, mostrando/nascondendo le sezioni. La dashboard dei risultati è progettata con un layout a due colonne su desktop per presentare una sintesi chiara (punteggio) a sinistra e dettagli approfonditi a destra, un pattern che favorisce la scansione rapida delle informazioni. Su mobile, le colonne si impilano verticalmente per una leggibilità ottimale, garantendo una UX coerente su tutti i dispositivi. -->
-    <!-- Visualization & Content Choices: Brand Potential Score -> Goal: Informare/Valutare -> Viz: Grafico a indicatore (Doughnut Chart.js) -> Interaction: Il grafico si genera dinamicamente con colori (verde/giallo/rosso) basati sul punteggio per un feedback visivo immediato. Pillars Analysis -> Goal: Comparare -> Viz: Barre di progresso HTML/Tailwind -> Interaction: Le barre si colorano in base alla performance, offrendo una visione d'insieme rapida. Disponibilità Digitale -> Goal: Informare -> Viz: Griglia HTML/Tailwind con icone Unicode -> Interaction: Chiara visualizzazione dello stato (Preso/Disponibile) con icone universali (✅/❌). Librerie Usate: Chart.js per il grafico principale, Tailwind CSS per tutto il layout. -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <title>Intellimark.ai - Mockup Interattivo Definitivo</title>
+    <!-- Versione 5.0 - Correzione definitiva del bug di avvio automatico -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Figtree', sans-serif; background-color: #F8F9FA; }
+        :root {
+            --color-primary-start: #0A2A5B;
+            --color-primary-end: #4A0E69;
+            --color-green: #28A745;
+            --color-yellow: #FFC107;
+            --color-red: #DC3545;
+        }
+        body { font-family: 'Figtree', sans-serif; background-color: #F8F9FA; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
         h1, h2, h3, h4, .font-inter { font-family: 'Inter', sans-serif; }
-        .gradient-text { background: linear-gradient(to right, #0A2A5B, #4A0E69); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .btn-gradient { background: linear-gradient(to right, #0A2A5B, #2a1a63); }
-        .btn-gradient:hover { background: linear-gradient(to right, #123c7c, #3c2a80); }
-        .chart-container { position: relative; width: 100%; max-width: 300px; margin-left: auto; margin-right: auto; height: 150px; }
-        @media (min-width: 768px) { .chart-container { height: 200px; } }
-        .hidden { display: none; }
+        .gradient-text { background: linear-gradient(to right, var(--color-primary-start), var(--color-primary-end)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .btn-gradient { background: linear-gradient(to right, var(--color-primary-start), var(--color-primary-end)); transition: all 0.3s ease; }
+        .btn-gradient:hover { box-shadow: 0 4px 15px 0 rgba(10, 42, 91, 0.3); }
+        .hidden { display: none !important; }
+        .fade-in { animation: fadeIn 0.5s ease-in-out forwards; }
+        .fade-out { animation: fadeOut 0.5s ease-in-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
         #loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(8px);
-            z-index: 100;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(248, 249, 250, 0.8);
+            backdrop-filter: blur(5px); z-index: 100;
+            display: flex; align-items: center; justify-content: center;
         }
         .spinner {
-            border: 6px solid #f3f3f3;
-            border-top: 6px solid #0A2A5B;
-            border-radius: 50%;
-            width: 60px;
-            height: 60px;
+            border: 6px solid #e2e8f0; border-top: 6px solid var(--color-primary-start);
+            border-radius: 50%; width: 60px; height: 60px;
             animation: spin 1s linear infinite;
         }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="antialiased text-gray-800">
@@ -59,11 +52,9 @@
     </div>
 
     <div id="app-container">
-
-        <!-- ===== Header ===== -->
-        <header id="main-header" class="bg-white/80 backdrop-blur-sm sticky top-0 z-40">
+        <header id="main-header" class="bg-white/80 backdrop-blur-sm sticky top-0 z-40 border-b border-gray-200/80">
             <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-                <a href="#" class="font-inter font-bold text-2xl gradient-text" onclick="location.reload();">
+                <a href="#" class="font-inter font-bold text-2xl gradient-text" onclick="location.reload(); return false;" aria-label="Homepage di Intellimark.ai">
                     Intellimark.ai
                 </a>
                 <nav class="hidden md:flex items-center space-x-6">
@@ -71,16 +62,15 @@
                     <a href="#" class="text-gray-600 hover:text-blue-900 transition-colors">Prezzi</a>
                     <a href="#" class="text-gray-600 hover:text-blue-900 transition-colors">Login</a>
                 </nav>
-                <button class="hidden md:block btn-gradient text-white font-semibold py-2 px-5 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+                <button class="hidden md:block btn-gradient text-white font-semibold py-2 px-5 rounded-lg shadow-md hover:shadow-lg transition-all">
                     Parla con un Consulente
                 </button>
                 <div class="md:hidden">
-                     <button id="mobile-menu-btn" class="text-gray-600 focus:outline-none">
+                     <button id="mobile-menu-btn" class="text-gray-600 focus:outline-none" aria-label="Apri menu">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
                     </button>
                 </div>
             </div>
-             <!-- Mobile Menu -->
             <div id="mobile-menu" class="hidden md:hidden bg-white p-4">
                 <a href="#how-it-works" class="block py-2 text-gray-600 hover:text-blue-900">Come Funziona</a>
                 <a href="#" class="block py-2 text-gray-600 hover:text-blue-900">Prezzi</a>
@@ -92,185 +82,83 @@
         </header>
 
         <main>
-            <!-- ===== Schermata 1: Homepage / Ricerca ===== -->
-            <section id="home-screen">
+            <section id="home-screen" class="fade-in">
                 <div class="container mx-auto px-6 py-16 md:py-24 text-center">
                     <h1 class="text-4xl md:text-6xl font-extrabold font-inter text-gray-900 leading-tight">Il tuo brand ha <span class="gradient-text">potenziale?</span></h1>
                     <h2 class="text-4xl md:text-6xl font-extrabold font-inter text-gray-900 leading-tight mt-2">Scoprilo in 60 secondi.</h2>
-                    <p class="mt-6 max-w-2xl mx-auto text-lg text-gray-600">
-                        La nostra AI analizza milioni di dati per darti una risposta chiara e strategica sulla protezione del tuo marchio.
-                    </p>
+                    <p class="mt-6 max-w-2xl mx-auto text-lg text-gray-600">La nostra AI analizza milioni di dati per darti una risposta chiara e strategica sulla protezione del tuo marchio.</p>
                     <div class="mt-10 max-w-2xl mx-auto">
                         <div class="relative flex items-center shadow-lg rounded-full">
                             <input id="brand-search-input" type="text" placeholder="Inserisci il nome del tuo brand..." class="w-full py-4 pl-8 pr-24 md:pr-20 rounded-full text-lg border-2 border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <button title="Cerca per logo" class="absolute right-20 md:right-16 text-gray-500 hover:text-blue-700 transition-colors">
+                            <button title="Cerca per logo" aria-label="Cerca per logo" class="absolute right-20 md:right-16 text-gray-500 hover:text-blue-700 transition-colors">
                                 <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                             </button>
-                             <button id="start-search-btn" class="absolute right-2 top-2 bottom-2 btn-gradient text-white font-semibold px-4 rounded-full text-lg">
-                                Cerca
-                            </button>
+                            <button id="start-search-btn" class="absolute right-2 top-2 bottom-2 btn-gradient text-white font-semibold px-4 rounded-full text-lg">Cerca</button>
                         </div>
                     </div>
                 </div>
-
                 <div id="how-it-works" class="bg-white py-16 md:py-24">
-                    <div class="container mx-auto px-6">
+                     <div class="container mx-auto px-6">
                         <div class="text-center mb-12">
                             <h2 class="text-3xl md:text-4xl font-bold font-inter text-gray-900">Come Funziona</h2>
                             <p class="mt-3 text-lg text-gray-600 max-w-2xl mx-auto">Un processo semplice in tre passi per darti il pieno controllo.</p>
                         </div>
                         <div class="grid md:grid-cols-3 gap-10 text-center">
-                             <div class="p-6">
-                                <div class="flex items-center justify-center h-16 w-16 rounded-full bg-blue-100 mx-auto mb-4">
-                                     <svg class="w-8 h-8 text-blue-800" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                                </div>
-                                <h3 class="text-xl font-bold font-inter mb-2">1. Analizza</h3>
-                                <p class="text-gray-600">Descrivi o carica il tuo brand. La nostra intelligenza artificiale si mette subito al lavoro per te.</p>
-                            </div>
-                            <div class="p-6">
-                                <div class="flex items-center justify-center h-16 w-16 rounded-full bg-blue-100 mx-auto mb-4">
-                                    <svg class="w-8 h-8 text-blue-800" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                </div>
-                                <h3 class="text-xl font-bold font-inter mb-2">2. Valuta</h3>
-                                <p class="text-gray-600">Ricevi il tuo Brand Potential Score™, una metrica chiara e oggettiva sulla forza del tuo marchio.</p>
-                            </div>
-                            <div class="p-6">
-                                <div class="flex items-center justify-center h-16 w-16 rounded-full bg-blue-100 mx-auto mb-4">
-                                    <svg class="w-8 h-8 text-blue-800" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path></svg>
-                                </div>
-                                <h3 class="text-xl font-bold font-inter mb-2">3. Agisci</h3>
-                                <p class="text-gray-600">Registra con i nostri legali o ricevi una consulenza strategica per proteggere il tuo asset più prezioso.</p>
-                            </div>
-                        </div>
-                        <div class="mt-16 text-center text-gray-500">
-                             <p class="text-lg">Già scelto da oltre <span class="font-bold text-gray-700">500</span> startup e creativi in Italia.</p>
+                             <div class="p-6"> <div class="flex items-center justify-center h-16 w-16 rounded-full bg-blue-100 mx-auto mb-4"> <svg class="w-8 h-8 text-blue-800" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg> </div> <h3 class="text-xl font-bold font-inter mb-2">1. Analizza</h3> <p class="text-gray-600">Descrivi o carica il tuo brand. La nostra intelligenza artificiale si mette subito al lavoro per te.</p> </div>
+                             <div class="p-6"> <div class="flex items-center justify-center h-16 w-16 rounded-full bg-blue-100 mx-auto mb-4"> <svg class="w-8 h-8 text-blue-800" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> </div> <h3 class="text-xl font-bold font-inter mb-2">2. Valuta</h3> <p class="text-gray-600">Ricevi il tuo Brand Potential Score™, una metrica chiara e oggettiva sulla forza del tuo marchio.</p> </div>
+                             <div class="p-6"> <div class="flex items-center justify-center h-16 w-16 rounded-full bg-blue-100 mx-auto mb-4"> <svg class="w-8 h-8 text-blue-800" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path></svg> </div> <h3 class="text-xl font-bold font-inter mb-2">3. Agisci</h3> <p class="text-gray-600">Registra con i nostri legali o ricevi una consulenza strategica per proteggere il tuo asset più prezioso.</p> </div>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- ===== Schermata 2: Pagina dei Risultati (Dashboard) ===== -->
-            <section id="results-screen" class="hidden">
-                 <div class="bg-white border-b">
-                    <div class="container mx-auto px-6 py-4">
-                        <h2 class="text-xl font-semibold">Ricerca per: <span id="searched-brand-name" class="font-bold gradient-text"></span></h2>
-                    </div>
+            <section id="results-screen" class="hidden" aria-live="polite">
+                <div class="bg-white border-b border-gray-200/80">
+                    <div class="container mx-auto px-6 py-4"><h2 class="text-xl font-semibold">Risultati per: <span id="searched-brand-name" class="font-bold gradient-text"></span></h2></div>
                 </div>
-
                 <div class="container mx-auto px-6 py-12">
                     <div class="grid lg:grid-cols-3 gap-8">
-                        
-                        <!-- Colonna Sinistra (Riepilogo) -->
-                        <div class="lg:col-span-1 bg-white p-6 md:p-8 rounded-2xl shadow-sm border">
-                           <h3 class="text-2xl font-bold font-inter text-center">Brand Potential Score™</h3>
-                           <div class="chart-container mt-4">
-                               <canvas id="brandScoreChart"></canvas>
-                               <div id="score-text" class="absolute inset-0 flex flex-col items-center justify-center font-inter">
-                                   <span id="score-value" class="text-5xl font-extrabold text-gray-800"></span>
-                                   <span class="text-lg font-semibold text-gray-500">/ 100</span>
-                               </div>
-                           </div>
-                           <div class="mt-8 space-y-6">
-                                <div>
-                                    <div class="flex justify-between font-semibold mb-1">
-                                        <span>Distintività Semantica</span>
-                                        <span id="pillar1-value" class="font-bold"></span>
-                                    </div>
-                                    <div class="w-full bg-gray-200 rounded-full h-3">
-                                        <div id="pillar1-bar" class="h-3 rounded-full transition-all duration-500"></div>
-                                    </div>
+                        <div class="lg:col-span-1 bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-200/80">
+                            <h3 class="text-2xl font-bold font-inter text-center">Brand Potential Score™</h3>
+                            <div class="relative w-full max-w-[300px] mx-auto h-[150px] md:h-[200px]">
+                                <canvas id="brandScoreChart"></canvas>
+                                <div class="absolute inset-0 flex flex-col items-center justify-center font-inter">
+                                    <span id="score-value" class="text-5xl font-extrabold text-gray-800"></span>
+                                    <span class="text-lg font-semibold text-gray-500">/ 100</span>
                                 </div>
-                                <div>
-                                    <div class="flex justify-between font-semibold mb-1">
-                                        <span>Rischio di Confusione Marchi</span>
-                                        <span id="pillar2-value" class="font-bold"></span>
-                                    </div>
-                                    <div class="w-full bg-gray-200 rounded-full h-3">
-                                        <div id="pillar2-bar" class="h-3 rounded-full transition-all duration-500"></div>
-                                    </div>
-                                </div>
-                                <div>
-                                    <div class="flex justify-between font-semibold mb-1">
-                                        <span>Disponibilità Digitale</span>
-                                        <span id="pillar3-value" class="font-bold"></span>
-                                    </div>
-                                    <div class="w-full bg-gray-200 rounded-full h-3">
-                                        <div id="pillar3-bar" class="h-3 rounded-full transition-all duration-500"></div>
-                                    </div>
-                                </div>
-                           </div>
+                            </div>
+                            <div class="mt-8 space-y-6">
+                                <div><div class="flex justify-between font-semibold mb-1"><span>Distintività Semantica</span><span id="pillar1-value" class="font-bold"></span></div><div class="w-full bg-gray-200 rounded-full h-3"><div id="pillar1-bar" class="h-3 rounded-full transition-all duration-500"></div></div></div>
+                                <div><div class="flex justify-between font-semibold mb-1"><span>Rischio di Confusione</span><span id="pillar2-value" class="font-bold"></span></div><div class="w-full bg-gray-200 rounded-full h-3"><div id="pillar2-bar" class="h-3 rounded-full transition-all duration-500"></div></div></div>
+                                <div><div class="flex justify-between font-semibold mb-1"><span>Disponibilità Digitale</span><span id="pillar3-value" class="font-bold"></span></div><div class="w-full bg-gray-200 rounded-full h-3"><div id="pillar3-bar" class="h-3 rounded-full transition-all duration-500"></div></div></div>
+                            </div>
                         </div>
-
-                        <!-- Colonna Destra (Dettagli) -->
                         <div class="lg:col-span-2 space-y-6">
-                            <div class="bg-white p-6 rounded-2xl shadow-sm border">
-                                <h4 class="text-xl font-bold font-inter mb-3">Analisi di Distintività</h4>
-                                <p id="distinctiveness-analysis-text" class="text-gray-600"></p>
-                            </div>
-                            <div class="bg-white p-6 rounded-2xl shadow-sm border">
-                                <h4 class="text-xl font-bold font-inter mb-3">Ricerca di Anteriorità (UIBM/EUIPO)</h4>
-                                <p class="text-gray-600 mb-4">Trovati <span class="font-bold">0 marchi identici</span> e <span class="font-bold">2 marchi simili</span> in settori non correlati. Rischio di opposizione basso.</p>
-                                <a href="#" class="font-semibold text-blue-700 hover:underline">Vedi dettagli &rarr;</a>
-                            </div>
-                            <div class="bg-white p-6 rounded-2xl shadow-sm border">
-                                <h4 class="text-xl font-bold font-inter mb-4">Disponibilità Digitale</h4>
-                                <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                                    <div class="flex items-center space-x-2"><span class="text-red-500 font-bold text-xl">❌</span><div><p class="font-semibold">nomebrand.it</p><p class="text-sm text-red-600">Preso</p></div></div>
-                                    <div class="flex items-center space-x-2"><span class="text-green-500 font-bold text-xl">✅</span><div><p class="font-semibold">nomebrand.com</p><p class="text-sm text-green-600">Disponibile</p></div></div>
-                                    <div class="flex items-center space-x-2"><span class="text-green-500 font-bold text-xl">✅</span><div><p class="font-semibold">nomebrand.eu</p><p class="text-sm text-green-600">Disponibile</p></div></div>
-                                    <div class="flex items-center space-x-2"><span class="text-green-500 font-bold text-xl">✅</span><div><p class="font-semibold">Instagram</p><p class="text-sm text-green-600">@nomebrand</p></div></div>
-                                    <div class="flex items-center space-x-2"><span class="text-red-500 font-bold text-xl">❌</span><div><p class="font-semibold">Facebook</p><p class="text-sm text-red-600">/nomebrand</p></div></div>
-                                    <div class="flex items-center space-x-2"><span class="text-green-500 font-bold text-xl">✅</span><div><p class="font-semibold">X (Twitter)</p><p class="text-sm text-green-600">@nomebrand</p></div></div>
-                                </div>
-                            </div>
-                            <div id="cta-box" class="bg-gradient-to-r text-white p-8 rounded-2xl shadow-lg">
-                                 <h4 id="cta-title" class="text-2xl font-bold font-inter"></h4>
-                                 <p class="mt-2 opacity-90">Questo brand ha tutti i requisiti per una protezione efficace. Non rischiare di perderlo.</p>
-                                 <div class="mt-6 flex flex-col sm:flex-row gap-4">
-                                     <button class="w-full sm:w-auto bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg transition-colors">Registra Ora da 249€</button>
-                                     <button id="open-booking-modal-btn" class="w-full sm:w-auto bg-white/20 hover:bg-white/30 text-white font-bold py-3 px-6 rounded-lg transition-colors">Pianifica una call strategica gratuita</button>
-                                 </div>
-                            </div>
+                            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200/80"><h4 class="text-xl font-bold font-inter mb-3">Analisi di Distintività</h4><p id="distinctiveness-analysis-text" class="text-gray-600"></p></div>
+                            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200/80"><h4 class="text-xl font-bold font-inter mb-3">Ricerca di Anteriorità (UIBM/EUIPO)</h4><div id="anteriority-results-container"></div></div>
+                            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200/80"><h4 class="text-xl font-bold font-inter mb-4">Disponibilità Digitale</h4><div id="digital-availability-container" class="grid grid-cols-2 sm:grid-cols-3 gap-4"></div></div>
+                            <div id="cta-box" class="bg-gradient-to-r text-white p-8 rounded-2xl shadow-lg"><h4 id="cta-title" class="text-2xl font-bold font-inter"></h4><p class="mt-2 opacity-90">Questo brand ha i requisiti per una protezione efficace. Non rischiare di perderlo.</p><div class="mt-6 flex flex-col sm:flex-row gap-4"><button class="w-full sm:w-auto bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg transition-colors">Registra Ora da 249€</button><button id="open-booking-modal-btn" class="w-full sm:w-auto bg-white/20 hover:bg-white/30 text-white font-bold py-3 px-6 rounded-lg transition-colors">Pianifica una call strategica</button></div></div>
                         </div>
                     </div>
                 </div>
             </section>
         </main>
 
-        <!-- ===== Schermata 3: Pop-up / Modale "Pianifica una call" ===== -->
-        <div id="booking-modal" class="hidden fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4">
-            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl transform transition-all opacity-0 -translate-y-4" id="modal-content">
+        <div id="booking-modal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+            <div id="modal-content" class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl transform opacity-0 -translate-y-4">
                  <div class="p-6 md:p-8 relative">
-                    <button id="close-modal-btn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-3xl">&times;</button>
+                    <button id="close-modal-btn" aria-label="Chiudi modale" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-3xl">&times;</button>
                     <h3 class="text-2xl md:text-3xl font-bold font-inter text-gray-900 mb-6">Pianifica una call strategica</h3>
                     <div class="grid md:grid-cols-2 gap-8">
                         <div>
-                            <div class="flex items-center space-x-4">
-                                <img src="https://placehold.co/80x80/E2E8F0/4A5568?text=DR" alt="Foto Dott.ssa Rossi" class="rounded-full w-20 h-20 border-2 border-white shadow-md">
-                                <div><p class="font-bold text-lg">Dott.ssa Rossi</p><p class="text-gray-600">Esperta in IP</p></div>
-                            </div>
+                            <div class="flex items-center space-x-4"><img src="https://placehold.co/80x80/E2E8F0/4A5568?text=DR" alt="Foto Dott.ssa Rossi" class="rounded-full w-20 h-20 border-2 border-white shadow-md"><div><p class="font-bold text-lg">Dott.ssa Rossi</p><p class="text-gray-600">Esperta in IP</p></div></div>
                             <p class="mt-4 text-gray-600">Scegli un orario per una sessione gratuita di 15 minuti. Analizzeremo insieme i risultati e definiremo i prossimi passi per la tutela del tuo brand.</p>
                         </div>
                         <div class="border-t md:border-t-0 md:border-l border-gray-200 md:pl-8 pt-6 md:pt-0">
                             <p class="font-bold text-center text-lg mb-4">Giugno 2025</p>
                             <div class="grid grid-cols-7 gap-1 text-center text-sm text-gray-500 mb-2"><span>Lun</span><span>Mar</span><span>Mer</span><span>Gio</span><span>Ven</span><span>Sab</span><span>Dom</span></div>
-                            <div class="grid grid-cols-7 gap-1 text-center">
-                                <div class="text-gray-400">26</div><div class="text-gray-400">27</div><div class="text-gray-400">28</div><div class="text-gray-400">29</div><div class="text-gray-400">30</div><div class="text-gray-400">31</div><div>1</div>
-                                <div>2</div><div>3</div><div>4</div><div>5</div><div>6</div><div>7</div><div>8</div>
-                                <div>9</div><div class="bg-blue-600 text-white font-bold rounded-full w-8 h-8 flex items-center justify-center mx-auto">10</div><div class="hover:bg-blue-100 rounded-full w-8 h-8 flex items-center justify-center mx-auto cursor-pointer">11</div><div class="hover:bg-blue-100 rounded-full w-8 h-8 flex items-center justify-center mx-auto cursor-pointer">12</div><div class="hover:bg-blue-100 rounded-full w-8 h-8 flex items-center justify-center mx-auto cursor-pointer">13</div><div>14</div><div>15</div>
-                                <div>16</div><div class="hover:bg-blue-100 rounded-full w-8 h-8 flex items-center justify-center mx-auto cursor-pointer">17</div><div class="hover:bg-blue-100 rounded-full w-8 h-8 flex items-center justify-center mx-auto cursor-pointer">18</div><div class="hover:bg-blue-100 rounded-full w-8 h-8 flex items-center justify-center mx-auto cursor-pointer">19</div><div class="hover:bg-blue-100 rounded-full w-8 h-8 flex items-center justify-center mx-auto cursor-pointer">20</div><div>21</div><div>22</div>
-                            </div>
-                            <div id="time-slots" class="mt-4">
-                                <p class="font-semibold text-center mb-2">Seleziona un orario:</p>
-                                <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
-                                    <button class="time-slot-btn w-full border border-blue-600 text-blue-700 font-semibold py-2 rounded-lg hover:bg-blue-600 hover:text-white transition-colors">09:30</button>
-                                    <button class="time-slot-btn w-full border border-blue-600 text-blue-700 font-semibold py-2 rounded-lg hover:bg-blue-600 hover:text-white transition-colors">10:00</button>
-                                    <button class="time-slot-btn w-full border border-blue-600 text-blue-700 font-semibold py-2 rounded-lg hover:bg-blue-600 hover:text-white transition-colors">11:15</button>
-                                    <button class="time-slot-btn w-full border border-blue-600 text-blue-700 font-semibold py-2 rounded-lg hover:bg-blue-600 hover:text-white transition-colors">14:00</button>
-                                    <button class="time-slot-btn w-full border border-blue-600 text-blue-700 font-semibold py-2 rounded-lg hover:bg-blue-600 hover:text-white transition-colors">14:45</button>
-                                    <button class="time-slot-btn w-full border border-gray-300 text-gray-400 font-semibold py-2 rounded-lg cursor-not-allowed">16:00</button>
-                                </div>
-                            </div>
+                            <div class="grid grid-cols-7 gap-1 text-center"> <div class="text-gray-400">26</div><div class="text-gray-400">27</div><div class="text-gray-400">28</div><div class="text-gray-400">29</div><div class="text-gray-400">30</div><div class="text-gray-400">31</div><div>1</div> <div>2</div><div>3</div><div>4</div><div>5</div><div>6</div><div>7</div><div>8</div> <div>9</div><div class="bg-blue-600 text-white font-bold rounded-full w-8 h-8 flex items-center justify-center mx-auto">10</div><div class="hover:bg-blue-100 rounded-full w-8 h-8 flex items-center justify-center mx-auto cursor-pointer">11</div><div class="hover:bg-blue-100 rounded-full w-8 h-8 flex items-center justify-center mx-auto cursor-pointer">12</div><div class="hover:bg-blue-100 rounded-full w-8 h-8 flex items-center justify-center mx-auto cursor-pointer">13</div><div>14</div><div>15</div> <div>16</div><div class="hover:bg-blue-100 rounded-full w-8 h-8 flex items-center justify-center mx-auto cursor-pointer">17</div><div class="hover:bg-blue-100 rounded-full w-8 h-8 flex items-center justify-center mx-auto cursor-pointer">18</div><div class="hover:bg-blue-100 rounded-full w-8 h-8 flex items-center justify-center mx-auto cursor-pointer">19</div><div class="hover:bg-blue-100 rounded-full w-8 h-8 flex items-center justify-center mx-auto cursor-pointer">20</div><div>21</div><div>22</div> </div>
+                            <div class="mt-4"><p class="font-semibold text-center mb-2">Seleziona un orario:</p><div class="grid grid-cols-2 md:grid-cols-3 gap-2"><button class="time-slot-btn w-full border border-blue-600 text-blue-700 font-semibold py-2 rounded-lg hover:bg-blue-600 hover:text-white transition-colors">09:30</button><button class="time-slot-btn w-full border border-blue-600 text-blue-700 font-semibold py-2 rounded-lg hover:bg-blue-600 hover:text-white transition-colors">10:00</button><button class="time-slot-btn w-full border border-blue-600 text-blue-700 font-semibold py-2 rounded-lg hover:bg-blue-600 hover:text-white transition-colors">11:15</button><button class="time-slot-btn w-full border border-blue-600 text-blue-700 font-semibold py-2 rounded-lg hover:bg-blue-600 hover:text-white transition-colors">14:00</button><button class="time-slot-btn w-full border border-blue-600 text-blue-700 font-semibold py-2 rounded-lg hover:bg-blue-600 hover:text-white transition-colors">14:45</button><button class="time-slot-btn w-full border border-gray-300 text-gray-400 font-semibold py-2 rounded-lg cursor-not-allowed">16:00</button></div></div>
                             <button id="confirm-appointment-btn" class="mt-6 w-full btn-gradient text-white font-bold py-3 px-6 rounded-lg transition-colors opacity-50 cursor-not-allowed" disabled>Conferma Appuntamento</button>
                         </div>
                     </div>
@@ -279,210 +167,253 @@
         </div>
     </div>
 
-    <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // --- Elementi del DOM ---
-        const homeScreen = document.getElementById('home-screen');
-        const resultsScreen = document.getElementById('results-screen');
-        const startSearchBtn = document.getElementById('start-search-btn');
-        const brandSearchInput = document.getElementById('brand-search-input');
-        const searchedBrandName = document.getElementById('searched-brand-name');
-        const loadingOverlay = document.getElementById('loading-overlay');
-        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-        const mobileMenu = document.getElementById('mobile-menu');
-        const bookingModal = document.getElementById('booking-modal');
-        const modalContent = document.getElementById('modal-content');
-        const openBookingModalBtn = document.getElementById('open-booking-modal-btn');
-        const closeModalBtn = document.getElementById('close-modal-btn');
-        const timeSlotBtns = document.querySelectorAll('.time-slot-btn');
-        const confirmAppointmentBtn = document.getElementById('confirm-appointment-btn');
+<script>
+// Riscritto come modulo per isolare lo scope e migliorare la manutenibilità
+const AppController = (function() {
 
-        let brandScoreChart = null;
+    // --- STATE ---
+    const state = {
+        brandName: '',
+        results: {},
+        brandScoreChart: null,
+    };
 
-        // --- Funzioni di logica principali ---
-        
-        async function performBrandAnalysis(brandName) {
-            // *** PUNTO CHIAVE PER SVILUPPO FUTURO ***
-            // Qui andrà la vera chiamata all'API di Intellimark.ai.
-            // Per ora, simuliamo un'attesa e restituiamo dati fittizi.
+    // --- ELEMENTS CACHE ---
+    const elements = {
+        homeScreen: document.getElementById('home-screen'),
+        resultsScreen: document.getElementById('results-screen'),
+        startSearchBtn: document.getElementById('start-search-btn'),
+        brandSearchInput: document.getElementById('brand-search-input'),
+        searchedBrandName: document.getElementById('searched-brand-name'),
+        loadingOverlay: document.getElementById('loading-overlay'),
+        mobileMenuBtn: document.getElementById('mobile-menu-btn'),
+        mobileMenu: document.getElementById('mobile-menu'),
+        bookingModal: document.getElementById('booking-modal'),
+        modalContent: document.getElementById('modal-content'),
+        openBookingModalBtn: document.getElementById('open-booking-modal-btn'),
+        closeModalBtn: document.getElementById('close-modal-btn'),
+        timeSlotBtns: document.querySelectorAll('.time-slot-btn'),
+        confirmAppointmentBtn: document.getElementById('confirm-appointment-btn'),
+        scoreValue: document.getElementById('score-value'),
+        brandScoreChartCanvas: document.getElementById('brandScoreChart'),
+        pillars: {
+            p1: { value: document.getElementById('pillar1-value'), bar: document.getElementById('pillar1-bar') },
+            p2: { value: document.getElementById('pillar2-value'), bar: document.getElementById('pillar2-bar') },
+            p3: { value: document.getElementById('pillar3-value'), bar: document.getElementById('pillar3-bar') },
+        },
+        distinctivenessText: document.getElementById('distinctiveness-analysis-text'),
+        anteriorityContainer: document.getElementById('anteriority-results-container'),
+        digitalContainer: document.getElementById('digital-availability-container'),
+        ctaBox: document.getElementById('cta-box'),
+        ctaTitle: document.getElementById('cta-title'),
+    };
+
+    // --- API SIMULATION & DATA GENERATION ---
+    const api = {
+        async getAnalysis(brandName) {
             console.log(`Avvio analisi per: ${brandName}`);
-            await new Promise(resolve => setTimeout(resolve, 2500)); // Simula 2.5s di analisi AI
+            await new Promise(resolve => setTimeout(resolve, 2500)); 
 
-            const score = Math.floor(Math.random() * 71) + 30; // Punteggio casuale tra 30 e 100
+            const score = Math.floor(Math.random() * 71) + 30;
             const p1 = Math.floor(Math.random() * 51) + 50;
             const p2 = Math.floor(Math.random() * 51) + 50;
             const p3 = Math.floor(Math.random() * 61) + 40;
-            
-            const mockApiResult = { score, p1, p2, p3 };
-            console.log("Analisi simulata completata.", mockApiResult);
-            return mockApiResult;
-        }
 
-        async function handleSearch() {
-            const brandName = brandSearchInput.value.trim() || "NomeBrand";
-            showLoading();
-            
-            const results = await performBrandAnalysis(brandName);
-            
-            hideLoading();
-            displayResults(brandName, results);
-        }
+            const similarMarkCount = score > 60 ? Math.floor(Math.random() * 2) : Math.floor(Math.random() * 4) + 1;
+            const similarMarks = Array.from({ length: similarMarkCount }, () => this.generateFakeMark(brandName));
+            const digitalAvailability = this.generateDigitalAvailability(brandName);
 
-        function displayResults(brandName, results) {
-            searchedBrandName.textContent = brandName;
-            homeScreen.classList.add('hidden');
-            resultsScreen.classList.remove('hidden');
+            const results = { score, p1, p2, p3, similarMarks, digitalAvailability };
+            console.log("Analisi simulata completata.", results);
+            return results;
+        },
+        generateFakeMark(baseName) {
+            const prefixes = ["Evo", "Zen", "Aqua", "Nova", "Luxe"];
+            const suffixes = ["fy", "ly", "io", "ix", "a"];
+            const industries = ["Tecnologia", "Moda", "Alimentare", "Cosmetici", "Servizi Finanziari"];
+            const name = prefixes[Math.floor(Math.random() * prefixes.length)] + baseName.substring(0,3) + suffixes[Math.floor(Math.random() * suffixes.length)];
+            return { name, status: Math.random() > 0.5 ? "Simile" : "Molto Simile", classes: `Cl. ${Math.floor(Math.random() * 42) + 1}`, industry: industries[Math.floor(Math.random() * industries.length)] };
+        },
+        generateDigitalAvailability(baseName) {
+            const platforms = ['.it', '.com', '.eu', 'Instagram', 'Facebook', 'X (Twitter)', 'TikTok'];
+            return platforms.map(platform => ({
+                platform: platform.includes('.') ? `${baseName.toLowerCase()}${platform}` : `@${baseName.toLowerCase()}`,
+                name: platform.includes('.') ? platform.substring(1).toUpperCase() : platform,
+                isAvailable: Math.random() > 0.4,
+            }));
+        }
+    };
+
+    // --- RENDER FUNCTIONS ---
+    const render = {
+        fullResultsPage() {
+            elements.homeScreen.classList.add('hidden');
+            elements.resultsScreen.classList.remove('hidden');
+            elements.resultsScreen.classList.add('fade-in');
             window.scrollTo(0, 0);
 
-            updatePillar('pillar1', results.p1, 'Forte', 'Buona', 'Debole');
-            updatePillar('pillar2', results.p2, 'Basso', 'Medio', 'Alto');
-            updatePillar('pillar3', results.p3, 'Ottima', 'Buona', 'Scarsa');
+            elements.searchedBrandName.textContent = state.brandName;
             
-            updateCtaBox(results.score);
-            updateDistinctivenessText(results.p1);
+            this.updatePillars();
+            this.updateCtaBox();
+            this.updateDistinctivenessText();
+            this.updateAnteriorityResults();
+            this.updateDigitalAvailability();
 
-            setTimeout(() => {
-                createOrUpdateChart(results.score);
-            }, 100);
-        }
-
-        // --- Funzioni di UI ---
-
-        function showLoading() { loadingOverlay.classList.remove('hidden'); }
-        function hideLoading() { loadingOverlay.classList.add('hidden'); }
-        function toggleMobileMenu() { mobileMenu.classList.toggle('hidden'); }
-
-        function createOrUpdateChart(score) {
-            const ctx = document.getElementById('brandScoreChart').getContext('2d');
-            let scoreColor = getScoreColor(score);
-            
-            document.getElementById('score-value').textContent = score;
-            document.getElementById('score-value').style.color = scoreColor;
-
-            const data = {
-                datasets: [{
-                    data: [score, 100 - score],
-                    backgroundColor: [scoreColor, '#E5E7EB'],
-                    borderWidth: 0,
-                    circumference: 180,
-                    rotation: 270,
-                }]
+            setTimeout(() => this.createOrUpdateChart(), 100);
+        },
+        createOrUpdateChart() {
+            const scoreColor = ui.getScoreColor(state.results.score);
+            elements.scoreValue.textContent = state.results.score;
+            elements.scoreValue.style.color = scoreColor;
+            const data = { datasets: [{ data: [state.results.score, 100 - state.results.score], backgroundColor: [scoreColor, '#E5E7EB'], borderWidth: 0, circumference: 180, rotation: 270 }] };
+            const options = { responsive: true, maintainAspectRatio: false, cutout: '80%', plugins: { tooltip: { enabled: false } }, events: [] };
+            if (state.brandScoreChart) state.brandScoreChart.destroy();
+            state.brandScoreChart = new Chart(elements.brandScoreChartCanvas, { type: 'doughnut', data, options });
+        },
+        updatePillars() {
+            const { p1, p2, p3 } = state.results;
+            const update = (pillarId, value, labels) => {
+                let label = value > 75 ? labels[0] : (value > 40 ? labels[1] : labels[2]);
+                let color = ui.getScoreColor(value);
+                elements.pillars[pillarId].value.textContent = `${value}% (${label})`;
+                elements.pillars[pillarId].value.style.color = color;
+                elements.pillars[pillarId].bar.style.width = `${value}%`;
+                elements.pillars[pillarId].bar.style.backgroundColor = color;
             };
-
-            const options = {
-                responsive: true, maintainAspectRatio: false, cutout: '80%',
-                plugins: { tooltip: { enabled: false } }, events: []
-            };
-
-            if (brandScoreChart) brandScoreChart.destroy();
-            brandScoreChart = new Chart(ctx, { type: 'doughnut', data, options });
-        }
-        
-        function updatePillar(pillarId, value, highLabel, midLabel, lowLabel) {
-            const valueEl = document.getElementById(`${pillarId}-value`);
-            const barEl = document.getElementById(`${pillarId}-bar`);
-            let color = getScoreColor(value);
-            let label = highLabel;
-            if (value < 40) label = lowLabel;
-            else if (value < 75) label = midLabel;
-
-            valueEl.textContent = `${value}% (${label})`;
-            valueEl.style.color = color;
-            barEl.style.width = `${value}%`;
-            barEl.style.backgroundColor = color;
-        }
-
-        function updateCtaBox(score) {
-            const ctaBox = document.getElementById('cta-box');
-            const ctaTitle = document.getElementById('cta-title');
+            update('p1', p1, ['Forte', 'Buona', 'Debole']);
+            update('p2', p2, ['Basso', 'Medio', 'Alto']);
+            update('p3', p3, ['Ottima', 'Buona', 'Scarsa']);
+        },
+        updateCtaBox() {
+            const { score } = state.results;
             let title = `Punteggio: ${score}. `;
-            
-            ctaBox.classList.remove('from-red-800', 'to-red-900', 'from-yellow-500', 'to-yellow-600', 'from-blue-800', 'to-indigo-900');
-
-            if (score < 40) {
-                title += 'Rischio Alto!';
-                ctaBox.classList.add('from-red-800', 'to-red-900');
-            } else if (score < 75) {
-                title += 'Potenziale da Valutare.';
-                 ctaBox.classList.add('from-yellow-500', 'to-yellow-600');
-            } else {
-                title += 'Potenziale Eccellente!';
-                ctaBox.classList.add('from-blue-800', 'to-indigo-900');
+            let colorClass = '';
+            if (score < 40) { title += 'Rischio Alto!'; colorClass = 'from-red-800 to-red-900'; } 
+            else if (score < 75) { title += 'Potenziale da Valutare.'; colorClass = 'from-yellow-500 to-yellow-600'; } 
+            else { title += 'Potenziale Eccellente!'; colorClass = 'from-blue-800 to-indigo-900'; }
+            elements.ctaBox.className = 'bg-gradient-to-r text-white p-8 rounded-2xl shadow-lg ' + colorClass;
+            elements.ctaTitle.textContent = title;
+        },
+        updateDistinctivenessText() {
+            const { p1 } = state.results;
+            let text = '';
+            if (p1 > 75) { text = "Il nome è originale e non descrittivo. Ottima base di partenza. L'AI non ha rilevato termini generici o comuni che potrebbero indebolire la protezione legale del marchio."; } 
+            else if (p1 > 40) { text = "Il nome presenta alcuni elementi comuni ma possiede un certo grado di originalità. Si consiglia un'analisi legale per valutarne la forza effettiva."; }
+            else { text = "Il nome è altamente descrittivo o generico. Il rischio che venga rifiutata la registrazione è significativo. Si consiglia di esplorare alternative più uniche."; }
+            elements.distinctivenessText.textContent = text;
+        },
+        updateAnteriorityResults() {
+            const { similarMarks } = state.results;
+            elements.anteriorityContainer.innerHTML = ''; 
+            if(similarMarks.length === 0) {
+                elements.anteriorityContainer.innerHTML = `<p class="text-gray-600">🎉 Trovati <span class="font-bold">0 marchi identici o simili</span>. Rischio di opposizione molto basso.</p>`;
+                return;
             }
-            ctaTitle.textContent = title;
+            let html = `<p class="text-gray-600 mb-4">Trovati <span class="font-bold">${similarMarks.length} marchi simili</span> con potenziale di conflitto:</p><div class="space-y-3">`;
+            similarMarks.forEach(mark => {
+                const riskColor = mark.status === "Molto Simile" ? 'text-red-600' : 'text-yellow-600';
+                html += `<div class="p-3 border rounded-lg flex justify-between items-center"><div><p class="font-bold">${mark.name}</p><p class="text-sm text-gray-500">${mark.industry} - ${mark.classes}</p></div><span class="font-semibold ${riskColor}">${mark.status}</span></div>`;
+            });
+            html += `</div><a href="#" class="inline-block mt-4 font-semibold text-blue-700 hover:underline">Vedi analisi completa &rarr;</a>`;
+            elements.anteriorityContainer.innerHTML = html;
+        },
+        updateDigitalAvailability() {
+            const { digitalAvailability } = state.results;
+            elements.digitalContainer.innerHTML = '';
+            let html = digitalAvailability.map(item => {
+                const icon = item.isAvailable ? '✅' : '❌';
+                const textColor = item.isAvailable ? 'text-green-600' : 'text-red-600';
+                const textLabel = item.isAvailable ? 'Disponibile' : 'Preso';
+                return `<div class="flex items-center space-x-2"><span class="font-bold text-xl">${icon}</span><div><p class="font-semibold">${item.platform}</p><p class="text-sm ${textColor}">${textLabel}</p></div></div>`;
+            }).join('');
+            elements.digitalContainer.innerHTML = html;
         }
-        
-        function updateDistinctivenessText(score) {
-            const textEl = document.getElementById('distinctiveness-analysis-text');
-            if (score > 75) {
-                textEl.textContent = "Il nome è originale e non descrittivo. Ottima base di partenza. L'AI non ha rilevato termini generici o comuni che potrebbero indebolire la protezione legale del marchio.";
-            } else if (score > 40) {
-                textEl.textContent = "Il nome presenta alcuni elementi comuni ma possiede un certo grado di originalità. Si consiglia un'analisi legale per valutarne la forza effettiva.";
-            } else {
-                textEl.textContent = "Il nome è altamente descrittivo o generico. Il rischio che venga rifiutata la registrazione è significativo. Si consiglia di esplorare alternative più uniche.";
+    };
+
+    // --- UI HELPERS & HANDLERS ---
+    const ui = {
+        showLoading() { elements.loadingOverlay.classList.remove('hidden', 'fade-out'); elements.loadingOverlay.classList.add('fade-in'); },
+        hideLoading() { 
+            elements.loadingOverlay.classList.remove('fade-in');
+            elements.loadingOverlay.classList.add('fade-out');
+            setTimeout(() => elements.loadingOverlay.classList.add('hidden'), 500);
+        },
+        toggleMobileMenu() { elements.mobileMenu.classList.toggle('hidden'); },
+        openModal() {
+            elements.bookingModal.classList.remove('hidden');
+            setTimeout(() => elements.modalContent.classList.remove('opacity-0', '-translate-y-4'), 10);
+        },
+        closeModal() {
+            elements.modalContent.classList.add('opacity-0', '-translate-y-4');
+            setTimeout(() => elements.bookingModal.classList.add('hidden'), 300);
+        },
+        getScoreColor: score => score < 40 ? 'var(--color-red)' : (score < 75 ? 'var(--color-yellow)' : 'var(--color-green)'),
+        async handleSearch() {
+            state.brandName = elements.brandSearchInput.value.trim() || "NomeBrand";
+            ui.showLoading();
+            try {
+                state.results = await api.getAnalysis(state.brandName);
+                render.fullResultsPage();
+            } catch (error) {
+                console.error("Si è verificato un errore durante l'analisi:", error);
+            } finally {
+                ui.hideLoading();
             }
-        }
-        
-        function getScoreColor(score) {
-            if (score < 40) return '#DC3545'; // Red
-            if (score < 75) return '#FFC107'; // Yellow
-            return '#28A745'; // Green
-        }
-
-        function openModal() {
-            bookingModal.classList.remove('hidden');
-            setTimeout(() => modalContent.classList.remove('opacity-0', '-translate-y-4'), 10);
-        }
-
-        function closeModal() {
-            modalContent.classList.add('opacity-0', '-translate-y-4');
-            setTimeout(() => bookingModal.classList.add('hidden'), 300);
-        }
-        
-        function handleTimeSlotSelection(e) {
-            const btn = e.target;
-            if (btn.disabled) return;
-
-            timeSlotBtns.forEach(b => {
-                if (!b.disabled) {
-                   b.classList.remove('bg-blue-600', 'text-white');
-                   b.classList.add('border-blue-600', 'text-blue-700');
-                }
+        },
+        handleTimeSlotSelection(e) {
+            const btn = e.target.closest('.time-slot-btn');
+            if (!btn || btn.disabled) return;
+            elements.timeSlotBtns.forEach(b => {
+                if (!b.disabled) b.classList.remove('bg-blue-600', 'text-white');
             });
             btn.classList.add('bg-blue-600', 'text-white');
-            btn.classList.remove('border-blue-600', 'text-blue-700');
-            
-            confirmAppointmentBtn.disabled = false;
-            confirmAppointmentBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            elements.confirmAppointmentBtn.disabled = false;
+            elements.confirmAppointmentBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        },
+        handleConfirmAppointment() {
+            if(elements.confirmAppointmentBtn.disabled) return;
+            const msg = document.createElement('div');
+            msg.textContent = 'Appuntamento confermato!';
+            msg.className = 'fade-in fixed top-5 right-5 bg-green-500 text-white py-2 px-4 rounded-lg shadow-lg';
+            document.body.appendChild(msg);
+            setTimeout(() => {
+                msg.classList.add('fade-out');
+                msg.addEventListener('animationend', () => msg.remove());
+            }, 3000);
+            ui.closeModal();
         }
-        
-        function handleConfirmAppointment() {
-            if(confirmAppointmentBtn.disabled) return;
-            // In un'app reale, qui si gestirebbe la logica di prenotazione.
-            // Per la demo, usiamo un semplice alert non bloccante.
-            const confirmationMessage = document.createElement('div');
-            confirmationMessage.textContent = 'Appuntamento confermato!';
-            confirmationMessage.className = 'fixed top-5 right-5 bg-green-500 text-white py-2 px-4 rounded-lg shadow-lg';
-            document.body.appendChild(confirmationMessage);
-            setTimeout(() => confirmationMessage.remove(), 3000);
-            
-            closeModal();
-        }
+    };
 
-        // --- Event Listeners ---
-        function initEventListeners() {
-            startSearchBtn.addEventListener('click', handleSearch);
-            brandSearchInput.addEventListener('keypress', e => { if (e.key === 'Enter') handleSearch(); });
-            mobileMenuBtn.addEventListener('click', toggleMobileMenu);
-            openBookingModalBtn.addEventListener('click', openModal);
-            closeModalBtn.addEventListener('click', closeModal);
-            bookingModal.addEventListener('click', e => { if (e.target === bookingModal) closeModal(); });
-            timeSlotBtns.forEach(btn => btn.addEventListener('click', handleTimeSlotSelection));
-            confirmAppointmentBtn.addEventListener('click', handleConfirmAppointment);
-        }
+    // --- INITIALIZATION ---
+    function init() {
+        // Garantisce che il loader sia nascosto all'avvio, a prescindere dallo stato della cache
+        elements.loadingOverlay.classList.add('hidden');
         
-        initEventListeners();
-    });
-    </script>
+        // **LA CORREZIONE FONDAMENTALE È QUI**
+        // Si passa un riferimento alla funzione, non la si esegue.
+        // `ui.handleSearch` è la funzione da chiamare. `ui.handleSearch()` la eseguirebbe subito.
+        elements.startSearchBtn.addEventListener('click', ui.handleSearch);
+        elements.brandSearchInput.addEventListener('keypress', e => { if (e.key === 'Enter') ui.handleSearch(); });
+        elements.mobileMenuBtn.addEventListener('click', ui.toggleMobileMenu);
+        elements.openBookingModalBtn.addEventListener('click', ui.openModal);
+        elements.closeModalBtn.addEventListener('click', ui.closeModal);
+        elements.bookingModal.addEventListener('click', e => { if (e.target === elements.bookingModal) ui.closeModal(); });
+        elements.timeSlotBtns.forEach(btn => btn.addEventListener('click', ui.handleTimeSlotSelection));
+        elements.confirmAppointmentBtn.addEventListener('click', ui.handleConfirmAppointment);
+    }
+
+    // Ritorna solo il metodo pubblico per avviare l'app
+    return {
+        init: init
+    };
+
+})();
+
+// Avvia l'applicazione quando il DOM è pronto
+document.addEventListener('DOMContentLoaded', AppController.init);
+
+</script>
+
 </body>
 </html>
