@@ -90,6 +90,9 @@ module.exports = async (request, response) => {
         const searchResponse = await fetch(urlWithQuery, {
             method: 'GET',
             headers: {
+                // *** LA CORREZIONE CHIAVE È QUI ***
+                // Come da documentazione, aggiungiamo anche l'header X-IBM-Client-Id
+                // oltre al token di autorizzazione.
                 'Authorization': `Bearer ${accessToken}`,
                 'X-IBM-Client-Id': CLIENT_ID,
             },
