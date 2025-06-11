@@ -17,6 +17,7 @@
 ```
 
 **2. Carichi la Modifica su GitHub**
+
 Ora, apra il suo terminale nella cartella del progetto e carichi questa piccola ma fondamentale modifica.
 
 ```bash
@@ -24,14 +25,15 @@ Ora, apra il suo terminale nella cartella del progetto e carichi questa piccola 
 git add .
 
 # Crea il commit (il salvataggio)
-git commit -m "Configuro il progetto per usare ES Modules"
+git commit -m "Fix: Configuro il progetto per usare ES Modules"
 
 # Carica su GitHub
 git push
 ```
 
 **3. Test Finale**
-Vercel rileverà automaticamente questo aggiornamento e avvierà un nuovo deploy. Questa volta, il server capirà il "dialetto" del suo file `api/search.js` e non andrà più in crash.
+
+Vercel rileverà automaticamente questo aggiornamento e avvierà un nuovo deploy. Questa volta, il server capirà il "dialetto" del suo file `api/search.js`, non andrà più in crash e contatterà finalmente l'API dell'EUIPO.
 
 Attenda 1-2 minuti, vada sul suo sito Vercel (facendo una ricarica forzata con `Ctrl+F5` o `Cmd+Shift+R` per sicurezza) e provi a fare una ricerca.
 
