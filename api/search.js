@@ -1,7 +1,11 @@
 // Questo file deve trovarsi in: /api/search.js
-// VERSIONE CON LOG DI DIAGNOSTICA AVANZATA
+// Riscritto con sintassi CommonJS per massima compatibilità con Vercel.
 
-// Funzione helper per ottenere il token di accesso
+// Usiamo 'require' invece di 'import'
+const fetch = require('node-fetch');
+const { xml2js } = require('xml-js');
+
+// Funzione helper per ottenere il token di accesso (invariata nella logica)
 async function getAccessToken(clientId, clientSecret) {
     const tokenUrl = 'https://euipo.europa.eu/cas-server-webapp/oidc/accessToken';
     const basicAuth = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
@@ -18,27 +22,24 @@ async function getAccessToken(clientId, clientSecret) {
         });
 
         const responseData = await response.json();
-
         if (!response.ok) {
             console.error('ERRORE dall\'endpoint del token:', JSON.stringify(responseData, null, 2));
-            throw new Error('Autenticazione fallita. Le credenziali potrebbero essere errate o il formato della richiesta non è accettato.');
+            throw new Error('Autenticazione fallita. Verificare le credenziali EUIPO su Vercel.');
         }
 
         console.log('Token di accesso ottenuto con successo.');
         return responseData.access_token;
-
     } catch (error) {
         console.error('Errore di rete critico nella richiesta del token:', error);
-        throw new Error('Impossibile contattare il server di autenticazione EUIPO. Controllare la connessione o lo stato del servizio.');
+        throw new Error('Impossibile contattare il server di autenticazione EUIPO.');
     }
 }
 
-// Funzione helper per analizzare la risposta della ricerca
+// Funzione helper per analizzare la risposta (invariata nella logica)
 function parseEuipoResponse(jsonResponse) {
     const similarMarks = [];
     const records = jsonResponse?.trademarks || [];
     console.log(`Trovati ${records.length} record nella risposta.`);
-
     for (const record of records) {
         similarMarks.push({
             name: record.wordMarkSpecification?.verbalElement || 'N/D',
@@ -51,10 +52,9 @@ function parseEuipoResponse(jsonResponse) {
     return { similarMarks };
 }
 
-
-// Funzione principale che gestisce la richiesta dal frontend
-export default async function handler(request, response) {
-    console.log('--- Inizio esecuzione backend /api/search ---');
+// Usiamo 'module.exports' invece di 'export default'
+module.exports = async (request, response) => {
+    console.log('--- Inizio esecuzione backend CommonJS /api/search ---');
     response.setHeader('Access-Control-Allow-Origin', '*');
     response.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     response.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -69,12 +69,8 @@ export default async function handler(request, response) {
     }
     console.log(`Ricerca per il brand: "${brandName}"`);
 
-    // Leggiamo le credenziali
     const CLIENT_ID = process.env.EUIPO_CLIENT_ID;
     const CLIENT_SECRET = process.env.EUIPO_CLIENT_SECRET;
-
-    console.log(`Variabile EUIPO_CLIENT_ID trovata: ${CLIENT_ID ? 'Sì' : 'No'}`);
-    console.log(`Variabile EUIPO_CLIENT_SECRET trovata: ${CLIENT_SECRET ? 'Sì' : 'No'}`);
 
     if (!CLIENT_ID || !CLIENT_SECRET) {
         const msg = 'Errore di configurazione del server: EUIPO_CLIENT_ID e/o EUIPO_CLIENT_SECRET non sono impostati su Vercel.';
@@ -119,28 +115,65 @@ export default async function handler(request, response) {
         console.log('--- Fine esecuzione backend (Fallimento) ---');
         return response.status(500).json({ message: error.message || 'Errore interno del server non gestito.' });
     }
+};
+```
+
+---
+### 2. Aggiornamento di `package.json`
+
+Per completare il passaggio a CommonJS, dobbiamo aggiungere `node-fetch` come dipendenza, poiché `require('node-fetch')` funziona in modo leggermente diverso da `import`. Ho anche rimosso la riga `"type": "module"` che ora non serve più.
+
+**Azione 2:** Sostituisca il contenuto del suo file `package.json` con questo.
+
+
+```json
+{
+  "name": "intellimark-mockup",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "xml-js": "^1.6.11",
+    "node-fetch": "^2.6.7"
+  }
 }
 ```
 
-### 2. Piano d'Azione per la Diagnosi
+---
+### 3. Comandi Finali da Eseguire
 
-1.  **Sostituisca il Codice**: Apra il suo file `api/search.js` e sostituisca il contenuto con la versione qui sopra.
-2.  **Aggiorni GitHub**: Apra il terminale e carichi la modifica.
+Ora esegua questa sequenza di comandi nel suo terminale per mettere tutto in ordine e caricare su GitHub.
+
+1.  **Cancelli il vecchio file (se esiste):**
+    ```bash
+    rm api/search.mjs
+    ```
+    *(Se il comando `rm` dà errore su Windows, cancelli il file manualmente da Esplora File).*
+
+2.  **Installi le nuove dipendenze:**
+    ```bash
+    npm install
+    ```
+
+3.  **Prepari tutti i file per il commit:**
     ```bash
     git add .
-    git commit -m "Aggiungo log di diagnostica al backend"
+    ```
+
+4.  **Crei il commit finale:**
+    ```bash
+    git commit -m "Fix: Riscrivo backend in CommonJS per massima compatibilità"
+    ```
+
+5.  **Carichi su GitHub:**
+    ```bash
     git push
     ```
-3.  **Prepari il Pannello di Vercel**:
-    * Attenda 1-2 minuti che Vercel completi il nuovo deploy.
-    * Apra due schede nel suo browser: una con il suo sito Intellimark e una con la sua dashboard di Vercel.
-    * Nella dashboard di Vercel, vada alla tab **"Functions"** e clicchi sulla riga che dice **/api/search**. Vedrà una schermata pronta a mostrare i log in tempo reale.
-4.  **Esegua il Test e Legga i Log**:
-    * Torni alla scheda del suo sito e faccia una ricerca.
-    * Immediatamente dopo, torni alla scheda di Vercel con i log.
-    * Vedrà apparire una serie di messaggi. **Copi e incolli qui tutto quello che appare in quella schermata.**
 
-Quei log ci diranno esattamente in quale punto il processo si interrompe e perché. È lo strumento definitivo per risolvere questo problema.
-5.  **Analizzi i Log**:
-    * Se vede errori, cerchi di capire se sono legati alla rete, all'autenticazione o a problemi con la risposta del server.
-    * Se tutto sembra funzionare ma non ottiene risultati, verifichi che il nome del marchio sia corretto e che esistano marchi simili. 
+Dopo il deploy automatico su Vercel, questa versione, che si adatta all'ambiente del server invece di chiedergli di cambiare, risolverà l'errore di sintassi. Se dovesse ancora esserci un problema, i log ci mostreranno un errore diverso e più specifico legato all'autenticazione, che a quel punto potremo risolvere con certez

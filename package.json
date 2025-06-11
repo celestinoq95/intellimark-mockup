@@ -1,171 +1,21 @@
 {
   "name": "intellimark-mockup",
   "version": "1.0.0",
-  "description": "",
+  "description": "Applicazione per la ricerca di marchi con backend su Vercel che interroga l'API EUIPO.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "trademark",
+    "euipo",
+    "vercel",
+    "marchi"
+  ],
+  "author": "Celestino Quarato",
   "license": "ISC",
   "dependencies": {
+    "node-fetch": "^2.6.7",
     "xml-js": "^1.6.11"
   }
 }
-```
-
-Il codice del backend rimane identico, ma ora vivrà in un file con un nuovo nome. Per chiarezza, lo inserisco in un nuovo artefatto con il nome corretto.
-
-
-```javascript
-// Questo file deve trovarsi in: /api/search.mjs
-// L'estensione .mjs dice a Node.js/Vercel di trattarlo come un ES Module.
-
-import { xml2js } from 'xml-js';
-
-// Funzione helper per ottenere il token di accesso
-async function getAccessToken(clientId, clientSecret) {
-    const tokenUrl = 'https://euipo.europa.eu/cas-server-webapp/oidc/accessToken';
-    const basicAuth = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
-    console.log('Tentativo di ottenere il token di accesso...');
-
-    try {
-        const response = await fetch(tokenUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'Authorization': `Basic ${basicAuth}`,
-            },
-            body: 'grant_type=client_credentials',
-        });
-
-        const responseData = await response.json();
-
-        if (!response.ok) {
-            console.error('ERRORE dall\'endpoint del token:', JSON.stringify(responseData, null, 2));
-            throw new Error('Autenticazione fallita. Le credenziali potrebbero essere errate o il formato della richiesta non è accettato.');
-        }
-
-        console.log('Token di accesso ottenuto con successo.');
-        return responseData.access_token;
-
-    } catch (error) {
-        console.error('Errore di rete critico nella richiesta del token:', error);
-        throw new Error('Impossibile contattare il server di autenticazione EUIPO. Controllare la connessione o lo stato del servizio.');
-    }
-}
-
-// Funzione helper per analizzare la risposta della ricerca
-function parseEuipoResponse(jsonResponse) {
-    const similarMarks = [];
-    const records = jsonResponse?.trademarks || [];
-    console.log(`Trovati ${records.length} record nella risposta.`);
-
-    for (const record of records) {
-        similarMarks.push({
-            name: record.wordMarkSpecification?.verbalElement || 'N/D',
-            owner: record.applicants?.[0]?.name || 'N/D',
-            status: record.status || 'N/D',
-            classes: `Cl. ${record.niceClasses?.join(', ') || 'N/A'}`,
-            applicationNumber: record.applicationNumber,
-        });
-    }
-    return { similarMarks };
-}
-
-
-// Funzione principale che gestisce la richiesta dal frontend
-export default async function handler(request, response) {
-    console.log('--- Inizio esecuzione backend /api/search ---');
-    response.setHeader('Access-Control-Allow-Origin', '*');
-    response.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-    response.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
-    if (request.method === 'OPTIONS') {
-        return response.status(200).end();
-    }
-
-    const { brandName } = request.body;
-    if (!brandName) {
-        return response.status(400).json({ message: 'Il nome del brand è richiesto.' });
-    }
-    console.log(`Ricerca per il brand: "${brandName}"`);
-
-    const CLIENT_ID = process.env.EUIPO_CLIENT_ID;
-    const CLIENT_SECRET = process.env.EUIPO_CLIENT_SECRET;
-
-    console.log(`Variabile EUIPO_CLIENT_ID trovata: ${CLIENT_ID ? 'Sì' : 'No'}`);
-    console.log(`Variabile EUIPO_CLIENT_SECRET trovata: ${CLIENT_SECRET ? 'Sì' : 'No'}`);
-
-    if (!CLIENT_ID || !CLIENT_SECRET) {
-        const msg = 'Errore di configurazione del server: EUIPO_CLIENT_ID e/o EUIPO_CLIENT_SECRET non sono impostati su Vercel.';
-        console.error(msg);
-        return response.status(500).json({ message: msg });
-    }
-
-    try {
-        const accessToken = await getAccessToken(CLIENT_ID, CLIENT_SECRET);
-        console.log('Token ricevuto, procedo con la ricerca del marchio...');
-
-        const searchApiUrl = `https://api.euipo.europa.eu/trademark-search/trademarks`;
-        const rsqlQuery = `wordMarkSpecification.verbalElement==*${brandName}*`;
-        const urlWithQuery = `${searchApiUrl}?query=${encodeURIComponent(rsqlQuery)}&size=20`;
-        console.log(`URL di ricerca costruito: ${urlWithQuery}`);
-
-        const searchResponse = await fetch(urlWithQuery, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${accessToken}`,
-                'X-IBM-Client-Id': CLIENT_ID,
-            },
-        });
-        
-        const responseText = await searchResponse.text();
-
-        if (!searchResponse.ok) {
-            console.error(`ERRORE dalla ricerca EUIPO: Status ${searchResponse.status}`);
-            console.error(`Testo della risposta di errore: ${responseText}`);
-            throw new Error(`Il server EUIPO ha risposto con un errore. Controllare i log di Vercel per i dettagli.`);
-        }
-
-        console.log('Risposta dalla ricerca EUIPO ottenuta con successo.');
-        const resultJSON = JSON.parse(responseText);
-        const parsedResults = parseEuipoResponse(resultJSON);
-
-        console.log('--- Fine esecuzione backend (Successo) ---');
-        return response.status(200).json(parsedResults);
-
-    } catch (error) {
-        console.error("ERRORE CRITICO nel blocco principale del backend:", error);
-        console.log('--- Fine esecuzione backend (Fallimento) ---');
-        return response.status(500).json({ message: error.message || 'Errore interno del server non gestito.' });
-    }
-}
-```
-
-### 2. Comandi da Eseguire nel Terminale
-
-Ora esegua questi comandi nel suo terminale, uno alla volta. Useremo il comando `git mv` che è il modo corretto per dire a Git che stiamo rinominando un file.
-
-1.  **Rinomini il file del backend:**
-    ```bash
-    git mv api/search.js api/search.mjs
-    ```
-
-2.  **Prepari tutti i file per il commit** (questo includerà il file rinominato e il `package.json` che ha modificato):
-    ```bash
-    git add .
-    ```
-
-3.  **Crei un unico commit per queste modifiche:**
-    ```bash
-    git commit -m "Fix: Passo a .mjs per forzare ES Module"
-    ```
-
-4.  **Carichi le modifiche su GitHub:**
-    ```bash
-    git push
-    ```
-
-Dopo aver eseguito il `push`, Vercel inizierà un nuovo deploy. Questa volta, l'estensione `.mjs` forzerà il server a interpretare il file correttamente, risolvendo l'errore `Unexpected token 'export'` alla radi
