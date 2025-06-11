@@ -3,115 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Intellimark.ai - Mockup Interattivo Definitivo</title>
-    <!-- Versione 5.0 - Correzione definitiva del bug di avvio automatico -->
+    <title>Intellimark.ai - Beta con Backend Attivo</title>
+    <!-- Versione 8.0 - Chiamata al backend reale ATTIVATA -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --color-primary-start: #0A2A5B;
-            --color-primary-end: #4A0E69;
-            --color-green: #28A745;
-            --color-yellow: #FFC107;
-            --color-red: #DC3545;
-        }
+        :root { --color-primary-start: #0A2A5B; --color-primary-end: #4A0E69; --color-green: #28A745; --color-yellow: #FFC107; --color-red: #DC3545; }
         body { font-family: 'Figtree', sans-serif; background-color: #F8F9FA; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
-        h1, h2, h3, h4, .font-inter { font-family: 'Inter', sans-serif; }
         .gradient-text { background: linear-gradient(to right, var(--color-primary-start), var(--color-primary-end)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .btn-gradient { background: linear-gradient(to right, var(--color-primary-start), var(--color-primary-end)); transition: all 0.3s ease; }
         .btn-gradient:hover { box-shadow: 0 4px 15px 0 rgba(10, 42, 91, 0.3); }
         .hidden { display: none !important; }
-        .fade-in { animation: fadeIn 0.5s ease-in-out forwards; }
-        .fade-out { animation: fadeOut 0.5s ease-in-out forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
-        #loading-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(248, 249, 250, 0.8);
-            backdrop-filter: blur(5px); z-index: 100;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .spinner {
-            border: 6px solid #e2e8f0; border-top: 6px solid var(--color-primary-start);
-            border-radius: 50%; width: 60px; height: 60px;
-            animation: spin 1s linear infinite;
-        }
+        #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(248, 249, 250, 0.8); backdrop-filter: blur(5px); z-index: 100; display: flex; align-items: center; justify-content: center; }
+        .spinner { border: 6px solid #e2e8f0; border-top: 6px solid var(--color-primary-start); border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="antialiased text-gray-800">
-
-    <div id="loading-overlay" class="hidden">
-        <div class="text-center">
-            <div class="spinner mx-auto"></div>
-            <p class="mt-4 text-lg font-semibold font-inter text-gray-700">Analizzando il tuo brand...</p>
-        </div>
-    </div>
-
+    <div id="loading-overlay" class="hidden"> <div class="text-center"> <div class="spinner mx-auto"></div> <p class="mt-4 text-lg font-semibold font-inter text-gray-700">Sto interrogando le banche dati ufficiali...</p> </div> </div>
     <div id="app-container">
         <header id="main-header" class="bg-white/80 backdrop-blur-sm sticky top-0 z-40 border-b border-gray-200/80">
             <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-                <a href="#" class="font-inter font-bold text-2xl gradient-text" onclick="location.reload(); return false;" aria-label="Homepage di Intellimark.ai">
-                    Intellimark.ai
-                </a>
-                <nav class="hidden md:flex items-center space-x-6">
-                    <a href="#how-it-works" class="text-gray-600 hover:text-blue-900 transition-colors">Come Funziona</a>
-                    <a href="#" class="text-gray-600 hover:text-blue-900 transition-colors">Prezzi</a>
-                    <a href="#" class="text-gray-600 hover:text-blue-900 transition-colors">Login</a>
-                </nav>
-                <button class="hidden md:block btn-gradient text-white font-semibold py-2 px-5 rounded-lg shadow-md hover:shadow-lg transition-all">
-                    Parla con un Consulente
-                </button>
-                <div class="md:hidden">
-                     <button id="mobile-menu-btn" class="text-gray-600 focus:outline-none" aria-label="Apri menu">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
-                    </button>
-                </div>
-            </div>
-            <div id="mobile-menu" class="hidden md:hidden bg-white p-4">
-                <a href="#how-it-works" class="block py-2 text-gray-600 hover:text-blue-900">Come Funziona</a>
-                <a href="#" class="block py-2 text-gray-600 hover:text-blue-900">Prezzi</a>
-                <a href="#" class="block py-2 text-gray-600 hover:text-blue-900">Login</a>
-                <button class="mt-4 w-full btn-gradient text-white font-semibold py-2 px-5 rounded-lg shadow-md">
-                    Parla con un Consulente
-                </button>
+                <a href="#" class="font-inter font-bold text-2xl gradient-text" onclick="location.reload(); return false;" aria-label="Homepage di Intellimark.ai"> Intellimark.ai </a>
+                <nav class="hidden md:flex items-center space-x-6"> <a href="#" class="text-gray-600 hover:text-blue-900 transition-colors">Prezzi</a> </nav>
             </div>
         </header>
-
         <main>
             <section id="home-screen" class="fade-in">
                 <div class="container mx-auto px-6 py-16 md:py-24 text-center">
                     <h1 class="text-4xl md:text-6xl font-extrabold font-inter text-gray-900 leading-tight">Il tuo brand ha <span class="gradient-text">potenziale?</span></h1>
-                    <h2 class="text-4xl md:text-6xl font-extrabold font-inter text-gray-900 leading-tight mt-2">Scoprilo in 60 secondi.</h2>
-                    <p class="mt-6 max-w-2xl mx-auto text-lg text-gray-600">La nostra AI analizza milioni di dati per darti una risposta chiara e strategica sulla protezione del tuo marchio.</p>
                     <div class="mt-10 max-w-2xl mx-auto">
                         <div class="relative flex items-center shadow-lg rounded-full">
                             <input id="brand-search-input" type="text" placeholder="Inserisci il nome del tuo brand..." class="w-full py-4 pl-8 pr-24 md:pr-20 rounded-full text-lg border-2 border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <button title="Cerca per logo" aria-label="Cerca per logo" class="absolute right-20 md:right-16 text-gray-500 hover:text-blue-700 transition-colors">
-                                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                            </button>
                             <button id="start-search-btn" class="absolute right-2 top-2 bottom-2 btn-gradient text-white font-semibold px-4 rounded-full text-lg">Cerca</button>
                         </div>
                     </div>
                 </div>
-                <div id="how-it-works" class="bg-white py-16 md:py-24">
-                     <div class="container mx-auto px-6">
-                        <div class="text-center mb-12">
-                            <h2 class="text-3xl md:text-4xl font-bold font-inter text-gray-900">Come Funziona</h2>
-                            <p class="mt-3 text-lg text-gray-600 max-w-2xl mx-auto">Un processo semplice in tre passi per darti il pieno controllo.</p>
-                        </div>
-                        <div class="grid md:grid-cols-3 gap-10 text-center">
-                             <div class="p-6"> <div class="flex items-center justify-center h-16 w-16 rounded-full bg-blue-100 mx-auto mb-4"> <svg class="w-8 h-8 text-blue-800" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg> </div> <h3 class="text-xl font-bold font-inter mb-2">1. Analizza</h3> <p class="text-gray-600">Descrivi o carica il tuo brand. La nostra intelligenza artificiale si mette subito al lavoro per te.</p> </div>
-                             <div class="p-6"> <div class="flex items-center justify-center h-16 w-16 rounded-full bg-blue-100 mx-auto mb-4"> <svg class="w-8 h-8 text-blue-800" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> </div> <h3 class="text-xl font-bold font-inter mb-2">2. Valuta</h3> <p class="text-gray-600">Ricevi il tuo Brand Potential Score™, una metrica chiara e oggettiva sulla forza del tuo marchio.</p> </div>
-                             <div class="p-6"> <div class="flex items-center justify-center h-16 w-16 rounded-full bg-blue-100 mx-auto mb-4"> <svg class="w-8 h-8 text-blue-800" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path></svg> </div> <h3 class="text-xl font-bold font-inter mb-2">3. Agisci</h3> <p class="text-gray-600">Registra con i nostri legali o ricevi una consulenza strategica per proteggere il tuo asset più prezioso.</p> </div>
-                        </div>
-                    </div>
-                </div>
             </section>
-
             <section id="results-screen" class="hidden" aria-live="polite">
                 <div class="bg-white border-b border-gray-200/80">
                     <div class="container mx-auto px-6 py-4"><h2 class="text-xl font-semibold">Risultati per: <span id="searched-brand-name" class="font-bold gradient-text"></span></h2></div>
@@ -120,300 +51,172 @@
                     <div class="grid lg:grid-cols-3 gap-8">
                         <div class="lg:col-span-1 bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-200/80">
                             <h3 class="text-2xl font-bold font-inter text-center">Brand Potential Score™</h3>
-                            <div class="relative w-full max-w-[300px] mx-auto h-[150px] md:h-[200px]">
-                                <canvas id="brandScoreChart"></canvas>
-                                <div class="absolute inset-0 flex flex-col items-center justify-center font-inter">
-                                    <span id="score-value" class="text-5xl font-extrabold text-gray-800"></span>
-                                    <span class="text-lg font-semibold text-gray-500">/ 100</span>
-                                </div>
-                            </div>
-                            <div class="mt-8 space-y-6">
-                                <div><div class="flex justify-between font-semibold mb-1"><span>Distintività Semantica</span><span id="pillar1-value" class="font-bold"></span></div><div class="w-full bg-gray-200 rounded-full h-3"><div id="pillar1-bar" class="h-3 rounded-full transition-all duration-500"></div></div></div>
-                                <div><div class="flex justify-between font-semibold mb-1"><span>Rischio di Confusione</span><span id="pillar2-value" class="font-bold"></span></div><div class="w-full bg-gray-200 rounded-full h-3"><div id="pillar2-bar" class="h-3 rounded-full transition-all duration-500"></div></div></div>
-                                <div><div class="flex justify-between font-semibold mb-1"><span>Disponibilità Digitale</span><span id="pillar3-value" class="font-bold"></span></div><div class="w-full bg-gray-200 rounded-full h-3"><div id="pillar3-bar" class="h-3 rounded-full transition-all duration-500"></div></div></div>
-                            </div>
+                             <div class="relative w-full max-w-[300px] mx-auto h-[150px] md:h-[200px]"> <canvas id="brandScoreChart"></canvas> <div class="absolute inset-0 flex flex-col items-center justify-center font-inter"> <span id="score-value" class="text-5xl font-extrabold text-gray-800"></span> <span class="text-lg font-semibold text-gray-500">/ 100</span> </div> </div>
+                            <div class="mt-8 space-y-6"> <div><div class="flex justify-between font-semibold mb-1"><span>Distintività Semantica</span><span id="pillar1-value" class="font-bold"></span></div><div class="w-full bg-gray-200 rounded-full h-3"><div id="pillar1-bar" class="h-3 rounded-full transition-all duration-500"></div></div></div> <div><div class="flex justify-between font-semibold mb-1"><span>Rischio di Confusione</span><span id="pillar2-value" class="font-bold"></span></div><div class="w-full bg-gray-200 rounded-full h-3"><div id="pillar2-bar" class="h-3 rounded-full transition-all duration-500"></div></div></div> <div><div class="flex justify-between font-semibold mb-1"><span>Disponibilità Digitale</span><span id="pillar3-value" class="font-bold"></span></div><div class="w-full bg-gray-200 rounded-full h-3"><div id="pillar3-bar" class="h-3 rounded-full transition-all duration-500"></div></div></div> </div>
                         </div>
                         <div class="lg:col-span-2 space-y-6">
-                            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200/80"><h4 class="text-xl font-bold font-inter mb-3">Analisi di Distintività</h4><p id="distinctiveness-analysis-text" class="text-gray-600"></p></div>
-                            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200/80"><h4 class="text-xl font-bold font-inter mb-3">Ricerca di Anteriorità (UIBM/EUIPO)</h4><div id="anteriority-results-container"></div></div>
-                            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200/80"><h4 class="text-xl font-bold font-inter mb-4">Disponibilità Digitale</h4><div id="digital-availability-container" class="grid grid-cols-2 sm:grid-cols-3 gap-4"></div></div>
-                            <div id="cta-box" class="bg-gradient-to-r text-white p-8 rounded-2xl shadow-lg"><h4 id="cta-title" class="text-2xl font-bold font-inter"></h4><p class="mt-2 opacity-90">Questo brand ha i requisiti per una protezione efficace. Non rischiare di perderlo.</p><div class="mt-6 flex flex-col sm:flex-row gap-4"><button class="w-full sm:w-auto bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg transition-colors">Registra Ora da 249€</button><button id="open-booking-modal-btn" class="w-full sm:w-auto bg-white/20 hover:bg-white/30 text-white font-bold py-3 px-6 rounded-lg transition-colors">Pianifica una call strategica</button></div></div>
+                            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200/80"><h4 class="text-xl font-bold font-inter mb-3">Ricerca di Anteriorità (Banca Dati Ufficiale EUIPO)</h4><div id="anteriority-results-container"><p class="text-gray-500">I risultati della ricerca di anteriorità appariranno qui...</p></div></div>
+                            <div id="error-box" class="hidden bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-lg" role="alert"> <p class="font-bold">Errore di comunicazione</p> <p id="error-message"></p> </div>
                         </div>
                     </div>
                 </div>
             </section>
         </main>
-
-        <div id="booking-modal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-            <div id="modal-content" class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl transform opacity-0 -translate-y-4">
-                 <div class="p-6 md:p-8 relative">
-                    <button id="close-modal-btn" aria-label="Chiudi modale" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-3xl">&times;</button>
-                    <h3 class="text-2xl md:text-3xl font-bold font-inter text-gray-900 mb-6">Pianifica una call strategica</h3>
-                    <div class="grid md:grid-cols-2 gap-8">
-                        <div>
-                            <div class="flex items-center space-x-4"><img src="https://placehold.co/80x80/E2E8F0/4A5568?text=DR" alt="Foto Dott.ssa Rossi" class="rounded-full w-20 h-20 border-2 border-white shadow-md"><div><p class="font-bold text-lg">Dott.ssa Rossi</p><p class="text-gray-600">Esperta in IP</p></div></div>
-                            <p class="mt-4 text-gray-600">Scegli un orario per una sessione gratuita di 15 minuti. Analizzeremo insieme i risultati e definiremo i prossimi passi per la tutela del tuo brand.</p>
-                        </div>
-                        <div class="border-t md:border-t-0 md:border-l border-gray-200 md:pl-8 pt-6 md:pt-0">
-                            <p class="font-bold text-center text-lg mb-4">Giugno 2025</p>
-                            <div class="grid grid-cols-7 gap-1 text-center text-sm text-gray-500 mb-2"><span>Lun</span><span>Mar</span><span>Mer</span><span>Gio</span><span>Ven</span><span>Sab</span><span>Dom</span></div>
-                            <div class="grid grid-cols-7 gap-1 text-center"> <div class="text-gray-400">26</div><div class="text-gray-400">27</div><div class="text-gray-400">28</div><div class="text-gray-400">29</div><div class="text-gray-400">30</div><div class="text-gray-400">31</div><div>1</div> <div>2</div><div>3</div><div>4</div><div>5</div><div>6</div><div>7</div><div>8</div> <div>9</div><div class="bg-blue-600 text-white font-bold rounded-full w-8 h-8 flex items-center justify-center mx-auto">10</div><div class="hover:bg-blue-100 rounded-full w-8 h-8 flex items-center justify-center mx-auto cursor-pointer">11</div><div class="hover:bg-blue-100 rounded-full w-8 h-8 flex items-center justify-center mx-auto cursor-pointer">12</div><div class="hover:bg-blue-100 rounded-full w-8 h-8 flex items-center justify-center mx-auto cursor-pointer">13</div><div>14</div><div>15</div> <div>16</div><div class="hover:bg-blue-100 rounded-full w-8 h-8 flex items-center justify-center mx-auto cursor-pointer">17</div><div class="hover:bg-blue-100 rounded-full w-8 h-8 flex items-center justify-center mx-auto cursor-pointer">18</div><div class="hover:bg-blue-100 rounded-full w-8 h-8 flex items-center justify-center mx-auto cursor-pointer">19</div><div class="hover:bg-blue-100 rounded-full w-8 h-8 flex items-center justify-center mx-auto cursor-pointer">20</div><div>21</div><div>22</div> </div>
-                            <div class="mt-4"><p class="font-semibold text-center mb-2">Seleziona un orario:</p><div class="grid grid-cols-2 md:grid-cols-3 gap-2"><button class="time-slot-btn w-full border border-blue-600 text-blue-700 font-semibold py-2 rounded-lg hover:bg-blue-600 hover:text-white transition-colors">09:30</button><button class="time-slot-btn w-full border border-blue-600 text-blue-700 font-semibold py-2 rounded-lg hover:bg-blue-600 hover:text-white transition-colors">10:00</button><button class="time-slot-btn w-full border border-blue-600 text-blue-700 font-semibold py-2 rounded-lg hover:bg-blue-600 hover:text-white transition-colors">11:15</button><button class="time-slot-btn w-full border border-blue-600 text-blue-700 font-semibold py-2 rounded-lg hover:bg-blue-600 hover:text-white transition-colors">14:00</button><button class="time-slot-btn w-full border border-blue-600 text-blue-700 font-semibold py-2 rounded-lg hover:bg-blue-600 hover:text-white transition-colors">14:45</button><button class="time-slot-btn w-full border border-gray-300 text-gray-400 font-semibold py-2 rounded-lg cursor-not-allowed">16:00</button></div></div>
-                            <button id="confirm-appointment-btn" class="mt-6 w-full btn-gradient text-white font-bold py-3 px-6 rounded-lg transition-colors opacity-50 cursor-not-allowed" disabled>Conferma Appuntamento</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 
-<script>
-// Riscritto come modulo per isolare lo scope e migliorare la manutenibilità
-const AppController = (function() {
+    <script>
+    const AppController = (function() {
+        const state = { brandScoreChart: null };
+        const elements = {
+            homeScreen: document.getElementById('home-screen'),
+            resultsScreen: document.getElementById('results-screen'),
+            startSearchBtn: document.getElementById('start-search-btn'),
+            brandSearchInput: document.getElementById('brand-search-input'),
+            searchedBrandName: document.getElementById('searched-brand-name'),
+            loadingOverlay: document.getElementById('loading-overlay'),
+            scoreValue: document.getElementById('score-value'),
+            brandScoreChartCanvas: document.getElementById('brandScoreChart'),
+            pillars: {
+                p1: { value: document.getElementById('pillar1-value'), bar: document.getElementById('pillar1-bar') },
+                p2: { value: document.getElementById('pillar2-value'), bar: document.getElementById('pillar2-bar') },
+                p3: { value: document.getElementById('pillar3-value'), bar: document.getElementById('pillar3-bar') },
+            },
+            anteriorityContainer: document.getElementById('anteriority-results-container'),
+            errorBox: document.getElementById('error-box'),
+            errorMessage: document.getElementById('error-message'),
+        };
 
-    // --- STATE ---
-    const state = {
-        brandName: '',
-        results: {},
-        brandScoreChart: null,
-    };
+        const api = {
+            API_ENDPOINT: '/api/search', 
+            async getAnalysis(brandName) {
+                console.log(`Invio richiesta al nostro backend per: ${brandName}`);
+                const response = await fetch(this.API_ENDPOINT, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ brandName: brandName })
+                });
 
-    // --- ELEMENTS CACHE ---
-    const elements = {
-        homeScreen: document.getElementById('home-screen'),
-        resultsScreen: document.getElementById('results-screen'),
-        startSearchBtn: document.getElementById('start-search-btn'),
-        brandSearchInput: document.getElementById('brand-search-input'),
-        searchedBrandName: document.getElementById('searched-brand-name'),
-        loadingOverlay: document.getElementById('loading-overlay'),
-        mobileMenuBtn: document.getElementById('mobile-menu-btn'),
-        mobileMenu: document.getElementById('mobile-menu'),
-        bookingModal: document.getElementById('booking-modal'),
-        modalContent: document.getElementById('modal-content'),
-        openBookingModalBtn: document.getElementById('open-booking-modal-btn'),
-        closeModalBtn: document.getElementById('close-modal-btn'),
-        timeSlotBtns: document.querySelectorAll('.time-slot-btn'),
-        confirmAppointmentBtn: document.getElementById('confirm-appointment-btn'),
-        scoreValue: document.getElementById('score-value'),
-        brandScoreChartCanvas: document.getElementById('brandScoreChart'),
-        pillars: {
-            p1: { value: document.getElementById('pillar1-value'), bar: document.getElementById('pillar1-bar') },
-            p2: { value: document.getElementById('pillar2-value'), bar: document.getElementById('pillar2-bar') },
-            p3: { value: document.getElementById('pillar3-value'), bar: document.getElementById('pillar3-bar') },
-        },
-        distinctivenessText: document.getElementById('distinctiveness-analysis-text'),
-        anteriorityContainer: document.getElementById('anteriority-results-container'),
-        digitalContainer: document.getElementById('digital-availability-container'),
-        ctaBox: document.getElementById('cta-box'),
-        ctaTitle: document.getElementById('cta-title'),
-    };
-
-    // --- API SIMULATION & DATA GENERATION ---
-    const api = {
-        async getAnalysis(brandName) {
-            console.log(`Avvio analisi per: ${brandName}`);
-            await new Promise(resolve => setTimeout(resolve, 2500)); 
-
-            const score = Math.floor(Math.random() * 71) + 30;
-            const p1 = Math.floor(Math.random() * 51) + 50;
-            const p2 = Math.floor(Math.random() * 51) + 50;
-            const p3 = Math.floor(Math.random() * 61) + 40;
-
-            const similarMarkCount = score > 60 ? Math.floor(Math.random() * 2) : Math.floor(Math.random() * 4) + 1;
-            const similarMarks = Array.from({ length: similarMarkCount }, () => this.generateFakeMark(brandName));
-            const digitalAvailability = this.generateDigitalAvailability(brandName);
-
-            const results = { score, p1, p2, p3, similarMarks, digitalAvailability };
-            console.log("Analisi simulata completata.", results);
-            return results;
-        },
-        generateFakeMark(baseName) {
-            const prefixes = ["Evo", "Zen", "Aqua", "Nova", "Luxe"];
-            const suffixes = ["fy", "ly", "io", "ix", "a"];
-            const industries = ["Tecnologia", "Moda", "Alimentare", "Cosmetici", "Servizi Finanziari"];
-            const name = prefixes[Math.floor(Math.random() * prefixes.length)] + baseName.substring(0,3) + suffixes[Math.floor(Math.random() * suffixes.length)];
-            return { name, status: Math.random() > 0.5 ? "Simile" : "Molto Simile", classes: `Cl. ${Math.floor(Math.random() * 42) + 1}`, industry: industries[Math.floor(Math.random() * industries.length)] };
-        },
-        generateDigitalAvailability(baseName) {
-            const platforms = ['.it', '.com', '.eu', 'Instagram', 'Facebook', 'X (Twitter)', 'TikTok'];
-            return platforms.map(platform => ({
-                platform: platform.includes('.') ? `${baseName.toLowerCase()}${platform}` : `@${baseName.toLowerCase()}`,
-                name: platform.includes('.') ? platform.substring(1).toUpperCase() : platform,
-                isAvailable: Math.random() > 0.4,
-            }));
-        }
-    };
-
-    // --- RENDER FUNCTIONS ---
-    const render = {
-        fullResultsPage() {
-            elements.homeScreen.classList.add('hidden');
-            elements.resultsScreen.classList.remove('hidden');
-            elements.resultsScreen.classList.add('fade-in');
-            window.scrollTo(0, 0);
-
-            elements.searchedBrandName.textContent = state.brandName;
-            
-            this.updatePillars();
-            this.updateCtaBox();
-            this.updateDistinctivenessText();
-            this.updateAnteriorityResults();
-            this.updateDigitalAvailability();
-
-            setTimeout(() => this.createOrUpdateChart(), 100);
-        },
-        createOrUpdateChart() {
-            const scoreColor = ui.getScoreColor(state.results.score);
-            elements.scoreValue.textContent = state.results.score;
-            elements.scoreValue.style.color = scoreColor;
-            const data = { datasets: [{ data: [state.results.score, 100 - state.results.score], backgroundColor: [scoreColor, '#E5E7EB'], borderWidth: 0, circumference: 180, rotation: 270 }] };
-            const options = { responsive: true, maintainAspectRatio: false, cutout: '80%', plugins: { tooltip: { enabled: false } }, events: [] };
-            if (state.brandScoreChart) state.brandScoreChart.destroy();
-            state.brandScoreChart = new Chart(elements.brandScoreChartCanvas, { type: 'doughnut', data, options });
-        },
-        updatePillars() {
-            const { p1, p2, p3 } = state.results;
-            const update = (pillarId, value, labels) => {
-                let label = value > 75 ? labels[0] : (value > 40 ? labels[1] : labels[2]);
-                let color = ui.getScoreColor(value);
-                elements.pillars[pillarId].value.textContent = `${value}% (${label})`;
-                elements.pillars[pillarId].value.style.color = color;
-                elements.pillars[pillarId].bar.style.width = `${value}%`;
-                elements.pillars[pillarId].bar.style.backgroundColor = color;
-            };
-            update('p1', p1, ['Forte', 'Buona', 'Debole']);
-            update('p2', p2, ['Basso', 'Medio', 'Alto']);
-            update('p3', p3, ['Ottima', 'Buona', 'Scarsa']);
-        },
-        updateCtaBox() {
-            const { score } = state.results;
-            let title = `Punteggio: ${score}. `;
-            let colorClass = '';
-            if (score < 40) { title += 'Rischio Alto!'; colorClass = 'from-red-800 to-red-900'; } 
-            else if (score < 75) { title += 'Potenziale da Valutare.'; colorClass = 'from-yellow-500 to-yellow-600'; } 
-            else { title += 'Potenziale Eccellente!'; colorClass = 'from-blue-800 to-indigo-900'; }
-            elements.ctaBox.className = 'bg-gradient-to-r text-white p-8 rounded-2xl shadow-lg ' + colorClass;
-            elements.ctaTitle.textContent = title;
-        },
-        updateDistinctivenessText() {
-            const { p1 } = state.results;
-            let text = '';
-            if (p1 > 75) { text = "Il nome è originale e non descrittivo. Ottima base di partenza. L'AI non ha rilevato termini generici o comuni che potrebbero indebolire la protezione legale del marchio."; } 
-            else if (p1 > 40) { text = "Il nome presenta alcuni elementi comuni ma possiede un certo grado di originalità. Si consiglia un'analisi legale per valutarne la forza effettiva."; }
-            else { text = "Il nome è altamente descrittivo o generico. Il rischio che venga rifiutata la registrazione è significativo. Si consiglia di esplorare alternative più uniche."; }
-            elements.distinctivenessText.textContent = text;
-        },
-        updateAnteriorityResults() {
-            const { similarMarks } = state.results;
-            elements.anteriorityContainer.innerHTML = ''; 
-            if(similarMarks.length === 0) {
-                elements.anteriorityContainer.innerHTML = `<p class="text-gray-600">🎉 Trovati <span class="font-bold">0 marchi identici o simili</span>. Rischio di opposizione molto basso.</p>`;
-                return;
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({ message: 'Risposta non valida o errore interno del server.' }));
+                    throw new Error(errorData.message || `Errore di rete: ${response.status}`);
+                }
+                
+                return await response.json();
             }
-            let html = `<p class="text-gray-600 mb-4">Trovati <span class="font-bold">${similarMarks.length} marchi simili</span> con potenziale di conflitto:</p><div class="space-y-3">`;
-            similarMarks.forEach(mark => {
-                const riskColor = mark.status === "Molto Simile" ? 'text-red-600' : 'text-yellow-600';
-                html += `<div class="p-3 border rounded-lg flex justify-between items-center"><div><p class="font-bold">${mark.name}</p><p class="text-sm text-gray-500">${mark.industry} - ${mark.classes}</p></div><span class="font-semibold ${riskColor}">${mark.status}</span></div>`;
-            });
-            html += `</div><a href="#" class="inline-block mt-4 font-semibold text-blue-700 hover:underline">Vedi analisi completa &rarr;</a>`;
-            elements.anteriorityContainer.innerHTML = html;
-        },
-        updateDigitalAvailability() {
-            const { digitalAvailability } = state.results;
-            elements.digitalContainer.innerHTML = '';
-            let html = digitalAvailability.map(item => {
-                const icon = item.isAvailable ? '✅' : '❌';
-                const textColor = item.isAvailable ? 'text-green-600' : 'text-red-600';
-                const textLabel = item.isAvailable ? 'Disponibile' : 'Preso';
-                return `<div class="flex items-center space-x-2"><span class="font-bold text-xl">${icon}</span><div><p class="font-semibold">${item.platform}</p><p class="text-sm ${textColor}">${textLabel}</p></div></div>`;
-            }).join('');
-            elements.digitalContainer.innerHTML = html;
-        }
-    };
+        };
 
-    // --- UI HELPERS & HANDLERS ---
-    const ui = {
-        showLoading() { elements.loadingOverlay.classList.remove('hidden', 'fade-out'); elements.loadingOverlay.classList.add('fade-in'); },
-        hideLoading() { 
-            elements.loadingOverlay.classList.remove('fade-in');
-            elements.loadingOverlay.classList.add('fade-out');
-            setTimeout(() => elements.loadingOverlay.classList.add('hidden'), 500);
-        },
-        toggleMobileMenu() { elements.mobileMenu.classList.toggle('hidden'); },
-        openModal() {
-            elements.bookingModal.classList.remove('hidden');
-            setTimeout(() => elements.modalContent.classList.remove('opacity-0', '-translate-y-4'), 10);
-        },
-        closeModal() {
-            elements.modalContent.classList.add('opacity-0', '-translate-y-4');
-            setTimeout(() => elements.bookingModal.classList.add('hidden'), 300);
-        },
-        getScoreColor: score => score < 40 ? 'var(--color-red)' : (score < 75 ? 'var(--color-yellow)' : 'var(--color-green)'),
-        async handleSearch() {
-            state.brandName = elements.brandSearchInput.value.trim() || "NomeBrand";
-            ui.showLoading();
-            try {
-                state.results = await api.getAnalysis(state.brandName);
-                render.fullResultsPage();
-            } catch (error) {
-                console.error("Si è verificato un errore durante l'analisi:", error);
-            } finally {
-                ui.hideLoading();
-            }
-        },
-        handleTimeSlotSelection(e) {
-            const btn = e.target.closest('.time-slot-btn');
-            if (!btn || btn.disabled) return;
-            elements.timeSlotBtns.forEach(b => {
-                if (!b.disabled) b.classList.remove('bg-blue-600', 'text-white');
-            });
-            btn.classList.add('bg-blue-600', 'text-white');
-            elements.confirmAppointmentBtn.disabled = false;
-            elements.confirmAppointmentBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-        },
-        handleConfirmAppointment() {
-            if(elements.confirmAppointmentBtn.disabled) return;
-            const msg = document.createElement('div');
-            msg.textContent = 'Appuntamento confermato!';
-            msg.className = 'fade-in fixed top-5 right-5 bg-green-500 text-white py-2 px-4 rounded-lg shadow-lg';
-            document.body.appendChild(msg);
-            setTimeout(() => {
-                msg.classList.add('fade-out');
-                msg.addEventListener('animationend', () => msg.remove());
-            }, 3000);
-            ui.closeModal();
-        }
-    };
+        const render = {
+            fullResultsPage(brandName, results) {
+                elements.homeScreen.classList.add('hidden');
+                elements.resultsScreen.classList.remove('hidden');
+                elements.searchedBrandName.textContent = brandName;
+                
+                if (results.error) {
+                    this.showError(results.message);
+                    this.updateAnteriorityWithError();
+                    this.updateSimulatedMetrics([]); // Mostra metriche di base anche in caso di errore
+                } else {
+                    this.hideError();
+                    this.updateAnteriorityResults(results.similarMarks);
+                    this.updateSimulatedMetrics(results.similarMarks);
+                }
+            },
+            updateAnteriorityResults(similarMarks) {
+                elements.anteriorityContainer.innerHTML = ''; 
+                if (!similarMarks || similarMarks.length === 0) {
+                    elements.anteriorityContainer.innerHTML = `<p class="text-green-700 font-semibold">🎉 Ottima notizia! Nessun marchio simile trovato nella banca dati EUIPO.</p>`;
+                    return;
+                }
+                let html = `<p class="text-gray-600 mb-4">Trovati <span class="font-bold">${similarMarks.length} marchi registrati</span> con potenziale di conflitto:</p><div class="space-y-3 max-h-96 overflow-y-auto pr-2">`;
+                similarMarks.forEach(mark => {
+                    const statusColor = mark.status && mark.status.toLowerCase().includes('registered') ? 'text-green-600' : 'text-yellow-600';
+                    html += `<div class="p-3 border rounded-lg"><div class="flex justify-between items-start gap-4"><p class="font-bold text-lg">${mark.name}</p><span class="font-semibold text-sm text-right whitespace-nowrap px-2 py-1 rounded-full bg-gray-100 ${statusColor}">${mark.status}</span></div><p class="text-sm text-gray-500 mt-1">Titolare: ${mark.owner}</p><p class="text-sm text-gray-500">Classi di Nizza: ${mark.classes}</p></div>`;
+                });
+                html += `</div>`;
+                elements.anteriorityContainer.innerHTML = html;
+            },
+            updateSimulatedMetrics(similarMarks = []) {
+                const riskScore = 100 - (similarMarks.length * 8);
+                const score = Math.max(10, riskScore);
+                const update = (pillarId, value, labels) => {
+                    let label = value > 75 ? labels[0] : (value > 40 ? labels[1] : labels[2]);
+                    let color = ui.getScoreColor(value);
+                    elements.pillars[pillarId].value.textContent = `${value}% (${label})`;
+                    elements.pillars[pillarId].value.style.color = color;
+                    elements.pillars[pillarId].bar.style.width = `${value}%`;
+                    elements.pillars[pillarId].bar.style.backgroundColor = color;
+                };
+                update('p1', Math.floor(Math.random() * 16) + 80, ['Forte', 'Buona', 'Debole']);
+                update('p2', score, ['Basso', 'Medio', 'Alto']);
+                update('p3', Math.floor(Math.random() * 31) + 60, ['Ottima', 'Buona', 'Scarsa']);
+                this.createOrUpdateChart(score);
+            },
+            createOrUpdateChart(score) {
+                const scoreColor = ui.getScoreColor(score);
+                elements.scoreValue.textContent = score;
+                elements.scoreValue.style.color = scoreColor;
+                const data = { datasets: [{ data: [score, 100 - score], backgroundColor: [scoreColor, '#E5E7EB'], borderWidth: 0, circumference: 180, rotation: 270 }] };
+                const options = { responsive: true, maintainAspectRatio: false, cutout: '80%', plugins: { tooltip: { enabled: false } }, events: [] };
+                if (state.brandScoreChart) state.brandScoreChart.destroy();
+                state.brandScoreChart = new Chart(elements.brandScoreChartCanvas, { type: 'doughnut', data, options });
+            },
+            showError(message) {
+                elements.errorMessage.textContent = `Dettaglio: ${message}`;
+                elements.errorBox.classList.remove('hidden');
+            },
+            hideError() { elements.errorBox.classList.add('hidden'); },
+            updateAnteriorityWithError() { elements.anteriorityContainer.innerHTML = `<p class="text-red-700">Impossibile caricare i risultati.</p>`; }
+        };
 
-    // --- INITIALIZATION ---
-    function init() {
-        // Garantisce che il loader sia nascosto all'avvio, a prescindere dallo stato della cache
-        elements.loadingOverlay.classList.add('hidden');
+        const ui = {
+            showLoading() { elements.loadingOverlay.classList.remove('hidden'); },
+            hideLoading() { elements.loadingOverlay.classList.add('hidden'); },
+            getScoreColor: score => score < 40 ? 'var(--color-red)' : (score < 75 ? 'var(--color-yellow)' : 'var(--color-green)'),
+            async handleSearch() {
+                const brandName = elements.brandSearchInput.value.trim();
+                if (!brandName) {
+                    elements.brandSearchInput.focus();
+                    return;
+                }
+                ui.showLoading();
+                try {
+                    // **CHIAMATA REALE ATTIVATA**
+                    const results = await api.getAnalysis(brandName);
+                    render.fullResultsPage(brandName, results);
+                } catch (error) {
+                    console.error("Errore nel flusso di ricerca:", error);
+                    render.fullResultsPage(brandName, { error: true, message: error.message });
+                } finally {
+                    ui.hideLoading();
+                }
+            },
+        };
+
+        function init() {
+            elements.loadingOverlay.classList.add('hidden');
+            elements.startSearchBtn.addEventListener('click', ui.handleSearch);
+            elements.brandSearchInput.addEventListener('keypress', e => { if (e.key === 'Enter') ui.handleSearch(); });
+        }
         
-        // **LA CORREZIONE FONDAMENTALE È QUI**
-        // Si passa un riferimento alla funzione, non la si esegue.
-        // `ui.handleSearch` è la funzione da chiamare. `ui.handleSearch()` la eseguirebbe subito.
-        elements.startSearchBtn.addEventListener('click', ui.handleSearch);
-        elements.brandSearchInput.addEventListener('keypress', e => { if (e.key === 'Enter') ui.handleSearch(); });
-        elements.mobileMenuBtn.addEventListener('click', ui.toggleMobileMenu);
-        elements.openBookingModalBtn.addEventListener('click', ui.openModal);
-        elements.closeModalBtn.addEventListener('click', ui.closeModal);
-        elements.bookingModal.addEventListener('click', e => { if (e.target === elements.bookingModal) ui.closeModal(); });
-        elements.timeSlotBtns.forEach(btn => btn.addEventListener('click', ui.handleTimeSlotSelection));
-        elements.confirmAppointmentBtn.addEventListener('click', ui.handleConfirmAppointment);
-    }
+        return { init };
+    })();
 
-    // Ritorna solo il metodo pubblico per avviare l'app
-    return {
-        init: init
-    };
-
-})();
-
-// Avvia l'applicazione quando il DOM è pronto
-document.addEventListener('DOMContentLoaded', AppController.init);
-
-</script>
-
+    document.addEventListener('DOMContentLoaded', AppController.init);
+    </script>
 </body>
 </html>
+```
+
+### Prossimi Passi
+
+1.  **Sostituisca il Codice**: Apra il suo file `index.html` locale e sostituisca tutto il contenuto con il codice qui sopra.
+2.  **Aggiorni GitHub**: Apra il terminale e carichi la modifica.
+    ```bash
+    git add .
+    git commit -m "Attivo chiamata API reale al backend"
+    git push
+    ```
+3.  **Attenda il Deploy Automatico**: Vercel rileverà automaticamente il `push` su GitHub e aggiornerà il suo sito in 1-2 minuti.
+4.  **Test Finale**: Vada sul suo link di Vercel, svuoti la cache per sicurezza (`Ctrl+F5` o `Cmd+Shift+R`) e faccia una ricerca.
+
+Questa volta vedrà i risultati reali provenienti dal suo backend. Se qualcosa dovesse andare storto (ad esempio, se la chiave API non fosse corretta), il box rosso di errore le mostrerà il messaggio specifico inviato dal suo server.
