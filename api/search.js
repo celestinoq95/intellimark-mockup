@@ -1,8 +1,7 @@
 // Questo file deve trovarsi in: /api/search.js
 // Vercel lo trasformerà automaticamente in un endpoint serverless.
 
-// PASSO 1: Importiamo la libreria per la conversione da XML a JSON.
-// Vercel la installerà automaticamente perché la aggiungeremo al file package.json.
+// Importiamo la libreria per la conversione da XML a JSON.
 import { xml2js } from 'xml-js';
 
 // Funzione principale che gestisce la richiesta dal frontend
@@ -26,42 +25,61 @@ export default async function handler(request, response) {
     const EUIPO_API_KEY = process.env.EUIPO_API_KEY;
 
     if (!EUIPO_API_KEY) {
-        console.error("API Key non configurata sul server.");
-        return response.status(500).json({ message: 'Errore di configurazione del server: API Key mancante.' });
+        const errorMessage = 'Errore di configurazione del server: la variabile EUIPO_API_KEY non è stata impostata su Vercel.';
+        console.error(errorMessage);
+        return response.status(500).json({ message: errorMessage });
     }
     
-    // Corpo della richiesta XML, invariato rispetto a prima
-    const requestBody = `<TrademarkSearch><TradeMarkDetails><WordMarkSpecification><WordMark>
-                        <MarkVerbalElementText>${brandName}</MarkVerbalElementText></WordMark></WordMarkSpecification>
-                        </Details><SearchConditions><CaseSensitive>false</CaseSensitive>
-                        <SearchMode>Similar</SearchMode></SearchConditions></TrademarkSearch>`;
+    // Corpo della richiesta XML corretto
+    const requestBody = `
+        <TrademarkSearch>
+            <TradeMarkDetails>
+                <WordMarkSpecification>
+                    <WordMark>
+                        <MarkVerbalElementText>${brandName}</MarkVerbalElementText>
+                    </WordMark>
+                </WordMarkSpecification>
+            </TradeMarkDetails>
+            <SearchConditions>
+                <CaseSensitive>false</CaseSensitive>
+                <SearchMode>Similar</SearchMode>
+            </SearchConditions>
+        </TrademarkSearch>`;
 
     try {
         const euipoResponse = await fetch('https://euipo.europa.eu/trademark-search/ws/TrademarkSearch', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/xml',
-                // La documentazione EUIPO potrebbe richiedere un formato specifico per la chiave.
-                // Questo è un esempio comune.
-                'Authorization': `Bearer ${EUIPO_API_KEY}`
+                // La documentazione EUIPO TMDS non specifica un header di autorizzazione standard.
+                // Spesso, l'autenticazione è basata sull'IP o su parametri nella richiesta.
+                // Se la chiamata continua a fallire, è probabile che l'API Key vada usata
+                // in un altro modo o che l'accesso sia limitato.
+                // Per ora, tentiamo una chiamata diretta.
             },
             body: requestBody
         });
 
+        const responseText = await euipoResponse.text();
+
         if (!euipoResponse.ok) {
-            console.error(`Errore da EUIPO: ${euipoResponse.statusText}`);
-            throw new Error('Errore di comunicazione con il server EUIPO.');
+            // Se l'API restituisce un errore, proviamo a loggarlo per il debug
+            console.error(`Errore da EUIPO: Status ${euipoResponse.status}`);
+            console.error(`Risposta EUIPO: ${responseText}`);
+            throw new Error(`Il server EUIPO ha risposto con un errore: ${euipoResponse.statusText}. Controllare i log di Vercel per dettagli.`);
+        }
+        
+        const resultJS = xml2js(responseText, { compact: true, spaces: 2 });
+        
+        // Controlliamo se la risposta dall'API è un messaggio di errore (fault)
+        if (resultJS.Fault) {
+            const faultString = resultJS.Fault.faultstring?._text || 'Errore non specificato dall\'API.';
+            console.error(`Fault dall'API EUIPO: ${faultString}`);
+            throw new Error(faultString);
         }
 
-        const xmlText = await euipoResponse.text();
-        
-        // PASSO 2: Usiamo la libreria per convertire l'XML in un oggetto JavaScript.
-        const resultJS = xml2js(xmlText, { compact: true, spaces: 4 });
-
-        // PASSO 3: Analizziamo l'oggetto JavaScript per estrarre i dati reali.
         const parsedResults = parseEuipoResponse(resultJS);
         
-        // Invia i risultati puliti al frontend
         return response.status(200).json(parsedResults);
 
     } catch (error) {
@@ -70,24 +88,12 @@ export default async function handler(request, response) {
     }
 }
 
-/**
- * Funzione helper per navigare l'oggetto JSON convertito e estrarre i dati dei marchi.
- * @param {object} jsResponse - L'oggetto JavaScript risultato dalla conversione dell'XML.
- * @returns {{similarMarks: Array}} - Un oggetto contenente un array di marchi trovati.
- */
 function parseEuipoResponse(jsResponse) {
     const similarMarks = [];
-    
-    // Il percorso per arrivare ai dati dei marchi nell'oggetto convertito
     const records = jsResponse?.Transaction?.TradeMarkTransactionBody?.TransactionContentDetails?.TransactionData?.TradeMarkDetails?.TradeMarkRecord;
 
-    // Se non ci sono record o la struttura è diversa, restituisce un array vuoto.
-    if (!records) {
-        return { similarMarks: [] };
-    }
+    if (!records) { return { similarMarks: [] }; }
 
-    // L'API può restituire un singolo oggetto se c'è un solo risultato,
-    // o un array se ce ne sono molti. Standardizziamo il tutto in un array.
     const recordsArray = Array.isArray(records) ? records : [records];
     
     for (const record of recordsArray) {
@@ -95,7 +101,6 @@ function parseEuipoResponse(jsResponse) {
             const markDetails = record.TradeMark;
             const niceClasses = [];
             
-            // Estrazione delle classi di Nizza
             const goodsServices = markDetails.GoodsServicesDetails?.GoodsServices;
             if (goodsServices) {
                 const classDescriptions = Array.isArray(goodsServices.ClassDescriptionDetails?.ClassDescription) 
@@ -110,60 +115,51 @@ function parseEuipoResponse(jsResponse) {
             }
 
             similarMarks.push({
-                // Usiamo l'optional chaining (?.) per evitare errori se un campo non esiste
-                name: markDetails.MarkVerbalElementDetails?.MarkVerbalElement?.MarkVerbalElementText?._text || 'Nome non disponibile',
-                owner: markDetails.ApplicantDetails?.Applicant?.ApplicantName?._text || 'Titolare non disponibile',
-                status: markDetails.MarkCurrentStatusCode?._text || 'Stato non disponibile',
+                name: markDetails.MarkVerbalElementDetails?.MarkVerbalElement?.MarkVerbalElementText?._text || 'N/D',
+                owner: markDetails.ApplicantDetails?.Applicant?.ApplicantName?._text || 'N/D',
+                status: markDetails.MarkCurrentStatusCode?._text || 'N/D',
                 classes: `Cl. ${niceClasses.join(', ') || 'N/A'}`
             });
         } catch (e) {
             console.error("Errore nel parsing di un singolo record:", e);
-            // Salta il record problematico e continua con gli altri
         }
     }
     
     return { similarMarks };
 }
+
 ```
 
----
-### 2. Istruzioni per l'Aggiornamento
+### 2. Azioni Correttive (Checklist)
 
-Ora che abbiamo il codice del backend, dobbiamo dire al nostro progetto di usare la nuova libreria `xml-js`. Lo faremo creando un file `package.json`.
+Ora, segua questi passaggi in ordine.
 
-Segua questi passaggi usando il terminale, all'interno della sua cartella `intellimark-mockup`.
+**Azione 1: Aggiorni il Codice**
+1.  Apra il suo file locale `api/search.js`.
+2.  Sostituisca l'intero contenuto con il codice che le ho appena fornito.
+3.  Salvi il file.
 
-1.  **Crea il File `package.json`**
-    Questo comando crea un file `package.json` standard. È come dare una carta d'identità al suo progetto.
-    ```bash
-    npm init -y
-    ```
+**Azione 2: Verifichi la Chiave API su Vercel**
+1.  Vada sulla dashboard del suo progetto su Vercel.
+2.  Vada su **Settings** -> **Environment Variables**.
+3.  Verifichi con la massima attenzione:
+    * Il **NOME** della variabile deve essere `EUIPO_API_KEY`.
+    * Il **VALORE** deve essere la sua chiave API, incollata perfettamente, senza spazi bianchi prima o dopo. Clicchi su "Edit" per controllarla e salvarla di nuovo per sicurezza.
 
-2.  **Installa la Libreria `xml-js`**
-    Questo comando scarica la libreria e, soprattutto, la aggiunge come "ingrediente" ufficiale al suo `package.json`.
-    ```bash
-    npm install xml-js
-    ```
-    Vedrà che nella sua cartella sono apparsi un file `package-lock.json` e una cartella `node_modules`. **È normale e corretto.**
-
-3.  **Aggiungi Tutti i Nuovi File a Git**
-    Ora dobbiamo dire a Git di includere tutti questi nuovi file nel prossimo "salvataggio".
+**Azione 3: Carichi l'Aggiornamento su GitHub**
+1.  Apra il terminale nella cartella del progetto.
+2.  Esegua i soliti comandi:
     ```bash
     git add .
-    ```
-
-4.  **Crea il Commit e Carica su GitHub**
-    Salviamo le modifiche e carichiamole online.
-    ```bash
-    git commit -m "Implementato parsing XML reale con xml-js"
+    git commit -m "Miglioro gestione errori e parsing backend"
     git push
     ```
 
-### Cosa Succederà Ora
+**Azione 4: Test e Diagnosi Finale**
+1.  Attenda 1-2 minuti che Vercel completi il nuovo deploy.
+2.  Vada sul link del suo sito e faccia una **ricarica forzata** (`Ctrl+F5` o `Cmd+Shift+R`).
+3.  Provi a fare una ricerca.
 
-Quando questo nuovo codice verrà pubblicato su Vercel, accadrà la magia:
-* Vercel leggerà il `package.json`, vedrà che ha bisogno di `xml-js` e lo installerà automaticamente.
-* La sua funzione `api/search.js` ora ha il suo "traduttore" e potrà capire la risposta dell'EUIPO.
-* Quando farà una ricerca sul sito, vedrà i **dati reali** dei marchi trovati.
+Se l'errore persiste, ora abbiamo uno strumento in più. Il nuovo codice logga gli errori in modo molto più dettagliato.
 
-Ha appena fatto un passo enorme: ha aggiunto una dipendenza esterna e ha costruito una logica di parsing reale. La sua applicazione ora non è più un mockup, ma una vera e propria **beta funzionante
+* **Come Controllare i Log:** Vada sulla dashboard di Vercel, clicchi sulla tab **"Functions"** e poi sulla riga `/api/search`. Lì vedrà i log in tempo reale. Se c'è un errore, apparirà scritto lì, dandomi l'indizio definitivo per risolverlo. Mi faccia sapere cosa legge in quella sezione se il problema non si risol
