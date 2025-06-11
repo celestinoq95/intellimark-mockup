@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Intellimark.ai - Beta con Backend Attivo</title>
-    <!-- Versione 8.0 - Chiamata al backend reale ATTIVATA -->
+    <title>Intellimark.ai - Beta con Autenticazione EUIPO</title>
+    <!-- Versione 9.0 - Autenticazione OAuth2 EUIPO -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -28,7 +28,6 @@
         <header id="main-header" class="bg-white/80 backdrop-blur-sm sticky top-0 z-40 border-b border-gray-200/80">
             <div class="container mx-auto px-6 py-4 flex justify-between items-center">
                 <a href="#" class="font-inter font-bold text-2xl gradient-text" onclick="location.reload(); return false;" aria-label="Homepage di Intellimark.ai"> Intellimark.ai </a>
-                <nav class="hidden md:flex items-center space-x-6"> <a href="#" class="text-gray-600 hover:text-blue-900 transition-colors">Prezzi</a> </nav>
             </div>
         </header>
         <main>
@@ -52,7 +51,7 @@
                         <div class="lg:col-span-1 bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-200/80">
                             <h3 class="text-2xl font-bold font-inter text-center">Brand Potential Score™</h3>
                              <div class="relative w-full max-w-[300px] mx-auto h-[150px] md:h-[200px]"> <canvas id="brandScoreChart"></canvas> <div class="absolute inset-0 flex flex-col items-center justify-center font-inter"> <span id="score-value" class="text-5xl font-extrabold text-gray-800"></span> <span class="text-lg font-semibold text-gray-500">/ 100</span> </div> </div>
-                            <div class="mt-8 space-y-6"> <div><div class="flex justify-between font-semibold mb-1"><span>Distintività Semantica</span><span id="pillar1-value" class="font-bold"></span></div><div class="w-full bg-gray-200 rounded-full h-3"><div id="pillar1-bar" class="h-3 rounded-full transition-all duration-500"></div></div></div> <div><div class="flex justify-between font-semibold mb-1"><span>Rischio di Confusione</span><span id="pillar2-value" class="font-bold"></span></div><div class="w-full bg-gray-200 rounded-full h-3"><div id="pillar2-bar" class="h-3 rounded-full transition-all duration-500"></div></div></div> <div><div class="flex justify-between font-semibold mb-1"><span>Disponibilità Digitale</span><span id="pillar3-value" class="font-bold"></span></div><div class="w-full bg-gray-200 rounded-full h-3"><div id="pillar3-bar" class="h-3 rounded-full transition-all duration-500"></div></div></div> </div>
+                            <div class="mt-8 space-y-6"> <div><div class="flex justify-between font-semibold mb-1"><span>Rischio di Confusione</span><span id="pillar2-value" class="font-bold"></span></div><div class="w-full bg-gray-200 rounded-full h-3"><div id="pillar2-bar" class="h-3 rounded-full transition-all duration-500"></div></div></div> </div>
                         </div>
                         <div class="lg:col-span-2 space-y-6">
                             <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200/80"><h4 class="text-xl font-bold font-inter mb-3">Ricerca di Anteriorità (Banca Dati Ufficiale EUIPO)</h4><div id="anteriority-results-container"><p class="text-gray-500">I risultati della ricerca di anteriorità appariranno qui...</p></div></div>
@@ -76,11 +75,7 @@
             loadingOverlay: document.getElementById('loading-overlay'),
             scoreValue: document.getElementById('score-value'),
             brandScoreChartCanvas: document.getElementById('brandScoreChart'),
-            pillars: {
-                p1: { value: document.getElementById('pillar1-value'), bar: document.getElementById('pillar1-bar') },
-                p2: { value: document.getElementById('pillar2-value'), bar: document.getElementById('pillar2-bar') },
-                p3: { value: document.getElementById('pillar3-value'), bar: document.getElementById('pillar3-bar') },
-            },
+            pillars: { p2: { value: document.getElementById('pillar2-value'), bar: document.getElementById('pillar2-bar') } },
             anteriorityContainer: document.getElementById('anteriority-results-container'),
             errorBox: document.getElementById('error-box'),
             errorMessage: document.getElementById('error-message'),
@@ -89,18 +84,15 @@
         const api = {
             API_ENDPOINT: '/api/search', 
             async getAnalysis(brandName) {
-                console.log(`Invio richiesta al nostro backend per: ${brandName}`);
                 const response = await fetch(this.API_ENDPOINT, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ brandName: brandName })
                 });
-
                 if (!response.ok) {
                     const errorData = await response.json().catch(() => ({ message: 'Risposta non valida o errore interno del server.' }));
                     throw new Error(errorData.message || `Errore di rete: ${response.status}`);
                 }
-                
                 return await response.json();
             }
         };
@@ -114,28 +106,28 @@
                 if (results.error) {
                     this.showError(results.message);
                     this.updateAnteriorityWithError();
-                    this.updateSimulatedMetrics([]); // Mostra metriche di base anche in caso di errore
+                    this.updateMetrics([]);
                 } else {
                     this.hideError();
                     this.updateAnteriorityResults(results.similarMarks);
-                    this.updateSimulatedMetrics(results.similarMarks);
+                    this.updateMetrics(results.similarMarks);
                 }
             },
             updateAnteriorityResults(similarMarks) {
                 elements.anteriorityContainer.innerHTML = ''; 
                 if (!similarMarks || similarMarks.length === 0) {
-                    elements.anteriorityContainer.innerHTML = `<p class="text-green-700 font-semibold">🎉 Ottima notizia! Nessun marchio simile trovato nella banca dati EUIPO.</p>`;
+                    elements.anteriorityContainer.innerHTML = `<p class="text-green-700 font-semibold">🎉 Ottima notizia! Nessun marchio identico o molto simile trovato nella banca dati EUIPO.</p>`;
                     return;
                 }
-                let html = `<p class="text-gray-600 mb-4">Trovati <span class="font-bold">${similarMarks.length} marchi registrati</span> con potenziale di conflitto:</p><div class="space-y-3 max-h-96 overflow-y-auto pr-2">`;
+                let html = `<p class="text-gray-600 mb-4">Trovati <span class="font-bold">${similarMarks.length} marchi registrati</span> con potenziale di conflitto:</p><div class="space-y-3 max-h-[40rem] overflow-y-auto pr-2">`;
                 similarMarks.forEach(mark => {
                     const statusColor = mark.status && mark.status.toLowerCase().includes('registered') ? 'text-green-600' : 'text-yellow-600';
-                    html += `<div class="p-3 border rounded-lg"><div class="flex justify-between items-start gap-4"><p class="font-bold text-lg">${mark.name}</p><span class="font-semibold text-sm text-right whitespace-nowrap px-2 py-1 rounded-full bg-gray-100 ${statusColor}">${mark.status}</span></div><p class="text-sm text-gray-500 mt-1">Titolare: ${mark.owner}</p><p class="text-sm text-gray-500">Classi di Nizza: ${mark.classes}</p></div>`;
+                    html += `<div class="p-4 border rounded-lg bg-gray-50/50"><div class="flex justify-between items-start gap-4"><div class="flex-grow"><p class="font-bold text-lg">${mark.name}</p><p class="text-sm text-gray-500 mt-1">Titolare: ${mark.owner}</p></div><span class="font-semibold text-xs text-right whitespace-nowrap px-2 py-1 rounded-full bg-gray-200 ${statusColor}">${mark.status}</span></div><div class="mt-2 pt-2 border-t border-gray-200 flex justify-between text-sm text-gray-600"><span>Classi di Nizza: <b>${mark.classes}</b></span><span>N°: ${mark.applicationNumber}</span></div></div>`;
                 });
                 html += `</div>`;
                 elements.anteriorityContainer.innerHTML = html;
             },
-            updateSimulatedMetrics(similarMarks = []) {
+            updateMetrics(similarMarks = []) {
                 const riskScore = 100 - (similarMarks.length * 8);
                 const score = Math.max(10, riskScore);
                 const update = (pillarId, value, labels) => {
@@ -146,9 +138,7 @@
                     elements.pillars[pillarId].bar.style.width = `${value}%`;
                     elements.pillars[pillarId].bar.style.backgroundColor = color;
                 };
-                update('p1', Math.floor(Math.random() * 16) + 80, ['Forte', 'Buona', 'Debole']);
                 update('p2', score, ['Basso', 'Medio', 'Alto']);
-                update('p3', Math.floor(Math.random() * 31) + 60, ['Ottima', 'Buona', 'Scarsa']);
                 this.createOrUpdateChart(score);
             },
             createOrUpdateChart(score) {
@@ -174,17 +164,12 @@
             getScoreColor: score => score < 40 ? 'var(--color-red)' : (score < 75 ? 'var(--color-yellow)' : 'var(--color-green)'),
             async handleSearch() {
                 const brandName = elements.brandSearchInput.value.trim();
-                if (!brandName) {
-                    elements.brandSearchInput.focus();
-                    return;
-                }
+                if (!brandName) { elements.brandSearchInput.focus(); return; }
                 ui.showLoading();
                 try {
-                    // **CHIAMATA REALE ATTIVATA**
                     const results = await api.getAnalysis(brandName);
                     render.fullResultsPage(brandName, results);
                 } catch (error) {
-                    console.error("Errore nel flusso di ricerca:", error);
                     render.fullResultsPage(brandName, { error: true, message: error.message });
                 } finally {
                     ui.hideLoading();
@@ -205,18 +190,3 @@
     </script>
 </body>
 </html>
-```
-
-### Prossimi Passi
-
-1.  **Sostituisca il Codice**: Apra il suo file `index.html` locale e sostituisca tutto il contenuto con il codice qui sopra.
-2.  **Aggiorni GitHub**: Apra il terminale e carichi la modifica.
-    ```bash
-    git add .
-    git commit -m "Attivo chiamata API reale al backend"
-    git push
-    ```
-3.  **Attenda il Deploy Automatico**: Vercel rileverà automaticamente il `push` su GitHub e aggiornerà il suo sito in 1-2 minuti.
-4.  **Test Finale**: Vada sul suo link di Vercel, svuoti la cache per sicurezza (`Ctrl+F5` o `Cmd+Shift+R`) e faccia una ricerca.
-
-Questa volta vedrà i risultati reali provenienti dal suo backend. Se qualcosa dovesse andare storto (ad esempio, se la chiave API non fosse corretta), il box rosso di errore le mostrerà il messaggio specifico inviato dal suo server.
