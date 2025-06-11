@@ -3,13 +3,17 @@
 
 // Usiamo 'require' invece di 'import'
 const fetch = require('node-fetch');
-const { xml2js } = require('xml-js');
 
-// Funzione helper per ottenere il token di accesso (invariata nella logica)
+// Funzione helper per ottenere il token di accesso
 async function getAccessToken(clientId, clientSecret) {
     const tokenUrl = 'https://euipo.europa.eu/cas-server-webapp/oidc/accessToken';
     const basicAuth = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
-    console.log('Tentativo di ottenere il token di accesso...');
+    console.log('Tentativo di ottenere il token di accesso con lo scope corretto...');
+
+    // Aggiungiamo lo scope richiesto dalla documentazione
+    const body = new URLSearchParams();
+    body.append('grant_type', 'client_credentials');
+    body.append('scope', 'uid');
 
     try {
         const response = await fetch(tokenUrl, {
@@ -18,7 +22,7 @@ async function getAccessToken(clientId, clientSecret) {
                 'Content-Type': 'application/x-www-form-urlencoded',
                 'Authorization': `Basic ${basicAuth}`,
             },
-            body: 'grant_type=client_credentials',
+            body: body,
         });
 
         const responseData = await response.json();
@@ -35,7 +39,7 @@ async function getAccessToken(clientId, clientSecret) {
     }
 }
 
-// Funzione helper per analizzare la risposta (invariata nella logica)
+// Funzione helper per analizzare la risposta
 function parseEuipoResponse(jsonResponse) {
     const similarMarks = [];
     const records = jsonResponse?.trademarks || [];
@@ -52,7 +56,7 @@ function parseEuipoResponse(jsonResponse) {
     return { similarMarks };
 }
 
-// Usiamo 'module.exports' invece di 'export default'
+// Funzione principale del backend
 module.exports = async (request, response) => {
     console.log('--- Inizio esecuzione backend CommonJS /api/search ---');
     response.setHeader('Access-Control-Allow-Origin', '*');
@@ -90,9 +94,6 @@ module.exports = async (request, response) => {
         const searchResponse = await fetch(urlWithQuery, {
             method: 'GET',
             headers: {
-                // *** LA CORREZIONE CHIAVE È QUI ***
-                // Come da documentazione, aggiungiamo anche l'header X-IBM-Client-Id
-                // oltre al token di autorizzazione.
                 'Authorization': `Bearer ${accessToken}`,
                 'X-IBM-Client-Id': CLIENT_ID,
             },
