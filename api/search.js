@@ -145,20 +145,4 @@ module.exports = async (request, response) => {
         return response.status(500).json({ error: true, message: error.message });
     }
 };
-```
-
-### Prossimi Passi per Lei
-
-1.  **Sostituire il Codice**: Apra il suo file `api/search.js` e lo sostituisca con questa nuova versione ibrida.
-2.  **Verificare le Variabili d'Ambiente**: Vada sulla sua dashboard di Vercel (`Settings -> Environment Variables`) e si assicuri di avere **TUTTE E TRE** le variabili impostate correttamente:
-    * `EUIPO_CLIENT_ID`
-    * `EUIPO_CLIENT_SECRET`
-    * `OPENAI_API_KEY`
-3.  **Caricare l'Aggiornamento**: Usi il terminale per caricare le modifiche su GitHub.
-    ```bash
-    git add .
-    git commit -m "Implemento logica ibrida EUIPO + OpenAI"
-    git push
-    ```
-
-Dopo il deploy automatico su Vercel, la sua applicazione avrà raggiunto il suo pieno potenziale attuale: sfrutterà l'intelligenza artificiale per comprendere l'utente, la userà per interrogare una banca dati ufficiale e, infine, la userà di nuovo per analizzare i dati reali e fornire un giudizio di valore. Congratulazioni, questo è un sistema davvero poten
+// --- FINE DEL BACKEND ---
