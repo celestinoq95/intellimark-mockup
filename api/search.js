@@ -4,14 +4,56 @@
 const fetch = require('node-fetch');
 const { NICE_CLASSES_KNOWLEDGE_BASE } = require('./nice_knowledge_base.js');
 
-// Le funzioni helper (getAccessToken, etc.) rimangono invariate...
-async function getAccessToken(clientId, clientSecret) { /*...*/ }
-async function searchEuipoTrademarks(brandName, classes, accessToken, clientId) { /*...*/ }
-function parseEuipoResponse(jsonResponse) { /*...*/ }
+// Funzioni helper...
+async function getAccessToken(clientId, clientSecret) {
+    const tokenUrl = 'https://euipo.europa.eu/cas-server-webapp/oidc/accessToken';
+    const basicAuth = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
+    console.log('Tentativo di ottenere il token di accesso...');
+    const body = new URLSearchParams({ grant_type: 'client_credentials', scope: 'trademark-search.trademarks.read' });
+    const response = await fetch(tokenUrl, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Authorization': `Basic ${basicAuth}` }, body });
+    const data = await response.json();
+    if (!response.ok) {
+        console.error('ERRORE dall\'endpoint del token:', data);
+        throw new Error('Autenticazione EUIPO fallita.');
+    }
+    console.log('Token di accesso ottenuto.');
+    return data.access_token;
+}
+
+async function searchEuipoTrademarks(brandName, classes, accessToken, clientId) {
+    const searchApiUrl = `https://api.euipo.europa.eu/trademark-search/trademarks`;
+    const rsqlQuery = `wordMarkSpecification.verbalElement==*${brandName}* and niceClasses=in=(${classes.join(',')})`;
+    const urlWithQuery = `${searchApiUrl}?query=${encodeURIComponent(rsqlQuery)}&size=10`;
+    console.log(`URL di ricerca costruito: ${urlWithQuery}`);
+    const response = await fetch(urlWithQuery, { headers: { 'Authorization': `Bearer ${accessToken}`, 'X-IBM-Client-Id': clientId } });
+    if (!response.ok) {
+         const errorText = await response.text();
+         console.error(`ERRORE dalla ricerca EUIPO: Status ${response.status}`);
+         console.error(`Testo della risposta di errore: ${errorText}`);
+         throw new Error('Ricerca EUIPO fallita.');
+    }
+    return response.json();
+}
+
+function parseEuipoResponse(jsonResponse) {
+    const similarMarks = [];
+    const records = jsonResponse?.trademarks || [];
+    console.log(`Trovati ${records.length} record nella risposta.`);
+    for (const record of records) {
+        similarMarks.push({
+            name: record.wordMarkSpecification?.verbalElement || 'N/D',
+            owner: record.applicants?.[0]?.name || 'N/D',
+            status: record.status || 'N/D',
+            classes: `Cl. ${record.niceClasses?.join(', ') || 'N/A'}`,
+            applicationNumber: record.applicationNumber,
+        });
+    }
+    return { similarMarks };
+}
+
 async function callOpenAI_API(prompt) {
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) {
-        // Questo è l'errore che stiamo vedendo.
         throw new Error('API Key di OpenAI non configurata correttamente sul server Vercel.');
     }
     const apiURL = 'https://api.openai.com/v1/chat/completions';
@@ -29,27 +71,21 @@ async function callOpenAI_API(prompt) {
 
 // --- FLUSSO PRINCIPALE DEL BACKEND ---
 module.exports = async (request, response) => {
-    // Intestazioni CORS
-    response.setHeader('Access-Control-Allow-Origin', '*');
-    if (request.method === 'OPTIONS') return response.status(200).end();
-
-    // *** INIZIO BLOCCO DI DIAGNOSTICA ***
+    // *** BLOCCO DI DIAGNOSTICA ***
     console.log('--- ESEGUO DIAGNOSTICA VARIABILI D\'AMBIENTE ---');
-    // Stampiamo i nomi di tutte le variabili che Vercel rende disponibili
     const availableEnvVars = Object.keys(process.env);
     console.log('Nomi delle variabili disponibili:', availableEnvVars);
-    
-    // Eseguiamo un controllo specifico e case-sensitive sulla nostra chiave
     const isOpenAiKeyPresent = availableEnvVars.includes('OPENAI_API_KEY');
     console.log(`VERIFICA SPECIFICA "OPENAI_API_KEY": ${isOpenAiKeyPresent ? 'TROVATA' : '*** NON TROVATA ***'}`);
-    
     const isEuipoIdPresent = availableEnvVars.includes('EUIPO_CLIENT_ID');
     console.log(`VERIFICA SPECIFICA "EUIPO_CLIENT_ID": ${isEuipoIdPresent ? 'TROVATA' : '*** NON TROVATA ***'}`);
-
     const isEuipoSecretPresent = availableEnvVars.includes('EUIPO_CLIENT_SECRET');
     console.log(`VERIFICA SPECIFICA "EUIPO_CLIENT_SECRET": ${isEuipoSecretPresent ? 'TROVATA' : '*** NON TROVATA ***'}`);
     console.log('--- FINE DIAGNOSTICA ---');
-    // *** FINE BLOCCO DI DIAGNOSTICA ***
+
+    // Intestazioni CORS
+    response.setHeader('Access-Control-Allow-Origin', '*');
+    if (request.method === 'OPTIONS') return response.status(200).end();
 
     try {
         const payload = request.body;
@@ -62,9 +98,13 @@ module.exports = async (request, response) => {
             throw new Error('Credenziali EUIPO non configurate.');
         }
 
-        const classificationPrompt = `Sei un esperto di Classificazione di Nizza... (prompt omesso per brevità)`; // Il prompt rimane invariato
-        const identifiedClassesString = "9,25"; // Valore fittizio per bypassare la prima chiamata AI durante il debug
-        const identifiedClasses = [9, 25];
+        const classificationPrompt = `Sei un esperto di Classificazione di Nizza... (prompt omesso per brevità)`;
+        const identifiedClassesString = await callOpenAI_API(classificationPrompt); // Uso fittizio di OpenAI per la classificazione
+        const identifiedClasses = identifiedClassesString.split(',').map(c => parseInt(c.trim())).filter(c => !isNaN(c));
+
+        if (identifiedClasses.length === 0) {
+            throw new Error("L'AI non è riuscita a identificare classi pertinenti.");
+        }
 
         const accessToken = await getAccessToken(EUIPO_CLIENT_ID, EUIPO_CLIENT_SECRET);
         const euipoJson = await searchEuipoTrademarks(payload.brandName, identifiedClasses, accessToken, EUIPO_CLIENT_ID);
@@ -84,28 +124,3 @@ module.exports = async (request, response) => {
         return response.status(500).json({ error: true, message: error.message });
     }
 };
-```
-
-### Azioni Finali per la Diagnosi
-
-1.  **Sostituisca il Codice**: Apra il suo file `api/search.js` e lo sostituisca con questa nuova versione diagnostica.
-2.  **Aggiorni GitHub**: Apra il terminale e carichi la modifica.
-    ```bash
-    git add .
-    git commit -m "Fix: Aggiungo diagnostica avanzata al backend"
-    git push
-    ```
-3.  **Forzi un Nuovo Deploy su Vercel**: Per essere assolutamente certi che Vercel usi il nuovo codice e le nuove variabili, forziamo un "redeploy".
-    * Vada sulla sua dashboard di Vercel.
-    * Clicchi sul suo progetto.
-    * Vada sulla tab **"Deployments"**.
-    * Trovi l'ultimo deploy in cima alla lista (dovrebbe essere di pochi istanti fa). Clicchi sui **tre puntini (⋮)** a destra.
-    * Selezioni **"Redeploy"**.
-
-4.  **Esegua il Test e Catturi i Log**:
-    * Attenda il completamento del nuovo deploy.
-    * Apra la tab **"Functions" -> `/api/search`** per vedere i log in tempo reale.
-    * Vada sul suo sito e faccia una ricerca.
-    * **Copi e incolli qui l'intero nuovo output dei log**.
-
-Questa volta, il log conterrà la lista di tutte le variabili che il server vede. Se `OPENAI_API_KEY` non è in quella lista o ha un nome diverso, avremo trovato la causa e la soluzione sarà sempli
