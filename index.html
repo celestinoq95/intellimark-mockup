@@ -272,6 +272,21 @@
             margin: 0.125rem;
         }
         
+        /* Judgment Content Styles */
+        .judgment-content strong { 
+            color: var(--color-slate-900); 
+            font-weight: 600; 
+        }
+        
+        .judgment-content .highlight { 
+            background-color: #e0e7ff; 
+            color: #3730a3; 
+            padding: 2px 6px; 
+            border-radius: 4px; 
+            font-weight: 500; 
+            display: inline-block;
+        }
+        
         /* FAQ Styles */
         .faq-item {
             border-radius: 1rem;
@@ -919,8 +934,135 @@
             </section>
 
             <!-- Results Screen (Hidden by default) -->
-            <section id="results-screen" class="hidden section-padding">
-                <!-- Results content remains the same as in the original -->
+            <section id="results-screen" class="hidden">
+                <div class="section-padding">
+                    <div class="container mx-auto px-6">
+                        <!-- Back Button -->
+                        <button onclick="location.reload();" class="mb-8 flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-colors group">
+                            <svg class="w-5 h-5 transform group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                            </svg>
+                            <span class="font-medium">Nuova Ricerca</span>
+                        </button>
+
+                        <!-- Results Header -->
+                        <div class="text-center mb-12">
+                            <h1 class="text-4xl md:text-5xl font-black text-slate-900 mb-4">
+                                Analisi del Brand <span class="gradient-text" id="searched-brand-name"></span>
+                            </h1>
+                            <p class="text-lg text-slate-600">Ecco il report dettagliato sulla registrabilità del tuo marchio</p>
+                        </div>
+
+                        <!-- Error Box (hidden by default) -->
+                        <div id="error-box" class="hidden mb-8 premium-card border-red-200 bg-red-50 p-6">
+                            <div class="flex items-start gap-3">
+                                <svg class="w-6 h-6 text-red-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                                </svg>
+                                <div>
+                                    <h3 class="font-semibold text-red-900">Si è verificato un errore</h3>
+                                    <p id="error-message" class="text-red-700 mt-1"></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Results Grid -->
+                        <div class="grid lg:grid-cols-3 gap-8">
+                            <!-- Left Column - Score -->
+                            <div class="lg:col-span-1">
+                                <div class="premium-card p-8 text-center sticky top-24">
+                                    <h2 class="text-2xl font-bold text-slate-900 mb-6">Brand Potential Score™</h2>
+                                    <div class="relative w-48 h-48 mx-auto mb-6">
+                                        <canvas id="brandScoreChart"></canvas>
+                                        <div class="absolute inset-0 flex items-center justify-center">
+                                            <div>
+                                                <div id="score-value" class="text-5xl font-black gradient-text">--</div>
+                                                <div class="text-sm text-slate-500 font-medium">su 100</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="score-interpretation" class="space-y-3">
+                                        <!-- Score interpretation will be inserted here -->
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Right Column - Details -->
+                            <div class="lg:col-span-2 space-y-8">
+                                <!-- AI Classes Section -->
+                                <div class="premium-card p-8">
+                                    <div class="flex items-start gap-4 mb-6">
+                                        <div class="w-12 h-12 gradient-bg rounded-xl flex items-center justify-center flex-shrink-0">
+                                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                                            </svg>
+                                        </div>
+                                        <div class="flex-1">
+                                            <h3 class="text-xl font-bold text-slate-900 mb-2">Classi di Nizza Identificate</h3>
+                                            <p class="text-slate-600">L'AI ha identificato le seguenti classi pertinenti per i tuoi prodotti/servizi:</p>
+                                        </div>
+                                    </div>
+                                    <div id="ai-classes-container" class="space-y-3">
+                                        <div class="skeleton h-20 animate-shimmer rounded-lg"></div>
+                                        <div class="skeleton h-20 animate-shimmer rounded-lg"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Legal Judgment Section -->
+                                <div class="premium-card p-8" id="judgment-card">
+                                    <div class="flex items-start gap-4 mb-6">
+                                        <div class="w-12 h-12 gradient-bg rounded-xl flex items-center justify-center flex-shrink-0">
+                                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"></path>
+                                            </svg>
+                                        </div>
+                                        <div class="flex-1">
+                                            <h3 class="text-xl font-bold text-slate-900 mb-2">Giudizio Legale Sintetico</h3>
+                                            <div class="skeleton h-32 animate-shimmer rounded-lg"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Anteriorities Section -->
+                                <div class="premium-card p-8" id="anteriority-card">
+                                    <div class="flex items-start gap-4 mb-6">
+                                        <div class="w-12 h-12 gradient-bg rounded-xl flex items-center justify-center flex-shrink-0">
+                                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                            </svg>
+                                        </div>
+                                        <div class="flex-1">
+                                            <h3 class="text-xl font-bold text-slate-900 mb-2">Anteriorità Rilevanti</h3>
+                                            <p class="text-slate-600 mb-4">Marchi simili che potrebbero rappresentare un ostacolo:</p>
+                                            <div class="space-y-4">
+                                                <div class="skeleton h-24 animate-shimmer rounded-lg"></div>
+                                                <div class="skeleton h-24 animate-shimmer rounded-lg"></div>
+                                                <div class="skeleton h-24 animate-shimmer rounded-lg"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- CTA Section -->
+                                <div class="premium-card p-8 gradient-bg text-white">
+                                    <h3 class="text-2xl font-bold mb-4">Prossimi Passi</h3>
+                                    <p class="mb-6 text-white/90">
+                                        Sulla base di questa analisi, ti consigliamo di procedere con una consulenza specialistica 
+                                        per valutare nel dettaglio la strategia di registrazione più adatta.
+                                    </p>
+                                    <div class="flex flex-col sm:flex-row gap-4">
+                                        <button class="bg-white text-slate-900 font-bold py-3 px-6 rounded-full hover:bg-slate-100 transition-colors">
+                                            Scarica Report PDF
+                                        </button>
+                                        <button class="bg-white/20 backdrop-blur text-white font-bold py-3 px-6 rounded-full hover:bg-white/30 transition-colors border-2 border-white/50">
+                                            Parla con un Esperto
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </section>
         </main>
 
@@ -1023,7 +1165,7 @@
                 'product-description', 'select-countries', 'searched-brand-name', 'brandScoreChart',
                 'score-value', 'ai-classes-container', 'judgment-card', 'anteriority-card', 
                 'error-box', 'error-message', 'faq-container', 'process-line',
-                'mobile-menu-button', 'mobile-menu-close'
+                'mobile-menu-button', 'mobile-menu-close', 'score-interpretation'
             ];
             elementIds.forEach(id => {
                 const camelCaseId = id.replace(/-(\w)/g, (_, c) => c.toUpperCase());
@@ -1254,30 +1396,329 @@
             
             // Setup CTA buttons to scroll to form
             document.querySelectorAll('button').forEach(button => {
-                if (button.textContent.includes('Inizia') || button.textContent.includes('Analizza')) {
-                    button.addEventListener('click', () => {
+                if (button.textContent.includes('Inizia') && 
+                    !button.id.includes('start-search') && 
+                    button.textContent !== 'Inizia Gratis') {
+                    button.addEventListener('click', (e) => {
+                        e.preventDefault();
                         document.querySelector('#brand-search-input')?.scrollIntoView({
                             behavior: 'smooth',
                             block: 'center'
                         });
+                        setTimeout(() => {
+                            elements.brandSearchInput?.focus();
+                        }, 500);
                     });
                 }
             });
         }
         
-        // Handle search (placeholder - implement your actual search logic)
-        function handleSearch() {
-            const brand = elements.brandSearchInput?.value;
-            const products = elements.productDescription?.value;
-            const countries = state.tomSelectCountries?.getValue();
+        // API mock functions
+        const api = {
+            async searchBrand(brandName, products, countries) {
+                // Simulate API delay
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                // Generate mock data
+                const score = Math.floor(Math.random() * 40) + 55; // Score between 55-95
+                const classes = this.generateClasses(products);
+                const judgment = this.generateJudgment(score);
+                const anteriorities = this.generateAnteriorities(brandName);
+                
+                return {
+                    success: true,
+                    data: {
+                        brand: brandName,
+                        score: score,
+                        classes: classes,
+                        judgment: judgment,
+                        anteriorities: anteriorities
+                    }
+                };
+            },
             
-            if (!brand || !products || !countries || countries.length === 0) {
-                alert('Per favore compila tutti i campi');
-                return;
+            generateClasses(products) {
+                const allClasses = [
+                    { number: 9, name: "Software e applicazioni", description: "Software di analisi dati, applicazioni mobile, programmi per computer" },
+                    { number: 35, name: "Servizi di business", description: "Consulenza aziendale, marketing, pubblicità" },
+                    { number: 42, name: "Servizi tecnologici", description: "Sviluppo software, consulenza IT, servizi cloud" },
+                    { number: 45, name: "Servizi legali", description: "Consulenza legale, servizi di proprietà intellettuale" }
+                ];
+                return allClasses.slice(0, Math.floor(Math.random() * 2) + 2);
+            },
+            
+            generateJudgment(score) {
+                if (score >= 80) {
+                    return {
+                        level: "positive",
+                        summary: "Ottima registrabilità",
+                        details: "L'analisi evidenzia un <strong>rischio basso</strong> di conflitti. Il marchio proposto presenta <span class='highlight'>caratteri distintivi forti</span> e non sono state rilevate anteriorità bloccanti nelle classi di interesse."
+                    };
+                } else if (score >= 60) {
+                    return {
+                        level: "warning",
+                        summary: "Registrabilità con riserve",
+                        details: "Sono state rilevate alcune <strong>similitudini moderate</strong> con marchi esistenti. Si consiglia una <span class='highlight'>valutazione approfondita</span> per le classi merceologiche indicate, considerando possibili strategie di differenziazione."
+                    };
+                } else {
+                    return {
+                        level: "negative",
+                        summary: "Registrabilità critica",
+                        details: "L'analisi evidenzia <strong>rischi significativi</strong> di rigetto o opposizione. Sono presenti <span class='highlight'>anteriorità rilevanti</span> che potrebbero ostacolare la registrazione nelle classi selezionate."
+                    };
+                }
+            },
+            
+            generateAnteriorities(brandName) {
+                const variations = ["TECH", "SMART", "DIGITAL", "PLUS", "PRO"];
+                const anteriorities = [];
+                const count = Math.floor(Math.random() * 3) + 2;
+                
+                for (let i = 0; i < count; i++) {
+                    anteriorities.push({
+                        name: brandName.toUpperCase() + " " + variations[i],
+                        number: "EU" + Math.floor(Math.random() * 1000000 + 17000000),
+                        status: Math.random() > 0.5 ? "Registrato" : "In domanda",
+                        classes: [9, 35, 42].sort(() => Math.random() - 0.5).slice(0, 2),
+                        similarity: Math.floor(Math.random() * 30) + 60,
+                        owner: "Company " + String.fromCharCode(65 + i) + " S.r.l."
+                    });
+                }
+                
+                return anteriorities.sort((a, b) => b.similarity - a.similarity);
             }
+        };
+        
+        // Render functions
+        const render = {
+            showResults(data) {
+                elements.homeScreen.classList.add('hidden');
+                elements.resultsScreen.classList.remove('hidden');
+                elements.searchedBrandName.textContent = data.brand;
+                
+                // Render score
+                this.renderScore(data.score);
+                
+                // Render classes
+                this.renderClasses(data.classes);
+                
+                // Render judgment
+                this.renderJudgment(data.judgment);
+                
+                // Render anteriorities
+                this.renderAnteriorities(data.anteriorities);
+                
+                // Scroll to top
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            },
             
-            // Add your search implementation here
-            console.log('Searching for:', { brand, products, countries });
+            renderScore(score) {
+                elements.scoreValue.textContent = score;
+                
+                // Create chart
+                const ctx = elements.brandScoreChart.getContext('2d');
+                
+                if (state.brandScoreChart) {
+                    state.brandScoreChart.destroy();
+                }
+                
+                state.brandScoreChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        datasets: [{
+                            data: [score, 100 - score],
+                            backgroundColor: [
+                                score >= 80 ? '#16a34a' : score >= 60 ? '#f59e0b' : '#dc2626',
+                                '#e2e8f0'
+                            ],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        cutout: '85%',
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: { enabled: false }
+                        }
+                    }
+                });
+                
+                // Render interpretation
+                const interpretationHtml = `
+                    <div class="p-4 rounded-lg ${score >= 80 ? 'bg-green-50' : score >= 60 ? 'bg-yellow-50' : 'bg-red-50'}">
+                        <div class="flex items-center gap-2 mb-2">
+                            <svg class="w-5 h-5 ${score >= 80 ? 'text-green-600' : score >= 60 ? 'text-yellow-600' : 'text-red-600'}" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="${score >= 80 ? 'M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z' : score >= 60 ? 'M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z' : 'M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z'}" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="font-semibold ${score >= 80 ? 'text-green-900' : score >= 60 ? 'text-yellow-900' : 'text-red-900'}">
+                                ${score >= 80 ? 'Rischio Basso' : score >= 60 ? 'Rischio Medio' : 'Rischio Alto'}
+                            </span>
+                        </div>
+                        <p class="${score >= 80 ? 'text-green-700' : score >= 60 ? 'text-yellow-700' : 'text-red-700'} text-sm">
+                            ${score >= 80 ? 'Ottime possibilità di registrazione senza opposizioni' : score >= 60 ? 'Possibili criticità da valutare con attenzione' : 'Alte probabilità di conflitti o opposizioni'}
+                        </p>
+                    </div>
+                `;
+                
+                document.getElementById('score-interpretation').innerHTML = interpretationHtml;
+            },
+            
+            renderClasses(classes) {
+                const classesHtml = classes.map(cls => `
+                    <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                        <div class="flex items-start gap-3">
+                            <span class="flex-shrink-0 text-2xl font-bold gradient-text">${cls.number}</span>
+                            <div>
+                                <h4 class="font-semibold text-slate-900">${cls.name}</h4>
+                                <p class="text-sm text-slate-600 mt-1">${cls.description}</p>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+                
+                elements.aiClassesContainer.innerHTML = classesHtml;
+            },
+            
+            renderJudgment(judgment) {
+                let bgClass, borderClass, titleClass, textClass;
+                
+                if (judgment.level === 'positive') {
+                    bgClass = 'bg-green-50';
+                    borderClass = 'border-green-200';
+                    titleClass = 'text-green-900';
+                    textClass = 'text-green-800';
+                } else if (judgment.level === 'warning') {
+                    bgClass = 'bg-yellow-50';
+                    borderClass = 'border-yellow-200';
+                    titleClass = 'text-yellow-900';
+                    textClass = 'text-yellow-800';
+                } else {
+                    bgClass = 'bg-red-50';
+                    borderClass = 'border-red-200';
+                    titleClass = 'text-red-900';
+                    textClass = 'text-red-800';
+                }
+                
+                const judgmentHtml = `
+                    <div class="p-6 rounded-lg ${bgClass} border ${borderClass}">
+                        <h4 class="font-bold ${titleClass} mb-2">${judgment.summary}</h4>
+                        <div class="judgment-content ${textClass}">${judgment.details}</div>
+                    </div>
+                    <div class="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                        <p class="text-sm text-blue-800">
+                            <strong>Nota legale:</strong> Questa analisi è basata su algoritmi AI e dati pubblici. 
+                            Per una valutazione definitiva, consigliamo sempre una consulenza con i nostri esperti in proprietà intellettuale.
+                        </p>
+                    </div>
+                `;
+                
+                const judgmentContainer = elements.judgmentCard.querySelector('.flex-1');
+                const skeleton = judgmentContainer.querySelector('.skeleton');
+                if (skeleton) skeleton.remove();
+                
+                const judgmentDiv = document.createElement('div');
+                judgmentDiv.innerHTML = judgmentHtml;
+                judgmentContainer.appendChild(judgmentDiv);
+            },
+            
+            renderAnteriorities(anteriorities) {
+                const anteriorityHtml = anteriorities.map(ant => `
+                    <div class="p-4 bg-white rounded-lg border border-slate-200 hover:border-slate-300 transition-colors">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-semibold text-slate-900">${ant.name}</h4>
+                            <span class="text-sm px-2 py-1 rounded-full ${ant.similarity >= 80 ? 'bg-red-100 text-red-700' : ant.similarity >= 60 ? 'bg-yellow-100 text-yellow-700' : 'bg-green-100 text-green-700'}">
+                                ${ant.similarity}% similarità
+                            </span>
+                        </div>
+                        <div class="text-sm text-slate-600 space-y-1">
+                            <p><strong>Numero:</strong> ${ant.number}</p>
+                            <p><strong>Stato:</strong> ${ant.status}</p>
+                            <p><strong>Classi:</strong> ${ant.classes.join(', ')}</p>
+                            <p><strong>Titolare:</strong> ${ant.owner}</p>
+                        </div>
+                    </div>
+                `).join('');
+                
+                const anteriorityContainer = elements.anteriorityCard.querySelector('.space-y-4');
+                anteriorityContainer.innerHTML = anteriorityHtml;
+            },
+            
+            showError(message) {
+                elements.errorBox.classList.remove('hidden');
+                elements.errorMessage.textContent = message;
+            }
+        };
+        
+        // UI functions
+        const ui = {
+            async handleSearch() {
+                const brand = elements.brandSearchInput?.value.trim();
+                const products = elements.productDescription?.value.trim();
+                const countries = state.tomSelectCountries?.getValue();
+                
+                // Validation
+                if (!brand) {
+                    elements.brandSearchInput.focus();
+                    elements.brandSearchInput.parentElement.classList.add('border-red-500');
+                    setTimeout(() => {
+                        elements.brandSearchInput.parentElement.classList.remove('border-red-500');
+                    }, 2000);
+                    return;
+                }
+                
+                if (!products) {
+                    elements.productDescription.focus();
+                    elements.productDescription.parentElement.classList.add('border-red-500');
+                    setTimeout(() => {
+                        elements.productDescription.parentElement.classList.remove('border-red-500');
+                    }, 2000);
+                    return;
+                }
+                
+                if (!countries || countries.length === 0) {
+                    state.tomSelectCountries.focus();
+                    elements.selectCountries.parentElement.classList.add('border-red-500');
+                    setTimeout(() => {
+                        elements.selectCountries.parentElement.classList.remove('border-red-500');
+                    }, 2000);
+                    return;
+                }
+                
+                // Show loading state
+                elements.startSearchBtn.disabled = true;
+                elements.startSearchBtn.innerHTML = `
+                    <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Analisi in corso...
+                `;
+                
+                try {
+                    // Call API
+                    const result = await api.searchBrand(brand, products, countries);
+                    
+                    if (result.success) {
+                        render.showResults(result.data);
+                    } else {
+                        throw new Error(result.message || 'Errore durante l\'analisi');
+                    }
+                } catch (error) {
+                    console.error('Search error:', error);
+                    render.showError(error.message || 'Si è verificato un errore durante l\'analisi. Riprova più tardi.');
+                } finally {
+                    // Reset button
+                    elements.startSearchBtn.disabled = false;
+                    elements.startSearchBtn.innerHTML = 'Analizza il Mio Brand';
+                }
+            }
+        };
+        
+        // Handle search
+        async function handleSearch() {
+            await ui.handleSearch();
         }
         
         return { init: initializeApp };
