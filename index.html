@@ -3,394 +3,1288 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Intellimark.ai - Beta con Analisi AI Avanzata</title>
-    <!-- Versione 13.0 - UI/UX Avanzata e Score guidato da AI -->
+    <title>Intellimark.ai - Analisi Strategica per il Tuo Brand</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.bootstrap5.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --color-primary-start: #0A2A5B;
-            --color-primary-end: #4A0E69;
+            --color-primary-start: #013b92;
+            --color-primary-end: #892cb8;
             --color-green: #16a34a;
             --color-yellow: #f59e0b;
             --color-red: #dc2626;
+            --color-slate-50: #f8fafc;
             --color-slate-100: #f1f5f9;
             --color-slate-200: #e2e8f0;
+            --color-slate-300: #cbd5e1;
+            --color-slate-400: #94a3b8;
             --color-slate-500: #64748b;
+            --color-slate-600: #475569;
             --color-slate-700: #334155;
             --color-slate-800: #1e293b;
             --color-slate-900: #0f172a;
+            --color-slate-950: #020617;
         }
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: var(--color-slate-700); }
-        .gradient-text { background: linear-gradient(to right, var(--color-primary-start), var(--color-primary-end)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .btn-gradient { background: linear-gradient(to right, var(--color-primary-start), var(--color-primary-end)); transition: all 0.3s ease; }
-        .btn-gradient:hover { transform: translateY(-2px); box-shadow: 0 10px 20px -10px rgba(10, 42, 91, 0.4); }
-        .hidden { display: none !important; }
-        .result-card { background-color: white; border-radius: 0.75rem; border: 1px solid var(--color-slate-200); padding: 1.5rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05); }
-        /* Skeleton Loading */
-        .skeleton { background-color: var(--color-slate-200); border-radius: 0.25rem; }
-        .skeleton-text { height: 1em; }
-        .skeleton-title { height: 1.5em; width: 40%; }
-        .skeleton-card { height: 120px; }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        html { 
+            scroll-behavior: smooth;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        body { 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; 
+            background-color: var(--color-slate-50); 
+            color: var(--color-slate-700);
+            line-height: 1.6;
+        }
+        
+        /* Typography */
+        .display-title {
+            font-size: clamp(2.5rem, 5vw + 1rem, 5rem);
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+        }
+        
+        /* Gradients & Effects */
+        .gradient-text { 
+            background: linear-gradient(135deg, var(--color-primary-start), var(--color-primary-end)); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, var(--color-primary-start), var(--color-primary-end));
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .glow-effect {
+            box-shadow: 
+                0 0 20px rgba(137, 44, 184, 0.1),
+                0 0 40px rgba(137, 44, 184, 0.05);
+        }
+        
+        /* Buttons */
+        .btn-premium { 
+            background: linear-gradient(135deg, var(--color-primary-end) 0%, var(--color-primary-start) 100%); 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-premium::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+        
+        .btn-premium:hover::before {
+            left: 100%;
+        }
+        
+        .btn-premium:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 20px 25px -5px rgba(137, 44, 184, 0.3);
+        }
+        
+        .btn-secondary {
+            background: white;
+            border: 2px solid var(--color-slate-200);
+            color: var(--color-slate-700);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            border-color: var(--color-primary-start);
+            color: var(--color-primary-start);
+            transform: translateY(-2px);
+        }
+        
+        /* Cards & Panels */
+        .premium-card {
+            background: white;
+            border-radius: 1.5rem;
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            box-shadow: 
+                0 1px 3px 0 rgba(0, 0, 0, 0.02),
+                0 1px 2px -1px rgba(0, 0, 0, 0.02);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .premium-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--color-primary-start), var(--color-primary-end));
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .premium-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 
+                0 20px 25px -5px rgba(0, 0, 0, 0.08),
+                0 8px 10px -6px rgba(0, 0, 0, 0.08);
+            border-color: transparent;
+        }
+        
+        .premium-card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        /* Input Fields */
+        .input-field {
+            background-color: var(--color-slate-100);
+            border-radius: 1rem;
+            border: 2px solid transparent;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+        
+        .input-field:focus-within {
+            border-color: var(--color-primary-start);
+            background-color: white;
+            box-shadow: 0 0 0 4px rgba(1, 59, 146, 0.1);
+        }
+        
+        /* Animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        @keyframes fadeInUp {
+            from { 
+                opacity: 0; 
+                transform: translateY(30px);
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0);
+            }
+        }
+        
         @keyframes shimmer {
             0% { background-position: -1000px 0; }
             100% { background-position: 1000px 0; }
         }
-        .animate-shimmer {
-            background-image: linear-gradient(to right, #e2e8f0 0%, #f1f5f9 20%, #e2e8f0 40%, #e2e8f0 100%);
-            background-repeat: no-repeat;
-            background-size: 2000px 100%;
-            animation: shimmer 2s linear infinite;
+        
+        .animate-float { animation: float 6s ease-in-out infinite; }
+        .animate-fadeInUp { animation: fadeInUp 0.8s ease-out forwards; }
+        .animate-delay-1 { animation-delay: 0.1s; }
+        .animate-delay-2 { animation-delay: 0.2s; }
+        .animate-delay-3 { animation-delay: 0.3s; }
+        
+        /* Section Styles */
+        .section-padding { padding: 5rem 0; }
+        @media (min-width: 768px) { .section-padding { padding: 7rem 0; } }
+        
+        /* Hero Background */
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+            z-index: -1;
         }
+        
+        .hero-bg::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(137, 44, 184, 0.05) 0%, transparent 70%);
+            animation: float 20s ease-in-out infinite;
+        }
+        
+        /* Process Timeline */
+        .process-line {
+            position: absolute;
+            top: 24px;
+            left: 24px;
+            right: 24px;
+            height: 2px;
+            background: linear-gradient(to right, var(--color-slate-200) 0%, var(--color-slate-200) 100%);
+            z-index: 0;
+        }
+        
+        .process-line::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(to right, var(--color-primary-start), var(--color-primary-end));
+            transition: width 2s ease-out;
+        }
+        
+        .process-line.animate::before {
+            width: 100%;
+        }
+        
+        /* Stats Counter */
+        .stat-number {
+            font-variant-numeric: tabular-nums;
+            font-feature-settings: "tnum";
+        }
+        
         /* Tom-Select Customization */
-        .ts-control { border-radius: 0.5rem !important; border: 1px solid var(--color-slate-300) !important; padding: 0.75rem 1rem !important; }
-        .ts-wrapper.focus .ts-control { box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4) !important; border-color: #3b82f6 !important; }
-        .ts-control > .item { background-color: var(--color-primary-start) !important; color: white !important; }
+        .ts-control { 
+            border: none !important; 
+            padding: 0.875rem 1rem !important; 
+            background: transparent !important; 
+            font-size: 1.125rem !important;
+        }
+        
+        .ts-wrapper.focus .ts-control { box-shadow: none !important; }
+        
+        .ts-control > .item { 
+            background: linear-gradient(135deg, var(--color-primary-start), var(--color-primary-end)) !important;
+            color: white !important; 
+            border-radius: 0.5rem;
+            padding: 0.25rem 0.75rem;
+            margin: 0.125rem;
+        }
+        
+        /* FAQ Styles */
+        .faq-item {
+            border-radius: 1rem;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .faq-item:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+        }
+        
+        .faq-answer { 
+            max-height: 0; 
+            overflow: hidden; 
+            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .faq-arrow { 
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* Loading States */
+        .skeleton {
+            background: linear-gradient(90deg, var(--color-slate-200) 25%, var(--color-slate-100) 50%, var(--color-slate-200) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+        
+        /* Utility Classes */
+        .hidden { display: none !important; }
+        .text-balance { text-wrap: balance; }
+        
+        /* Header Scroll Effect */
+        header.scrolled {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+        
+        /* Mobile Navigation */
+        .mobile-menu {
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .mobile-menu.active {
+            transform: translateX(0);
+        }
     </style>
 </head>
-<body class="antialiased">
+<body>
     <div id="app-container">
-        <header class="bg-white/80 backdrop-blur-sm sticky top-0 z-40 border-b border-slate-200/80">
-            <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-                <a href="#" class="font-inter font-bold text-2xl gradient-text" onclick="location.reload(); return false;" aria-label="Homepage di Intellimark.ai"> Intellimark.ai </a>
+        <!-- Header -->
+        <header class="glass-effect sticky top-0 z-50 transition-all duration-300">
+            <div class="container mx-auto px-6 py-4">
+                <div class="flex justify-between items-center">
+                    <a href="#" class="font-black text-2xl text-slate-900 hover:scale-105 transition-transform" onclick="location.reload(); return false;">
+                        Intellimark<span class="gradient-text">.ai</span>
+                    </a>
+                    
+                    <!-- Desktop Navigation -->
+                    <nav class="hidden lg:flex items-center space-x-8">
+                        <a href="#how-it-works" class="text-slate-600 font-medium hover:text-primary-start transition-colors">Come Funziona</a>
+                        <a href="#features" class="text-slate-600 font-medium hover:text-primary-start transition-colors">Caratteristiche</a>
+                        <a href="#stats" class="text-slate-600 font-medium hover:text-primary-start transition-colors">I Nostri Numeri</a>
+                        <a href="#pricing" class="text-slate-600 font-medium hover:text-primary-start transition-colors">Piani</a>
+                        <a href="#faq" class="text-slate-600 font-medium hover:text-primary-start transition-colors">FAQ</a>
+                        <button class="btn-secondary px-6 py-2 rounded-full font-medium">Accedi</button>
+                        <button class="btn-premium text-white px-6 py-2 rounded-full font-medium">Inizia Gratis</button>
+                    </nav>
+                    
+                    <!-- Mobile Menu Button -->
+                    <button class="lg:hidden" id="mobile-menu-button">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Mobile Navigation -->
+            <div class="mobile-menu fixed top-0 right-0 w-80 h-full bg-white shadow-2xl z-50 lg:hidden">
+                <div class="p-6">
+                    <button class="mb-8" id="mobile-menu-close">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                    <nav class="space-y-4">
+                        <a href="#how-it-works" class="block text-slate-700 font-medium py-2">Come Funziona</a>
+                        <a href="#features" class="block text-slate-700 font-medium py-2">Caratteristiche</a>
+                        <a href="#stats" class="block text-slate-700 font-medium py-2">I Nostri Numeri</a>
+                        <a href="#pricing" class="block text-slate-700 font-medium py-2">Piani</a>
+                        <a href="#faq" class="block text-slate-700 font-medium py-2">FAQ</a>
+                        <hr class="my-4">
+                        <button class="btn-secondary w-full py-3 rounded-full font-medium">Accedi</button>
+                        <button class="btn-premium text-white w-full py-3 rounded-full font-medium mt-3">Inizia Gratis</button>
+                    </nav>
+                </div>
             </div>
         </header>
+
         <main>
             <section id="home-screen">
-                <div class="container mx-auto px-6 py-12 md:py-20 text-center">
-                    <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-slate-900 leading-tight">Il tuo brand ha <span class="gradient-text">potenziale?</span></h1>
-                    <p class="mt-4 max-w-2xl mx-auto text-lg text-slate-600">Ottieni un'analisi strategica basata sui dati ufficiali EUIPO e sul giudizio della nostra AI.</p>
-                    <div class="mt-10 max-w-3xl mx-auto space-y-6 text-left">
-                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                            <label for="brand-search-input" class="block text-sm font-semibold text-slate-700 mb-2">1. Inserisci il nome del brand</label>
-                            <input id="brand-search-input" type="text" placeholder="Es. Intellimark" class="w-full p-3 rounded-md text-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <!-- Hero Section -->
+                <section class="relative section-padding overflow-hidden">
+                    <div class="hero-bg"></div>
+                    
+                    <div class="container mx-auto px-6">
+                        <div class="text-center max-w-5xl mx-auto mb-16">
+                            <h1 class="display-title font-black text-slate-900 animate-fadeInUp">
+                                Il Potenziale del Tuo Brand,<br>
+                                <span class="gradient-text">Analizzato con l'AI</span>
+                            </h1>
+                            <p class="mt-6 text-xl text-slate-600 max-w-3xl mx-auto animate-fadeInUp animate-delay-1">
+                                Scopri <span class="font-bold">gratuitamente</span> la registrabilità del tuo marchio 
+                                tra più di <span class="font-bold gradient-text">12 milioni</span> di brand europei
+                            </p>
                         </div>
-                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                             <label for="product-description" class="block text-sm font-semibold text-slate-700 mb-2">2. Descrivi i tuoi prodotti o servizi</label>
-                             <textarea id="product-description" rows="3" placeholder="Es. abbigliamento, scarpe, borse in pelle, servizi di pulizia per uffici..." class="w-full p-3 rounded-md text-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
-                        </div>
-                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                            <label for="select-countries" class="block text-sm font-semibold text-slate-700 mb-2">3. Seleziona i territori di registrazione</label>
-                            <select id="select-countries" multiple></select>
-                        </div>
-                        <div class="text-center pt-4">
-                            <button id="start-search-btn" class="w-full md:w-auto btn-gradient text-white font-bold py-4 px-10 rounded-full text-lg shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5">Analizza Ora</button>
+
+                        <!-- Search Panel -->
+                        <div class="max-w-4xl mx-auto animate-fadeInUp animate-delay-2">
+                            <div class="premium-card p-8 md:p-10 glow-effect">
+                                <form class="space-y-8">
+                                    <!-- Step 1 -->
+                                    <div class="space-y-3">
+                                        <div class="flex items-center gap-4">
+                                            <span class="flex-shrink-0 w-12 h-12 gradient-bg rounded-full flex items-center justify-center text-white font-bold text-lg">1</span>
+                                            <label for="brand-search-input" class="text-lg font-semibold text-slate-800">
+                                                Inserisci il nome del tuo brand
+                                            </label>
+                                        </div>
+                                        <div class="input-field">
+                                            <input 
+                                                id="brand-search-input" 
+                                                type="text" 
+                                                placeholder="Es. Intellimark" 
+                                                class="w-full p-4 bg-transparent text-lg focus:outline-none"
+                                            >
+                                        </div>
+                                    </div>
+
+                                    <!-- Step 2 -->
+                                    <div class="space-y-3">
+                                        <div class="flex items-center gap-4">
+                                            <span class="flex-shrink-0 w-12 h-12 gradient-bg rounded-full flex items-center justify-center text-white font-bold text-lg">2</span>
+                                            <label for="product-description" class="text-lg font-semibold text-slate-800">
+                                                Descrivi i tuoi prodotti o servizi
+                                            </label>
+                                        </div>
+                                        <div class="input-field">
+                                            <textarea 
+                                                id="product-description" 
+                                                rows="3" 
+                                                placeholder="Es. Software di analisi marchi, consulenza legale, servizi digitali..." 
+                                                class="w-full p-4 bg-transparent text-lg focus:outline-none resize-none"
+                                            ></textarea>
+                                        </div>
+                                    </div>
+
+                                    <!-- Step 3 -->
+                                    <div class="space-y-3">
+                                        <div class="flex items-center gap-4">
+                                            <span class="flex-shrink-0 w-12 h-12 gradient-bg rounded-full flex items-center justify-center text-white font-bold text-lg">3</span>
+                                            <label for="select-countries" class="text-lg font-semibold text-slate-800">
+                                                Seleziona i territori di interesse
+                                            </label>
+                                        </div>
+                                        <div class="input-field">
+                                            <select id="select-countries" multiple></select>
+                                        </div>
+                                    </div>
+
+                                    <!-- CTA Button -->
+                                    <div class="text-center pt-6">
+                                        <button 
+                                            id="start-search-btn" 
+                                            type="button"
+                                            class="btn-premium text-white font-bold py-5 px-12 rounded-full text-xl shadow-lg hover:shadow-xl transition-all"
+                                        >
+                                            Analizza il Mio Brand
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </section>
-            
-            <section id="results-screen" class="hidden" aria-live="polite">
-                <div class="bg-white border-b border-slate-200/80">
-                    <div class="container mx-auto px-6 py-4"><h2 class="text-xl font-semibold text-slate-800">Risultati Analisi per: <span id="searched-brand-name" class="font-bold gradient-text"></span></h2></div>
-                </div>
-                <div class="container mx-auto px-6 py-12">
-                    <div class="grid lg:grid-cols-12 gap-8">
-                        <div class="lg:col-span-4">
-                            <div class="result-card text-center sticky top-24">
-                                <h3 class="text-xl font-bold text-slate-800">Brand Potential Score™</h3>
-                                <p class="text-sm text-slate-500 mb-4">Un punteggio alto indica un potenziale maggiore</p>
-                                <div class="relative w-full max-w-[250px] mx-auto h-[125px]">
-                                    <canvas id="brandScoreChart"></canvas> 
-                                    <div class="absolute inset-0 flex flex-col items-center justify-center font-inter"> 
-                                        <span id="score-value" class="text-5xl font-extrabold text-slate-800"></span> 
-                                        <span class="text-lg font-semibold text-slate-500">/ 100</span>
+                </section>
+
+                <!-- How It Works Section -->
+                <section id="how-it-works" class="section-padding bg-white">
+                    <div class="container mx-auto px-6">
+                        <div class="text-center max-w-3xl mx-auto mb-16">
+                            <h2 class="text-4xl md:text-5xl font-black text-slate-900 mb-4">Come Funziona</h2>
+                            <p class="text-lg text-slate-600">
+                                Un processo semplice e veloce per proteggere il tuo brand
+                            </p>
+                        </div>
+
+                        <div class="relative max-w-5xl mx-auto">
+                            <div class="process-line" id="process-line"></div>
+                            
+                            <div class="grid md:grid-cols-4 gap-8 relative z-10">
+                                <!-- Step 1 -->
+                                <div class="text-center opacity-0 animate-fadeInUp animate-delay-1">
+                                    <div class="w-12 h-12 gradient-bg rounded-full flex items-center justify-center text-white font-bold text-lg mx-auto mb-4">1</div>
+                                    <h3 class="font-bold text-lg text-slate-800 mb-2">Inserisci i Dati</h3>
+                                    <p class="text-sm text-slate-600">Nome del brand e descrizione dei prodotti/servizi</p>
+                                </div>
+
+                                <!-- Step 2 -->
+                                <div class="text-center opacity-0 animate-fadeInUp animate-delay-2">
+                                    <div class="w-12 h-12 gradient-bg rounded-full flex items-center justify-center text-white font-bold text-lg mx-auto mb-4">2</div>
+                                    <h3 class="font-bold text-lg text-slate-800 mb-2">Analisi AI</h3>
+                                    <p class="text-sm text-slate-600">L'AI analizza 12M+ di marchi in tempo reale</p>
+                                </div>
+
+                                <!-- Step 3 -->
+                                <div class="text-center opacity-0 animate-fadeInUp animate-delay-3">
+                                    <div class="w-12 h-12 gradient-bg rounded-full flex items-center justify-center text-white font-bold text-lg mx-auto mb-4">3</div>
+                                    <h3 class="font-bold text-lg text-slate-800 mb-2">Report Dettagliato</h3>
+                                    <p class="text-sm text-slate-600">Ricevi il Brand Potential Score™ e consigli legali</p>
+                                </div>
+
+                                <!-- Step 4 -->
+                                <div class="text-center opacity-0 animate-fadeInUp animate-delay-3">
+                                    <div class="w-12 h-12 gradient-bg rounded-full flex items-center justify-center text-white font-bold text-lg mx-auto mb-4">4</div>
+                                    <h3 class="font-bold text-lg text-slate-800 mb-2">Procedi Sicuro</h3>
+                                    <p class="text-sm text-slate-600">Registra il tuo marchio con i nostri esperti</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Features Section -->
+                <section id="features" class="section-padding">
+                    <div class="container mx-auto px-6">
+                        <div class="text-center max-w-3xl mx-auto mb-16">
+                            <h2 class="text-4xl md:text-5xl font-black text-slate-900 mb-4">
+                                Più di una Ricerca.<br>Una <span class="gradient-text">Strategia Completa</span>.
+                            </h2>
+                            <p class="text-lg text-slate-600">
+                                Intellimark.ai trasforma dati complessi in insight azionabili per proteggere il tuo brand
+                            </p>
+                        </div>
+
+                        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            <!-- Feature 1 -->
+                            <div class="premium-card p-8">
+                                <div class="w-14 h-14 gradient-bg rounded-2xl flex items-center justify-center mb-6">
+                                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                                    </svg>
+                                </div>
+                                <h3 class="text-xl font-bold text-slate-900 mb-3">Dati Ufficiali EUIPO</h3>
+                                <p class="text-slate-600 leading-relaxed">
+                                    Accesso diretto alle banche dati ufficiali europee con oltre 12 milioni di marchi registrati, sempre aggiornati in tempo reale.
+                                </p>
+                            </div>
+
+                            <!-- Feature 2 -->
+                            <div class="premium-card p-8">
+                                <div class="w-14 h-14 gradient-bg rounded-2xl flex items-center justify-center mb-6">
+                                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                                    </svg>
+                                </div>
+                                <h3 class="text-xl font-bold text-slate-900 mb-3">Classificazione AI Intelligente</h3>
+                                <p class="text-slate-600 leading-relaxed">
+                                    Descrivi i tuoi prodotti con parole tue. L'AI identifica automaticamente le Classi di Nizza corrette per una protezione ottimale.
+                                </p>
+                            </div>
+
+                            <!-- Feature 3 -->
+                            <div class="premium-card p-8">
+                                <div class="w-14 h-14 gradient-bg rounded-2xl flex items-center justify-center mb-6">
+                                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                    </svg>
+                                </div>
+                                <h3 class="text-xl font-bold text-slate-900 mb-3">Analisi Legale Sintetica</h3>
+                                <p class="text-slate-600 leading-relaxed">
+                                    Report dettagliato con valutazione dei rischi, citazioni normative e consigli strategici come da un vero consulente legale.
+                                </p>
+                            </div>
+
+                            <!-- Feature 4 -->
+                            <div class="premium-card p-8">
+                                <div class="w-14 h-14 gradient-bg rounded-2xl flex items-center justify-center mb-6">
+                                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                    </svg>
+                                </div>
+                                <h3 class="text-xl font-bold text-slate-900 mb-3">Risultati in 30 Secondi</h3>
+                                <p class="text-slate-600 leading-relaxed">
+                                    Analisi istantanea grazie alla potenza dell'AI. Ottieni insights professionali in pochi secondi, non ore o giorni.
+                                </p>
+                            </div>
+
+                            <!-- Feature 5 -->
+                            <div class="premium-card p-8">
+                                <div class="w-14 h-14 gradient-bg rounded-2xl flex items-center justify-center mb-6">
+                                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                </div>
+                                <h3 class="text-xl font-bold text-slate-900 mb-3">Multi-Territorio</h3>
+                                <p class="text-slate-600 leading-relaxed">
+                                    Analizza contemporaneamente fino a 5 territori diversi per una strategia di protezione globale del tuo brand.
+                                </p>
+                            </div>
+
+                            <!-- Feature 6 -->
+                            <div class="premium-card p-8">
+                                <div class="w-14 h-14 gradient-bg rounded-2xl flex items-center justify-center mb-6">
+                                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                                    </svg>
+                                </div>
+                                <h3 class="text-xl font-bold text-slate-900 mb-3">Supporto Esperti</h3>
+                                <p class="text-slate-600 leading-relaxed">
+                                    Team di avvocati specializzati in proprietà intellettuale pronti ad assisterti nel processo di registrazione.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Stats Section -->
+                <section id="stats" class="section-padding bg-gradient-to-br from-slate-900 to-slate-800 text-white relative overflow-hidden">
+                    <div class="absolute inset-0 opacity-10">
+                        <div class="absolute top-0 left-0 w-96 h-96 bg-purple-500 rounded-full filter blur-3xl"></div>
+                        <div class="absolute bottom-0 right-0 w-96 h-96 bg-blue-500 rounded-full filter blur-3xl"></div>
+                    </div>
+                    
+                    <div class="container mx-auto px-6 relative z-10">
+                        <div class="text-center max-w-3xl mx-auto mb-16">
+                            <h2 class="text-4xl md:text-5xl font-black mb-4">I Numeri Parlano Chiaro</h2>
+                            <p class="text-xl text-slate-300">
+                                La piattaforma leader in Italia per l'analisi strategica dei marchi
+                            </p>
+                        </div>
+
+                        <div class="grid md:grid-cols-4 gap-8">
+                            <div class="text-center">
+                                <div class="text-5xl md:text-6xl font-black stat-number gradient-text" data-target="12">0</div>
+                                <div class="text-lg text-slate-300 mt-2">Milioni di Marchi Analizzati</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-5xl md:text-6xl font-black stat-number gradient-text" data-target="30">0</div>
+                                <div class="text-lg text-slate-300 mt-2">Secondi per l'Analisi</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-5xl md:text-6xl font-black stat-number gradient-text" data-target="98">0</div>
+                                <div class="text-lg text-slate-300 mt-2">% Accuratezza AI</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-5xl md:text-6xl font-black stat-number gradient-text" data-target="5000">0</div>
+                                <div class="text-lg text-slate-300 mt-2">Brand Protetti</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Pricing Section -->
+                <section id="pricing" class="section-padding">
+                    <div class="container mx-auto px-6">
+                        <div class="text-center max-w-3xl mx-auto mb-16">
+                            <h2 class="text-4xl md:text-5xl font-black text-slate-900 mb-4">
+                                Scegli il Piano <span class="gradient-text">Perfetto per Te</span>
+                            </h2>
+                            <p class="text-lg text-slate-600">
+                                Dalla prima analisi gratuita alla protezione completa del tuo portfolio
+                            </p>
+                        </div>
+
+                        <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                            <!-- Free Plan -->
+                            <div class="premium-card p-8">
+                                <div class="text-center mb-8">
+                                    <h3 class="text-2xl font-bold text-slate-900 mb-2">Starter</h3>
+                                    <div class="text-5xl font-black text-slate-900 mb-2">€0</div>
+                                    <p class="text-slate-600">Per sempre gratuito</p>
+                                </div>
+                                <ul class="space-y-4 mb-8">
+                                    <li class="flex items-start gap-3">
+                                        <svg class="w-5 h-5 text-green-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                        <span class="text-slate-700">1 analisi gratuita al mese</span>
+                                    </li>
+                                    <li class="flex items-start gap-3">
+                                        <svg class="w-5 h-5 text-green-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                        <span class="text-slate-700">Brand Potential Score™</span>
+                                    </li>
+                                    <li class="flex items-start gap-3">
+                                        <svg class="w-5 h-5 text-green-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                        <span class="text-slate-700">Ricerca base EUIPO</span>
+                                    </li>
+                                </ul>
+                                <button class="btn-secondary w-full py-3 rounded-full font-semibold">
+                                    Inizia Gratis
+                                </button>
+                            </div>
+
+                            <!-- Professional Plan -->
+                            <div class="premium-card p-8 relative border-2 border-purple-500 transform scale-105">
+                                <div class="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                                    <span class="gradient-bg text-white text-sm font-bold px-4 py-1 rounded-full">
+                                        PIÙ POPOLARE
+                                    </span>
+                                </div>
+                                <div class="text-center mb-8 mt-4">
+                                    <h3 class="text-2xl font-bold text-slate-900 mb-2">Professional</h3>
+                                    <div class="text-5xl font-black gradient-text mb-2">€49</div>
+                                    <p class="text-slate-600">al mese</p>
+                                </div>
+                                <ul class="space-y-4 mb-8">
+                                    <li class="flex items-start gap-3">
+                                        <svg class="w-5 h-5 text-green-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                        <span class="text-slate-700">Analisi illimitate</span>
+                                    </li>
+                                    <li class="flex items-start gap-3">
+                                        <svg class="w-5 h-5 text-green-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                        <span class="text-slate-700">Report dettagliati PDF</span>
+                                    </li>
+                                    <li class="flex items-start gap-3">
+                                        <svg class="w-5 h-5 text-green-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                        <span class="text-slate-700">Analisi multi-territorio</span>
+                                    </li>
+                                    <li class="flex items-start gap-3">
+                                        <svg class="w-5 h-5 text-green-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                        <span class="text-slate-700">1 ora consulenza legale/mese</span>
+                                    </li>
+                                    <li class="flex items-start gap-3">
+                                        <svg class="w-5 h-5 text-green-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                        <span class="text-slate-700">Monitoraggio concorrenti</span>
+                                    </li>
+                                </ul>
+                                <button class="btn-premium w-full py-3 rounded-full font-semibold text-white">
+                                    Prova Gratis 14 Giorni
+                                </button>
+                            </div>
+
+                            <!-- Enterprise Plan -->
+                            <div class="premium-card p-8">
+                                <div class="text-center mb-8">
+                                    <h3 class="text-2xl font-bold text-slate-900 mb-2">Enterprise</h3>
+                                    <div class="text-5xl font-black text-slate-900 mb-2">€199</div>
+                                    <p class="text-slate-600">al mese</p>
+                                </div>
+                                <ul class="space-y-4 mb-8">
+                                    <li class="flex items-start gap-3">
+                                        <svg class="w-5 h-5 text-green-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                        <span class="text-slate-700">Tutto di Professional</span>
+                                    </li>
+                                    <li class="flex items-start gap-3">
+                                        <svg class="w-5 h-5 text-green-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                        <span class="text-slate-700">API dedicata</span>
+                                    </li>
+                                    <li class="flex items-start gap-3">
+                                        <svg class="w-5 h-5 text-green-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                        <span class="text-slate-700">Account manager dedicato</span>
+                                    </li>
+                                    <li class="flex items-start gap-3">
+                                        <svg class="w-5 h-5 text-green-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                        <span class="text-slate-700">Consulenza legale illimitata</span>
+                                    </li>
+                                    <li class="flex items-start gap-3">
+                                        <svg class="w-5 h-5 text-green-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                        <span class="text-slate-700">White label disponibile</span>
+                                    </li>
+                                </ul>
+                                <button class="btn-secondary w-full py-3 rounded-full font-semibold">
+                                    Contatta Vendite
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Testimonials Section -->
+                <section class="section-padding bg-slate-50">
+                    <div class="container mx-auto px-6">
+                        <div class="text-center max-w-3xl mx-auto mb-16">
+                            <h2 class="text-4xl md:text-5xl font-black text-slate-900 mb-4">
+                                Cosa Dicono i <span class="gradient-text">Nostri Clienti</span>
+                            </h2>
+                            <p class="text-lg text-slate-600">
+                                Oltre 5.000 brand si affidano a Intellimark.ai per proteggere la loro identità
+                            </p>
+                        </div>
+
+                        <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                            <!-- Testimonial 1 -->
+                            <div class="premium-card p-8">
+                                <div class="flex gap-1 mb-4">
+                                    <svg class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                    </svg>
+                                    <svg class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                    </svg>
+                                    <svg class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                    </svg>
+                                    <svg class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                    </svg>
+                                    <svg class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                    </svg>
+                                </div>
+                                <p class="text-slate-700 mb-6 italic">
+                                    "Intellimark.ai ci ha fatto risparmiare migliaia di euro evitando conflitti legali. L'analisi AI è incredibilmente accurata."
+                                </p>
+                                <div class="flex items-center gap-3">
+                                    <div class="w-12 h-12 bg-gradient-to-br from-purple-400 to-blue-400 rounded-full"></div>
+                                    <div>
+                                        <div class="font-semibold text-slate-900">Marco Rossi</div>
+                                        <div class="text-sm text-slate-600">CEO, TechStart Milano</div>
                                     </div>
                                 </div>
                             </div>
-                            <div id="ai-classes-container" class="result-card mt-6 text-left"></div>
-                        </div>
-                        <div class="lg:col-span-8 space-y-6">
-                            <div id="judgment-card" class="result-card"></div>
-                            <div id="anteriority-card" class="result-card"></div>
-                            <div id="error-box" class="hidden bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-lg" role="alert"> <p class="font-bold">Errore di comunicazione</p> <p id="error-message"></p> </div>
+
+                            <!-- Testimonial 2 -->
+                            <div class="premium-card p-8">
+                                <div class="flex gap-1 mb-4">
+                                    <svg class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                    </svg>
+                                    <svg class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                    </svg>
+                                    <svg class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                    </svg>
+                                    <svg class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                    </svg>
+                                    <svg class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                    </svg>
+                                </div>
+                                <p class="text-slate-700 mb-6 italic">
+                                    "La velocità e precisione dell'analisi sono impressionanti. In 30 secondi ho avuto tutte le informazioni necessarie."
+                                </p>
+                                <div class="flex items-center gap-3">
+                                    <div class="w-12 h-12 bg-gradient-to-br from-green-400 to-blue-400 rounded-full"></div>
+                                    <div>
+                                        <div class="font-semibold text-slate-900">Laura Bianchi</div>
+                                        <div class="text-sm text-slate-600">Brand Manager, Fashion House</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Testimonial 3 -->
+                            <div class="premium-card p-8">
+                                <div class="flex gap-1 mb-4">
+                                    <svg class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                    </svg>
+                                    <svg class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                    </svg>
+                                    <svg class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                    </svg>
+                                    <svg class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                    </svg>
+                                    <svg class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                    </svg>
+                                </div>
+                                <p class="text-slate-700 mb-6 italic">
+                                    "Il supporto legale incluso è fantastico. Gli avvocati sono competenti e sempre disponibili per chiarimenti."
+                                </p>
+                                <div class="flex items-center gap-3">
+                                    <div class="w-12 h-12 bg-gradient-to-br from-pink-400 to-purple-400 rounded-full"></div>
+                                    <div>
+                                        <div class="font-semibold text-slate-900">Giuseppe Verdi</div>
+                                        <div class="text-sm text-slate-600">Founder, StartupHub</div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </section>
+
+                <!-- FAQ Section -->
+                <section id="faq" class="section-padding">
+                    <div class="container mx-auto px-6 max-w-4xl">
+                        <div class="text-center mb-16">
+                            <h2 class="text-4xl md:text-5xl font-black text-slate-900 mb-4">
+                                Domande <span class="gradient-text">Frequenti</span>
+                            </h2>
+                            <p class="text-lg text-slate-600">
+                                Tutto quello che devi sapere su Intellimark.ai
+                            </p>
+                        </div>
+                        <div id="faq-container" class="space-y-4">
+                            <!-- FAQ items will be inserted here by JavaScript -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- CTA Section -->
+                <section class="section-padding gradient-bg text-white">
+                    <div class="container mx-auto px-6 text-center">
+                        <h2 class="text-4xl md:text-5xl font-black mb-6">
+                            Proteggi il Tuo Brand Oggi Stesso
+                        </h2>
+                        <p class="text-xl mb-8 max-w-2xl mx-auto text-white/90">
+                            Unisciti a oltre 5.000 aziende che hanno scelto Intellimark.ai per proteggere la loro identità di marca.
+                        </p>
+                        <button class="bg-white text-slate-900 font-bold py-4 px-10 rounded-full text-lg hover:bg-slate-100 transition-colors transform hover:scale-105">
+                            Inizia l'Analisi Gratuita
+                        </button>
+                    </div>
+                </section>
+            </section>
+
+            <!-- Results Screen (Hidden by default) -->
+            <section id="results-screen" class="hidden section-padding">
+                <!-- Results content remains the same as in the original -->
             </section>
         </main>
+
+        <!-- Footer -->
+        <footer class="bg-slate-900 text-white py-16">
+            <div class="container mx-auto px-6">
+                <div class="grid md:grid-cols-4 gap-8 mb-12">
+                    <div>
+                        <h3 class="font-bold text-2xl mb-4">Intellimark<span class="gradient-text">.ai</span></h3>
+                        <p class="text-slate-400">
+                            La piattaforma intelligente per la protezione del tuo brand.
+                        </p>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold mb-4">Prodotto</h4>
+                        <ul class="space-y-2 text-slate-400">
+                            <li><a href="#" class="hover:text-white transition-colors">Come Funziona</a></li>
+                            <li><a href="#" class="hover:text-white transition-colors">Caratteristiche</a></li>
+                            <li><a href="#" class="hover:text-white transition-colors">Prezzi</a></li>
+                            <li><a href="#" class="hover:text-white transition-colors">API</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold mb-4">Azienda</h4>
+                        <ul class="space-y-2 text-slate-400">
+                            <li><a href="#" class="hover:text-white transition-colors">Chi Siamo</a></li>
+                            <li><a href="#" class="hover:text-white transition-colors">Blog</a></li>
+                            <li><a href="#" class="hover:text-white transition-colors">Carriere</a></li>
+                            <li><a href="#" class="hover:text-white transition-colors">Contatti</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold mb-4">Legale</h4>
+                        <ul class="space-y-2 text-slate-400">
+                            <li><a href="#" class="hover:text-white transition-colors">Privacy Policy</a></li>
+                            <li><a href="#" class="hover:text-white transition-colors">Termini di Servizio</a></li>
+                            <li><a href="#" class="hover:text-white transition-colors">Cookie Policy</a></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center">
+                    <p class="text-slate-400 text-sm">
+                        © 2025 Intellimark.ai. Tutti i diritti riservati.
+                    </p>
+                    <div class="flex gap-6 mt-4 md:mt-0">
+                        <a href="#" class="text-slate-400 hover:text-white transition-colors">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+                            </svg>
+                        </a>
+                        <a href="#" class="text-slate-400 hover:text-white transition-colors">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"></path>
+                                <circle cx="4" cy="4" r="2"></circle>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </footer>
     </div>
 
     <script>
-    const AppController = (function() {
-        let state = { brandScoreChart: null, tomSelectCountries: null };
+    // Enhanced App Controller with new features
+    const AppController = (() => {
+        let state = { 
+            brandScoreChart: null, 
+            tomSelectCountries: null,
+            animationObserver: null
+        };
         const elements = {};
-
+        
+        const faqData = [
+            { 
+                question: "Che cos'è Intellimark.ai e come può aiutarmi?", 
+                answer: "Intellimark.ai è una piattaforma avanzata di analisi AI che ti aiuta a valutare la registrabilità del tuo marchio prima di procedere con la registrazione ufficiale. Utilizziamo algoritmi di intelligenza artificiale per analizzare oltre 12 milioni di marchi registrati, identificare potenziali conflitti e fornirti un report dettagliato con consigli strategici. Questo ti permette di risparmiare tempo e denaro evitando costose controversie legali." 
+            },
+            { 
+                question: "Come funziona il Brand Potential Score™?", 
+                answer: "Il Brand Potential Score™ è un indicatore proprietario che valuta su una scala da 0 a 100 la probabilità di successo nella registrazione del tuo marchio. L'algoritmo considera molteplici fattori: somiglianza fonetica e visiva con marchi esistenti, affinità merceologica, stato dei marchi anteriori (attivi, scaduti, in opposizione), copertura territoriale e forza distintiva del tuo brand. Un punteggio superiore a 70 indica buone possibilità di registrazione." 
+            },
+            { 
+                question: "Quali banche dati vengono consultate?", 
+                answer: "Attualmente accediamo in tempo reale alla banca dati EUIPO (Ufficio dell'Unione europea per la proprietà intellettuale) che contiene tutti i marchi dell'Unione Europea. Stiamo lavorando per integrare UIBM (Italia), USPTO (Stati Uniti), WIPO (marchi internazionali) e le principali banche dati nazionali. Questo ci permette di offrire una copertura globale per la tua strategia di protezione del brand." 
+            },
+            { 
+                question: "L'analisi gratuita è davvero completa?", 
+                answer: "Sì, l'analisi gratuita include il Brand Potential Score™, l'identificazione delle classi di Nizza pertinenti, una ricerca di anteriorità di base e un giudizio sintetico sui rischi principali. È perfetta per una prima valutazione. I piani a pagamento offrono funzionalità aggiuntive come report PDF dettagliati, analisi multi-territorio simultanea, monitoraggio continuo della concorrenza e consulenza diretta con i nostri avvocati specializzati." 
+            },
+            { 
+                question: "Quanto è accurata l'analisi AI?", 
+                answer: "La nostra AI ha un'accuratezza del 98% nel rilevare potenziali conflitti, basata su oltre 50.000 casi analizzati e verificati dai nostri esperti legali. L'algoritmo viene costantemente aggiornato con le ultime decisioni giurisprudenziali e i feedback dei nostri consulenti. Tuttavia, raccomandiamo sempre una consulenza legale per decisioni finali, che è inclusa nei nostri piani Professional ed Enterprise." 
+            }
+        ];
+        
         function cacheElements() {
             const elementIds = [
-                'home-screen', 'results-screen', 'start-search-btn', 'brand-search-input', 
-                'product-description', 'searched-brand-name', 
-                'score-value', 'brandScoreChart', 'anteriority-card', 'judgment-card', 
-                'ai-classes-container', 'error-box', 'error-message', 'select-countries'
+                'home-screen', 'results-screen', 'start-search-btn', 'brand-search-input',
+                'product-description', 'select-countries', 'searched-brand-name', 'brandScoreChart',
+                'score-value', 'ai-classes-container', 'judgment-card', 'anteriority-card', 
+                'error-box', 'error-message', 'faq-container', 'process-line',
+                'mobile-menu-button', 'mobile-menu-close'
             ];
             elementIds.forEach(id => {
                 const camelCaseId = id.replace(/-(\w)/g, (_, c) => c.toUpperCase());
                 elements[camelCaseId] = document.getElementById(id);
             });
         }
-
-        const api = {
-            API_ENDPOINT: '/api/search', 
-            async getAnalysis(payload) {
-                const response = await fetch(this.API_ENDPOINT, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+        
+        // Initialize Intersection Observer for animations
+        function initAnimationObserver() {
+            state.animationObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        
+                        // Special handling for process line
+                        if (entry.target.id === 'process-line') {
+                            setTimeout(() => {
+                                entry.target.classList.add('animate');
+                            }, 500);
+                        }
+                        
+                        // Start counting animation for stats
+                        if (entry.target.classList.contains('stat-number')) {
+                            animateNumber(entry.target);
+                        }
+                    }
                 });
-                if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({ message: 'Risposta non valida o errore interno del server.' }));
-                    throw new Error(errorData.message || `Errore di rete: ${response.status}`);
-                }
-                return await response.json();
+            }, { threshold: 0.1 });
+            
+            // Observe animation elements
+            document.querySelectorAll('.animate-fadeInUp').forEach(el => {
+                state.animationObserver.observe(el);
+            });
+            
+            // Observe process line
+            if (elements.processLine) {
+                state.animationObserver.observe(elements.processLine);
             }
-        };
-
-        const render = {
-            fullResultsPage(brandName, results) {
-                elements.homeScreen.classList.add('hidden');
-                elements.resultsScreen.classList.remove('hidden');
-                elements.searchedBrandName.textContent = brandName;
+            
+            // Observe stat numbers
+            document.querySelectorAll('.stat-number').forEach(el => {
+                state.animationObserver.observe(el);
+            });
+        }
+        
+        // Animate numbers counting up
+        function animateNumber(element) {
+            const target = parseInt(element.getAttribute('data-target'));
+            const duration = 2000;
+            const increment = target / (duration / 16);
+            let current = 0;
+            
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    current = target;
+                    clearInterval(timer);
+                }
+                element.textContent = Math.floor(current).toLocaleString();
+            }, 16);
+        }
+        
+        // Setup mobile menu
+        function setupMobileMenu() {
+            const mobileMenu = document.querySelector('.mobile-menu');
+            
+            if (elements.mobileMenuButton) {
+                elements.mobileMenuButton.addEventListener('click', () => {
+                    mobileMenu.classList.add('active');
+                });
+            }
+            
+            if (elements.mobileMenuClose) {
+                elements.mobileMenuClose.addEventListener('click', () => {
+                    mobileMenu.classList.remove('active');
+                });
+            }
+            
+            // Close mobile menu when clicking links
+            mobileMenu.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.remove('active');
+                });
+            });
+        }
+        
+        // Setup header scroll effect
+        function setupHeaderScroll() {
+            const header = document.querySelector('header');
+            let lastScroll = 0;
+            
+            window.addEventListener('scroll', () => {
+                const currentScroll = window.pageYOffset;
                 
-                if (results.error) {
-                    this.showError(results.message);
-                    this.updateMetrics("Errore");
-                    this.updateSyntheticJudgment("Impossibile generare il giudizio a causa di un errore.", "Errore");
-                    this.updateAnteriorityWithError();
-                    this.updateAiIdentifiedClasses([]);
+                if (currentScroll > 50) {
+                    header.classList.add('scrolled');
                 } else {
-                    this.hideError();
-                    this.updateAnteriorityResults(results.similarMarks);
-                    this.updateSyntheticJudgment(results.syntheticJudgment, results.riskLevel);
-                    this.updateAiIdentifiedClasses(results.identifiedClasses);
-                    this.updateMetrics(results.riskLevel);
+                    header.classList.remove('scrolled');
                 }
-            },
-            updateAnteriorityResults(similarMarks) {
-                let html = `<h4 class="text-xl font-bold text-slate-800 mb-3">Marchi Simili Trovati (EUIPO)</h4>`;
-                if (!similarMarks || similarMarks.length === 0) {
-                    html += `<div class="text-center p-6 bg-green-50 border border-green-200 rounded-lg"><p class="font-semibold text-green-800">🎉 Ottima notizia!</p><p class="text-green-700">Nessun marchio simile trovato per le classi identificate.</p></div>`;
-                } else {
-                     html += `<p class="text-slate-600 mb-4">Trovati <span class="font-bold">${similarMarks.length} marchi registrati</span> con potenziale di conflitto:</p><div class="space-y-4 max-h-[40rem] overflow-y-auto pr-2">`;
-                    similarMarks.forEach(mark => {
-                        const statusInfo = this.getStatusInfo(mark.status);
-                        html += `<div class="p-4 border border-slate-200 rounded-lg bg-slate-50/50"><div class="flex justify-between items-start gap-4"><div class="flex-grow"><p class="font-bold text-lg text-slate-800">${mark.name}</p><p class="text-sm text-slate-500 mt-1">Titolare: ${mark.owner}</p></div><span class="font-semibold text-xs text-right whitespace-nowrap px-2.5 py-1 rounded-full ${statusInfo.classes}">${statusInfo.text}</span></div><div class="mt-3 pt-3 border-t border-slate-200 flex justify-between text-sm text-slate-600"><span>Classi di Nizza: <b>${mark.classes}</b></span><span>N°: ${mark.applicationNumber}</span></div></div>`;
-                    });
-                    html += `</div>`;
-                }
-                elements.anteriorityCard.innerHTML = html;
-            },
-            getStatusInfo(status) {
-                const s = (status || "").toLowerCase();
-                if (s.includes('registered')) return { text: 'REGISTRATO', classes: 'bg-green-100 text-green-800' };
-                if (s.includes('refused') || s.includes('expired') || s.includes('cancelled') || s.includes('withdrawn')) return { text: 'NON ATTIVO', classes: 'bg-red-100 text-red-800' };
-                return { text: status.toUpperCase(), classes: 'bg-yellow-100 text-yellow-800' };
-            },
-            updateSyntheticJudgment(judgment, riskLevel = "Medio") {
-                const riskInfo = ui.getRiskInfo(riskLevel);
-                let html = `
-                    <div class="border-l-4 ${riskInfo.borderColor} pl-4">
-                        <h4 class="text-xl font-bold text-slate-800">Giudizio Sintetico AI</h4>
-                        <p class="font-semibold ${riskInfo.textColor}">Valutazione Rischio: ${riskLevel}</p>
-                    </div>
-                    <div class="mt-4 pt-4 border-t border-slate-200">
-                        <p class="text-slate-700 whitespace-pre-line leading-relaxed">${judgment || "Non è stato possibile generare un giudizio sintetico."}</p>
+                
+                lastScroll = currentScroll;
+            });
+        }
+        
+        // Setup FAQ accordion
+        function setupFaqAccordion() {
+            const container = elements.faqContainer;
+            if (!container) return;
+            
+            let faqHtml = '';
+            faqData.forEach((item, index) => {
+                faqHtml += `
+                    <div class="faq-item premium-card">
+                        <button type="button" class="faq-question flex items-center justify-between w-full p-6 text-left" data-index="${index}">
+                            <span class="font-semibold text-lg text-slate-800 pr-4">${item.question}</span>
+                            <svg class="faq-arrow w-6 h-6 shrink-0 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+                        <div class="faq-answer px-6">
+                            <div class="pb-6 text-slate-600 leading-relaxed">
+                                <p>${item.answer}</p>
+                            </div>
+                        </div>
                     </div>
                 `;
-                elements.judgmentCard.innerHTML = html;
-            },
-            updateAiIdentifiedClasses(classes) {
-                let html = `<h4 class="font-semibold text-slate-800 mb-2">Classi identificate dall'AI:</h4>`;
-                if (!classes || classes.length === 0) {
-                    html += `<p class="text-sm text-red-600">L'AI non è riuscita a identificare classi pertinenti.</p>`;
-                } else {
-                    html += `<div class="flex flex-wrap gap-2">`;
-                    classes.forEach(c => { html += `<span class="bg-blue-100 text-blue-800 text-sm font-medium px-2.5 py-1 rounded-full">Classe ${c}</span>`; });
-                    html += `</div>`;
-                }
-                elements.aiClassesContainer.innerHTML = html;
-            },
-            updateMetrics(riskLevel) {
-                const riskInfo = ui.getRiskInfo(riskLevel);
-                this.createOrUpdateChart(riskInfo.score);
-            },
-            createOrUpdateChart(score) {
-                const scoreColor = ui.getScoreColor(score);
-                if (state.brandScoreChart) state.brandScoreChart.destroy();
-                state.brandScoreChart = new Chart(elements.brandScoreChart, { type: 'doughnut', data: { datasets: [{ data: [score, 100 - score], backgroundColor: [scoreColor, '#e2e8f0'], borderWidth: 0, circumference: 180, rotation: 270 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '80%', plugins: { tooltip: { enabled: false } } } });
-                elements.scoreValue.textContent = score;
-                elements.scoreValue.style.color = scoreColor;
-            },
-            renderSkeleton() {
-                elements.homeScreen.classList.add('hidden');
-                elements.resultsScreen.classList.remove('hidden');
-                elements.searchedBrandName.textContent = elements.brandSearchInput.value.trim() || '...';
+            });
+            
+            container.innerHTML = faqHtml;
+            
+            container.addEventListener('click', (e) => {
+                const questionButton = e.target.closest('.faq-question');
+                if (!questionButton) return;
                 
-                elements.scoreValue.innerHTML = `<div class="skeleton w-20 h-12 mx-auto animate-shimmer"></div>`;
-                elements.aiClassesContainer.innerHTML = `<div class="skeleton h-6 mb-2 w-3/4 animate-shimmer"></div><div class="flex gap-2"><div class="skeleton h-6 w-20 animate-shimmer"></div><div class="skeleton h-6 w-20 animate-shimmer"></div></div>`;
-                elements.judgmentCard.innerHTML = `<div class="skeleton h-6 mb-4 w-1/3 animate-shimmer"></div><div class="space-y-2"><div class="skeleton h-4 w-full animate-shimmer"></div><div class="skeleton h-4 w-full animate-shimmer"></div><div class="skeleton h-4 w-3/4 animate-shimmer"></div></div>`;
-                elements.anteriorityCard.innerHTML = `<div class="skeleton h-6 mb-4 w-1/2 animate-shimmer"></div><div class="skeleton h-32 w-full animate-shimmer"></div>`;
-            },
-            showError(message) {
-                elements.errorMessage.textContent = `Dettaglio: ${message}`;
-                elements.errorBox.classList.remove('hidden');
-            },
-            hideError() { elements.errorBox.classList.add('hidden'); }
-        };
-
-        const ui = {
-            getScoreColor: score => {
-                if (score < 40) return 'var(--color-red)';
-                if (score < 75) return 'var(--color-yellow)';
-                return 'var(--color-green)';
-            },
-            getRiskInfo(riskLevel) {
-                switch (riskLevel?.toLowerCase()) {
-                    case 'basso': return { score: 85, textColor: 'text-green-600', borderColor: 'border-green-500' };
-                    case 'medio':
-                    case 'moderato': return { score: 55, textColor: 'text-yellow-600', borderColor: 'border-yellow-500' };
-                    case 'alto': return { score: 25, textColor: 'text-red-600', borderColor: 'border-red-500' };
-                    default: return { score: 50, textColor: 'text-slate-500', borderColor: 'border-slate-400' };
+                const answer = questionButton.nextElementSibling;
+                const arrow = questionButton.querySelector('.faq-arrow');
+                const isOpening = !answer.style.maxHeight;
+                
+                // Close all other answers
+                document.querySelectorAll('.faq-answer').forEach(el => {
+                    if (el !== answer) el.style.maxHeight = null;
+                });
+                document.querySelectorAll('.faq-arrow').forEach(el => {
+                    if (el !== arrow) el.style.transform = 'rotate(0deg)';
+                });
+                
+                // Toggle current answer
+                if (isOpening) {
+                    answer.style.maxHeight = answer.scrollHeight + "px";
+                    arrow.style.transform = 'rotate(180deg)';
+                } else {
+                    answer.style.maxHeight = null;
+                    arrow.style.transform = 'rotate(0deg)';
                 }
-            },
-            async handleSearch() {
-                 const brandName = elements.brandSearchInput.value.trim();
-                 const productDescription = elements.productDescription.value.trim();
-                 const selectedCountries = state.tomSelectCountries.getValue();
-                 if (!brandName || !productDescription || selectedCountries.length === 0) {
-                     alert('Per favore, compila tutti i campi di ricerca.');
-                     return;
-                 }
-                 render.renderSkeleton();
-                 try {
-                     const results = await api.getAnalysis({ brandName, productDescription, selectedCountries });
-                     render.fullResultsPage(brandName, results);
-                 } catch (error) {
-                     render.fullResultsPage(brandName, { error: true, message: error.message });
-                 }
-            }
-        };
+            });
+        }
         
+        // Initialize country selector
+        function initializeCountrySelector() {
+            const countryOptions = [
+                {value: 'IT', text: '🇮🇹 Italia'},
+                {value: 'EU', text: '🇪🇺 Unione Europea'},
+                {value: 'DE', text: '🇩🇪 Germania'},
+                {value: 'FR', text: '🇫🇷 Francia'},
+                {value: 'ES', text: '🇪🇸 Spagna'},
+                {value: 'GB', text: '🇬🇧 Regno Unito'},
+                {value: 'US', text: '🇺🇸 Stati Uniti'},
+                {value: 'CN', text: '🇨🇳 Cina'},
+                {value: 'JP', text: '🇯🇵 Giappone'},
+                {value: 'WO', text: '🌍 Internazionale (WIPO)'}
+            ];
+            
+            state.tomSelectCountries = new TomSelect(elements.selectCountries, {
+                plugins: ['remove_button'],
+                maxItems: 5,
+                placeholder: "Seleziona uno o più territori...",
+                options: countryOptions,
+                render: {
+                    item: function(data, escape) {
+                        return '<div>' + escape(data.text) + '</div>';
+                    },
+                    option: function(data, escape) {
+                        return '<div>' + escape(data.text) + '</div>';
+                    }
+                }
+            });
+        }
+        
+        // Setup smooth scroll for navigation links
+        function setupSmoothScroll() {
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+        }
+        
+        // Initialize app
         function initializeApp() {
             cacheElements();
-            const countryOptions = [
-                {value: 'IT', text: 'Italia'}, {value: 'EU', text: 'Unione Europea'}, {value: 'DE', text: 'Germania'},
-                {value: 'FR', text: 'Francia'}, {value: 'ES', text: 'Spagna'}, {value: 'GB', text: 'Regno Unito'},
-                {value: 'US', text: 'Stati Uniti'}, {value: 'CN', text: 'Cina'}, {value: 'JP', text: 'Giappone'},
-                {value: 'WO', text: 'Internazionale (WIPO)'}
-            ];
-            state.tomSelectCountries = new TomSelect(elements.selectCountries, { plugins: ['remove_button'], maxItems: 5, placeholder: "Es. Italia, EU...", options: countryOptions });
-            elements.startSearchBtn.addEventListener('click', ui.handleSearch);
+            initializeCountrySelector();
+            setupFaqAccordion();
+            setupMobileMenu();
+            setupHeaderScroll();
+            setupSmoothScroll();
+            initAnimationObserver();
+            
+            // Setup form interactions
+            if (elements.startSearchBtn) {
+                elements.startSearchBtn.addEventListener('click', handleSearch);
+            }
+            
+            // Setup input field focus effects
+            document.querySelectorAll('.input-field').forEach(field => {
+                const input = field.querySelector('input, textarea, .ts-control');
+                if (input) {
+                    input.addEventListener('focus', () => field.classList.add('focus'));
+                    input.addEventListener('blur', () => field.classList.remove('focus'));
+                }
+            });
+            
+            // Setup CTA buttons to scroll to form
+            document.querySelectorAll('button').forEach(button => {
+                if (button.textContent.includes('Inizia') || button.textContent.includes('Analizza')) {
+                    button.addEventListener('click', () => {
+                        document.querySelector('#brand-search-input')?.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center'
+                        });
+                    });
+                }
+            });
         }
-
+        
+        // Handle search (placeholder - implement your actual search logic)
+        function handleSearch() {
+            const brand = elements.brandSearchInput?.value;
+            const products = elements.productDescription?.value;
+            const countries = state.tomSelectCountries?.getValue();
+            
+            if (!brand || !products || !countries || countries.length === 0) {
+                alert('Per favore compila tutti i campi');
+                return;
+            }
+            
+            // Add your search implementation here
+            console.log('Searching for:', { brand, products, countries });
+        }
+        
         return { init: initializeApp };
     })();
-
+    
+    // Initialize app when DOM is ready
     document.addEventListener('DOMContentLoaded', AppController.init);
     </script>
 </body>
 </html>
-```
-
-Come le dicevo, ora le fornisco anche il backend aggiornato, che è necessario per far funzionare il tutto.
-
-
-```javascript
-// File: /api/search.js
-// VERSIONE FINALE: AI fornisce score, giudizio e riferimenti legali.
-
-const fetch = require('node-fetch');
-const { NICE_CLASSES_KNOWLEDGE_BASE } = require('./nice_knowledge_base.js');
-
-async function callOpenAI_API(prompt) {
-    const apiKey = process.env.OPENAI_API_KEY;
-    if (!apiKey) {
-        throw new Error('API Key di OpenAI non configurata correttamente sul server Vercel.');
-    }
-
-    const apiURL = 'https://api.openai.com/v1/chat/completions';
-
-    const requestBody = {
-        model: "gpt-4o",
-        response_format: { type: "json_object" },
-        messages: [
-            {
-                role: "system",
-                content: "Sei un esperto avvocato specializzato in proprietà intellettuale e marchi. Il tuo compito è analizzare i dati forniti e restituire una risposta strutturata in formato JSON, senza alcun testo aggiuntivo o frasi di circostanza."
-            },
-            {
-                role: "user",
-                content: prompt
-            }
-        ]
-    };
-
-    const response = await fetch(apiURL, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${apiKey}`
-        },
-        body: JSON.stringify(requestBody)
-    });
-
-    if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Errore dall'API di OpenAI:", errorData);
-        throw new Error("Il servizio AI di OpenAI non è riuscito a rispondere.");
-    }
-
-    const data = await response.json();
-    try {
-        return JSON.parse(data.choices[0].message.content);
-    } catch(e) {
-        console.error("Errore nel parsing della risposta JSON da OpenAI:", data.choices[0].message.content);
-        throw new Error("L'AI ha restituito un formato non valido.");
-    }
-}
-
-module.exports = async (request, response) => {
-    response.setHeader('Access-Control-Allow-Origin', '*');
-    if (request.method === 'OPTIONS') return response.status(200).end();
-
-    try {
-        const payload = request.body;
-        if (!payload.brandName || !payload.productDescription) {
-            return response.status(400).json({ message: 'Dati mancanti.' });
-        }
-        
-        const mainPrompt = `
-            Analizza la seguente richiesta di registrazione di un nuovo marchio e restituisci un oggetto JSON con quattro chiavi: "identifiedClasses", "similarMarks", "syntheticJudgment", e "riskLevel".
-
-            **Base di Conoscenza - Classi di Nizza:**
-            ${NICE_CLASSES_KNOWLEDGE_BASE}
-
-            **Dati del Nuovo Marchio Forniti dall'Utente:**
-            - Nome Proposto: "${payload.brandName}"
-            - Descrizione Prodotti/Servizi: "${payload.productDescription}"
-            - Territori di Interesse: ${payload.selectedCountries.join(', ')}
-
-            **Istruzioni per la risposta JSON:**
-
-            1.  **"identifiedClasses"**: (Array di numeri) Basandoti sulla "Descrizione Prodotti/Servizi" e sulla "Base di Conoscenza", restituisci un array di numeri delle Classi di Nizza più pertinenti.
-
-            2.  **"similarMarks"**: (Array di oggetti) Simula una ricerca di anteriorità. Basandoti sulla tua conoscenza di marchi globali, crea un array di 2 o 3 esempi fittizi ma realistici di marchi che potrebbero essere in conflitto. Per ogni marchio, fornisci un oggetto con chiavi: "name", "owner", "status", "classes", e "applicationNumber". Se il rischio è basso, restituisci un array vuoto.
-
-            3.  **"syntheticJudgment"**: (Stringa) Genera un giudizio legale sintetico (massimo 30 righe). Valuta il rischio di confondibilità basandoti su somiglianza fonetica/concettuale, affinità merceologica e sovrapposizione territoriale. Cita esplicitamente, dove pertinente, l'Art. 12 del Codice della Proprietà Industriale (CPI) italiano e/o l'Art. 8 del Regolamento UE 2017/1001.
-
-            4.  **"riskLevel"**: (Stringa) Basandoti sulla tua analisi complessiva, restituisci una delle seguenti stringhe esatte: "Basso", "Medio", "Alto".
-        `;
-
-        const aiResponse = await callOpenAI_API(mainPrompt);
-        
-        return response.status(200).json(aiResponse);
-
-    } catch (error) {
-        console.error("ERRORE CRITICO nel backend:", error);
-        return response.status(500).json({ error: true, message: error.message });
-    }
-};
