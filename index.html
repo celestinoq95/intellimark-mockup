@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Intellimark.ai - Beta con UI/UX Avanzata</title>
-    <!-- Versione 12.0 - UI/UX Avanzata e Skeleton Loading -->
+    <title>Intellimark.ai - Beta con Analisi AI Avanzata</title>
+    <!-- Versione 13.0 - UI/UX Avanzata e Score guidato da AI -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.bootstrap5.css" rel="stylesheet">
@@ -93,8 +93,8 @@
                     <div class="grid lg:grid-cols-12 gap-8">
                         <div class="lg:col-span-4">
                             <div class="result-card text-center sticky top-24">
-                                <h3 class="text-xl font-bold text-slate-800">Brand Risk Score™</h3>
-                                <p class="text-sm text-slate-500 mb-4">Un punteggio basso indica un rischio minore</p>
+                                <h3 class="text-xl font-bold text-slate-800">Brand Potential Score™</h3>
+                                <p class="text-sm text-slate-500 mb-4">Un punteggio alto indica un potenziale maggiore</p>
                                 <div class="relative w-full max-w-[250px] mx-auto h-[125px]">
                                     <canvas id="brandScoreChart"></canvas> 
                                     <div class="absolute inset-0 flex flex-col items-center justify-center font-inter"> 
@@ -124,7 +124,7 @@
         function cacheElements() {
             const elementIds = [
                 'home-screen', 'results-screen', 'start-search-btn', 'brand-search-input', 
-                'product-description', 'searched-brand-name', 'loading-overlay', 
+                'product-description', 'searched-brand-name', 
                 'score-value', 'brandScoreChart', 'anteriority-card', 'judgment-card', 
                 'ai-classes-container', 'error-box', 'error-message', 'select-countries'
             ];
@@ -158,16 +158,16 @@
                 
                 if (results.error) {
                     this.showError(results.message);
-                    this.updateMetrics([]);
-                    this.updateSyntheticJudgment("Impossibile generare il giudizio a causa di un errore.");
+                    this.updateMetrics("Errore");
+                    this.updateSyntheticJudgment("Impossibile generare il giudizio a causa di un errore.", "Errore");
                     this.updateAnteriorityWithError();
                     this.updateAiIdentifiedClasses([]);
                 } else {
                     this.hideError();
                     this.updateAnteriorityResults(results.similarMarks);
-                    this.updateSyntheticJudgment(results.syntheticJudgment);
+                    this.updateSyntheticJudgment(results.syntheticJudgment, results.riskLevel);
                     this.updateAiIdentifiedClasses(results.identifiedClasses);
-                    this.updateMetrics(results.similarMarks);
+                    this.updateMetrics(results.riskLevel);
                 }
             },
             updateAnteriorityResults(similarMarks) {
@@ -190,8 +190,18 @@
                 if (s.includes('refused') || s.includes('expired') || s.includes('cancelled') || s.includes('withdrawn')) return { text: 'NON ATTIVO', classes: 'bg-red-100 text-red-800' };
                 return { text: status.toUpperCase(), classes: 'bg-yellow-100 text-yellow-800' };
             },
-            updateSyntheticJudgment(judgment) {
-                elements.judgmentCard.innerHTML = `<h4 class="text-xl font-bold text-slate-800 mb-3">Giudizio Sintetico AI</h4><p class="text-slate-700 whitespace-pre-line leading-relaxed">${judgment || "Non è stato possibile generare un giudizio sintetico."}</p>`;
+            updateSyntheticJudgment(judgment, riskLevel = "Medio") {
+                const riskInfo = ui.getRiskInfo(riskLevel);
+                let html = `
+                    <div class="border-l-4 ${riskInfo.borderColor} pl-4">
+                        <h4 class="text-xl font-bold text-slate-800">Giudizio Sintetico AI</h4>
+                        <p class="font-semibold ${riskInfo.textColor}">Valutazione Rischio: ${riskLevel}</p>
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-slate-200">
+                        <p class="text-slate-700 whitespace-pre-line leading-relaxed">${judgment || "Non è stato possibile generare un giudizio sintetico."}</p>
+                    </div>
+                `;
+                elements.judgmentCard.innerHTML = html;
             },
             updateAiIdentifiedClasses(classes) {
                 let html = `<h4 class="font-semibold text-slate-800 mb-2">Classi identificate dall'AI:</h4>`;
@@ -204,16 +214,15 @@
                 }
                 elements.aiClassesContainer.innerHTML = html;
             },
-            updateMetrics(similarMarks = []) {
-                const riskScore = 100 - (similarMarks.length * 8);
-                const score = Math.max(10, riskScore);
-                this.createOrUpdateChart(100 - score); // Passiamo il risk score (0-90)
+            updateMetrics(riskLevel) {
+                const riskInfo = ui.getRiskInfo(riskLevel);
+                this.createOrUpdateChart(riskInfo.score);
             },
-            createOrUpdateChart(riskValue) { // La funzione ora accetta un valore di rischio
-                const scoreColor = ui.getScoreColor(100 - riskValue); // Colore basato sul potenziale (inverso del rischio)
+            createOrUpdateChart(score) {
+                const scoreColor = ui.getScoreColor(score);
                 if (state.brandScoreChart) state.brandScoreChart.destroy();
-                state.brandScoreChart = new Chart(elements.brandScoreChart, { type: 'doughnut', data: { datasets: [{ data: [100 - riskValue, riskValue], backgroundColor: [scoreColor, '#e2e8f0'], borderWidth: 0, circumference: 180, rotation: 270 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '80%', plugins: { tooltip: { enabled: false } } } });
-                elements.scoreValue.textContent = 100 - riskValue;
+                state.brandScoreChart = new Chart(elements.brandScoreChart, { type: 'doughnut', data: { datasets: [{ data: [score, 100 - score], backgroundColor: [scoreColor, '#e2e8f0'], borderWidth: 0, circumference: 180, rotation: 270 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '80%', plugins: { tooltip: { enabled: false } } } });
+                elements.scoreValue.textContent = score;
                 elements.scoreValue.style.color = scoreColor;
             },
             renderSkeleton() {
@@ -221,10 +230,10 @@
                 elements.resultsScreen.classList.remove('hidden');
                 elements.searchedBrandName.textContent = elements.brandSearchInput.value.trim() || '...';
                 
-                elements.scoreValue.innerHTML = `<div class="skeleton skeleton-text w-20 h-12 mx-auto animate-shimmer"></div>`;
-                elements.aiClassesContainer.innerHTML = `<div class="skeleton skeleton-title h-6 mb-2 animate-shimmer"></div><div class="flex gap-2"><div class="skeleton skeleton-text w-20 h-6 animate-shimmer"></div><div class="skeleton skeleton-text w-20 h-6 animate-shimmer"></div></div>`;
-                elements.judgmentCard.innerHTML = `<div class="skeleton skeleton-title h-6 mb-4 animate-shimmer"></div><div class="space-y-2"><div class="skeleton skeleton-text w-full animate-shimmer"></div><div class="skeleton skeleton-text w-full animate-shimmer"></div><div class="skeleton skeleton-text w-3/4 animate-shimmer"></div></div>`;
-                elements.anteriorityCard.innerHTML = `<div class="skeleton skeleton-title h-6 mb-4 animate-shimmer"></div><div class="skeleton skeleton-card w-full animate-shimmer"></div>`;
+                elements.scoreValue.innerHTML = `<div class="skeleton w-20 h-12 mx-auto animate-shimmer"></div>`;
+                elements.aiClassesContainer.innerHTML = `<div class="skeleton h-6 mb-2 w-3/4 animate-shimmer"></div><div class="flex gap-2"><div class="skeleton h-6 w-20 animate-shimmer"></div><div class="skeleton h-6 w-20 animate-shimmer"></div></div>`;
+                elements.judgmentCard.innerHTML = `<div class="skeleton h-6 mb-4 w-1/3 animate-shimmer"></div><div class="space-y-2"><div class="skeleton h-4 w-full animate-shimmer"></div><div class="skeleton h-4 w-full animate-shimmer"></div><div class="skeleton h-4 w-3/4 animate-shimmer"></div></div>`;
+                elements.anteriorityCard.innerHTML = `<div class="skeleton h-6 mb-4 w-1/2 animate-shimmer"></div><div class="skeleton h-32 w-full animate-shimmer"></div>`;
             },
             showError(message) {
                 elements.errorMessage.textContent = `Dettaglio: ${message}`;
@@ -238,6 +247,15 @@
                 if (score < 40) return 'var(--color-red)';
                 if (score < 75) return 'var(--color-yellow)';
                 return 'var(--color-green)';
+            },
+            getRiskInfo(riskLevel) {
+                switch (riskLevel?.toLowerCase()) {
+                    case 'basso': return { score: 85, textColor: 'text-green-600', borderColor: 'border-green-500' };
+                    case 'medio':
+                    case 'moderato': return { score: 55, textColor: 'text-yellow-600', borderColor: 'border-yellow-500' };
+                    case 'alto': return { score: 25, textColor: 'text-red-600', borderColor: 'border-red-500' };
+                    default: return { score: 50, textColor: 'text-slate-500', borderColor: 'border-slate-400' };
+                }
             },
             async handleSearch() {
                  const brandName = elements.brandSearchInput.value.trim();
@@ -276,3 +294,103 @@
     </script>
 </body>
 </html>
+```
+
+Come le dicevo, ora le fornisco anche il backend aggiornato, che è necessario per far funzionare il tutto.
+
+
+```javascript
+// File: /api/search.js
+// VERSIONE FINALE: AI fornisce score, giudizio e riferimenti legali.
+
+const fetch = require('node-fetch');
+const { NICE_CLASSES_KNOWLEDGE_BASE } = require('./nice_knowledge_base.js');
+
+async function callOpenAI_API(prompt) {
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey) {
+        throw new Error('API Key di OpenAI non configurata correttamente sul server Vercel.');
+    }
+
+    const apiURL = 'https://api.openai.com/v1/chat/completions';
+
+    const requestBody = {
+        model: "gpt-4o",
+        response_format: { type: "json_object" },
+        messages: [
+            {
+                role: "system",
+                content: "Sei un esperto avvocato specializzato in proprietà intellettuale e marchi. Il tuo compito è analizzare i dati forniti e restituire una risposta strutturata in formato JSON, senza alcun testo aggiuntivo o frasi di circostanza."
+            },
+            {
+                role: "user",
+                content: prompt
+            }
+        ]
+    };
+
+    const response = await fetch(apiURL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify(requestBody)
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Errore dall'API di OpenAI:", errorData);
+        throw new Error("Il servizio AI di OpenAI non è riuscito a rispondere.");
+    }
+
+    const data = await response.json();
+    try {
+        return JSON.parse(data.choices[0].message.content);
+    } catch(e) {
+        console.error("Errore nel parsing della risposta JSON da OpenAI:", data.choices[0].message.content);
+        throw new Error("L'AI ha restituito un formato non valido.");
+    }
+}
+
+module.exports = async (request, response) => {
+    response.setHeader('Access-Control-Allow-Origin', '*');
+    if (request.method === 'OPTIONS') return response.status(200).end();
+
+    try {
+        const payload = request.body;
+        if (!payload.brandName || !payload.productDescription) {
+            return response.status(400).json({ message: 'Dati mancanti.' });
+        }
+        
+        const mainPrompt = `
+            Analizza la seguente richiesta di registrazione di un nuovo marchio e restituisci un oggetto JSON con quattro chiavi: "identifiedClasses", "similarMarks", "syntheticJudgment", e "riskLevel".
+
+            **Base di Conoscenza - Classi di Nizza:**
+            ${NICE_CLASSES_KNOWLEDGE_BASE}
+
+            **Dati del Nuovo Marchio Forniti dall'Utente:**
+            - Nome Proposto: "${payload.brandName}"
+            - Descrizione Prodotti/Servizi: "${payload.productDescription}"
+            - Territori di Interesse: ${payload.selectedCountries.join(', ')}
+
+            **Istruzioni per la risposta JSON:**
+
+            1.  **"identifiedClasses"**: (Array di numeri) Basandoti sulla "Descrizione Prodotti/Servizi" e sulla "Base di Conoscenza", restituisci un array di numeri delle Classi di Nizza più pertinenti.
+
+            2.  **"similarMarks"**: (Array di oggetti) Simula una ricerca di anteriorità. Basandoti sulla tua conoscenza di marchi globali, crea un array di 2 o 3 esempi fittizi ma realistici di marchi che potrebbero essere in conflitto. Per ogni marchio, fornisci un oggetto con chiavi: "name", "owner", "status", "classes", e "applicationNumber". Se il rischio è basso, restituisci un array vuoto.
+
+            3.  **"syntheticJudgment"**: (Stringa) Genera un giudizio legale sintetico (massimo 30 righe). Valuta il rischio di confondibilità basandoti su somiglianza fonetica/concettuale, affinità merceologica e sovrapposizione territoriale. Cita esplicitamente, dove pertinente, l'Art. 12 del Codice della Proprietà Industriale (CPI) italiano e/o l'Art. 8 del Regolamento UE 2017/1001.
+
+            4.  **"riskLevel"**: (Stringa) Basandoti sulla tua analisi complessiva, restituisci una delle seguenti stringhe esatte: "Basso", "Medio", "Alto".
+        `;
+
+        const aiResponse = await callOpenAI_API(mainPrompt);
+        
+        return response.status(200).json(aiResponse);
+
+    } catch (error) {
+        console.error("ERRORE CRITICO nel backend:", error);
+        return response.status(500).json({ error: true, message: error.message });
+    }
+};
