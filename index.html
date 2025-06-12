@@ -287,6 +287,36 @@
             display: inline-block;
         }
         
+        .judgment-content h4 {
+            font-size: 1.125rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            margin-top: 1rem;
+            color: var(--color-slate-900);
+        }
+        
+        .judgment-content h4:first-child {
+            margin-top: 0;
+        }
+        
+        .judgment-content p {
+            margin-bottom: 0.75rem;
+            line-height: 1.6;
+        }
+        
+        .judgment-content p:last-child {
+            margin-bottom: 0;
+        }
+        
+        .judgment-content ul, .judgment-content ol {
+            margin-left: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .judgment-content li {
+            margin-bottom: 0.25rem;
+        }
+        
         /* FAQ Styles */
         .faq-item {
             border-radius: 1rem;
@@ -1413,14 +1443,90 @@
             });
         }
         
-        // API mock functions
+        // API functions
         const api = {
             async searchBrand(brandName, products, countries) {
+                try {
+                    // CONFIGURAZIONE BACKEND:
+                    // 1. Sostituisci 'your-vercel-domain' con il tuo dominio Vercel reale
+                    // 2. Assicurati che le variabili d'ambiente EUIPO_CLIENT_ID e EUIPO_CLIENT_SECRET 
+                    //    siano configurate nel tuo progetto Vercel
+                    // 3. Per testare in locale, usa: http://localhost:3000/api/search
+                    const BACKEND_URL = 'https://your-vercel-domain.vercel.app/api/search';
+                    
+                    const response = await fetch(BACKEND_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            brandName: brandName,
+                            productDescription: products,
+                            selectedCountries: countries
+                        })
+                    });
+                    
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || 'Errore nella ricerca');
+                    }
+                    
+                    const data = await response.json();
+                    
+                    // Adatta la risposta al formato atteso dal frontend
+                    return {
+                        success: true,
+                        data: {
+                            brand: brandName,
+                            score: data.brandScore,
+                            classes: data.identifiedClasses,
+                            judgment: {
+                                level: this.mapRiskLevel(data.riskLevel),
+                                summary: this.extractSummary(data.syntheticJudgment),
+                                details: data.syntheticJudgment
+                            },
+                            anteriorities: data.similarMarks
+                        }
+                    };
+                } catch (error) {
+                    console.error('Errore API:', error);
+                    // Fallback ai dati mock se l'API non è disponibile
+                    return this.generateMockData(brandName, products, countries);
+                }
+            },
+            
+            mapRiskLevel(riskLevel) {
+                const mapping = {
+                    'BASSO': 'positive',
+                    'MODERATO': 'warning',
+                    'ALTO': 'negative',
+                    'MOLTO ALTO': 'negative'
+                };
+                return mapping[riskLevel] || 'warning';
+            },
+            
+            extractSummary(judgment) {
+                // Estrai il livello di rischio dal giudizio
+                const riskMatch = judgment.match(/RISCHIO[:\s]*(BASSO|MODERATO|ALTO|MOLTO ALTO)/i);
+                if (riskMatch) {
+                    const risk = riskMatch[1];
+                    const summaries = {
+                        'BASSO': 'Ottima registrabilità',
+                        'MODERATO': 'Registrabilità con riserve',
+                        'ALTO': 'Registrabilità critica',
+                        'MOLTO ALTO': 'Registrabilità fortemente sconsigliata'
+                    };
+                    return summaries[risk] || 'Valutazione in corso';
+                }
+                return 'Analisi completata';
+            },
+            
+            // Dati mock di fallback
+            async generateMockData(brandName, products, countries) {
                 // Simulate API delay
                 await new Promise(resolve => setTimeout(resolve, 2000));
                 
-                // Generate mock data
-                const score = Math.floor(Math.random() * 40) + 55; // Score between 55-95
+                const score = Math.floor(Math.random() * 40) + 55;
                 const classes = this.generateClasses(products);
                 const judgment = this.generateJudgment(score);
                 const anteriorities = this.generateAnteriorities(brandName);
@@ -1439,10 +1545,10 @@
             
             generateClasses(products) {
                 const allClasses = [
-                    { number: 9, name: "Software e applicazioni", description: "Software di analisi dati, applicazioni mobile, programmi per computer" },
-                    { number: 35, name: "Servizi di business", description: "Consulenza aziendale, marketing, pubblicità" },
-                    { number: 42, name: "Servizi tecnologici", description: "Sviluppo software, consulenza IT, servizi cloud" },
-                    { number: 45, name: "Servizi legali", description: "Consulenza legale, servizi di proprietà intellettuale" }
+                    { number: 9, title: "Software e apparecchi scientifici", description: "Apparecchi e strumenti scientifici, software, hardware informatico" },
+                    { number: 35, title: "Pubblicità e gestione aziendale", description: "Servizi di pubblicità, gestione degli affari commerciali, amministrazione" },
+                    { number: 42, title: "Servizi scientifici e tecnologici", description: "Servizi scientifici e tecnologici, ricerca e progettazione, sviluppo software" },
+                    { number: 45, title: "Servizi giuridici e di sicurezza", description: "Servizi giuridici, servizi di sicurezza per la protezione di beni e individui" }
                 ];
                 return allClasses.slice(0, Math.floor(Math.random() * 2) + 2);
             },
@@ -1452,19 +1558,25 @@
                     return {
                         level: "positive",
                         summary: "Ottima registrabilità",
-                        details: "L'analisi evidenzia un <strong>rischio basso</strong> di conflitti. Il marchio proposto presenta <span class='highlight'>caratteri distintivi forti</span> e non sono state rilevate anteriorità bloccanti nelle classi di interesse."
+                        details: `<h4>VALUTAZIONE DEL RISCHIO: BASSO</h4>
+                        <p>L'analisi evidenzia un <strong>rischio basso</strong> di conflitti. Il marchio proposto presenta <span class='highlight'>caratteri distintivi forti</span> e non sono state rilevate anteriorità bloccanti.</p>
+                        <p><strong>Riferimenti normativi:</strong> Art. 7 CPI (Novità), Art. 8 EUTMR (Impedimenti relativi)</p>`
                     };
                 } else if (score >= 60) {
                     return {
                         level: "warning",
                         summary: "Registrabilità con riserve",
-                        details: "Sono state rilevate alcune <strong>similitudini moderate</strong> con marchi esistenti. Si consiglia una <span class='highlight'>valutazione approfondita</span> per le classi merceologiche indicate, considerando possibili strategie di differenziazione."
+                        details: `<h4>VALUTAZIONE DEL RISCHIO: MODERATO</h4>
+                        <p>Sono state rilevate <strong>similitudini moderate</strong> con marchi esistenti. Si consiglia una <span class='highlight'>valutazione approfondita</span> per le classi indicate.</p>
+                        <p><strong>Riferimenti normativi:</strong> Art. 12 CPI (Rischio di confusione), Art. 8 EUTMR (Impedimenti relativi)</p>`
                     };
                 } else {
                     return {
                         level: "negative",
                         summary: "Registrabilità critica",
-                        details: "L'analisi evidenzia <strong>rischi significativi</strong> di rigetto o opposizione. Sono presenti <span class='highlight'>anteriorità rilevanti</span> che potrebbero ostacolare la registrazione nelle classi selezionate."
+                        details: `<h4>VALUTAZIONE DEL RISCHIO: ALTO</h4>
+                        <p>L'analisi evidenzia <strong>rischi significativi</strong> di rigetto. Sono presenti <span class='highlight'>anteriorità rilevanti</span> che potrebbero ostacolare la registrazione.</p>
+                        <p><strong>Riferimenti normativi:</strong> Art. 8 CPI (Marchi anteriori), Art. 46 EUTMR (Motivi di opposizione)</p>`
                     };
                 }
             },
@@ -1477,9 +1589,9 @@
                 for (let i = 0; i < count; i++) {
                     anteriorities.push({
                         name: brandName.toUpperCase() + " " + variations[i],
-                        number: "EU" + Math.floor(Math.random() * 1000000 + 17000000),
+                        applicationNumber: "EU" + Math.floor(Math.random() * 1000000 + 17000000),
                         status: Math.random() > 0.5 ? "Registrato" : "In domanda",
-                        classes: [9, 35, 42].sort(() => Math.random() - 0.5).slice(0, 2),
+                        classes: "Cl. " + [9, 35, 42].sort(() => Math.random() - 0.5).slice(0, 2).join(', '),
                         similarity: Math.floor(Math.random() * 30) + 60,
                         owner: "Company " + String.fromCharCode(65 + i) + " S.r.l."
                     });
@@ -1571,7 +1683,7 @@
                         <div class="flex items-start gap-3">
                             <span class="flex-shrink-0 text-2xl font-bold gradient-text">${cls.number}</span>
                             <div>
-                                <h4 class="font-semibold text-slate-900">${cls.name}</h4>
+                                <h4 class="font-semibold text-slate-900">${cls.title || cls.name}</h4>
                                 <p class="text-sm text-slate-600 mt-1">${cls.description}</p>
                             </div>
                         </div>
@@ -1633,9 +1745,9 @@
                             </span>
                         </div>
                         <div class="text-sm text-slate-600 space-y-1">
-                            <p><strong>Numero:</strong> ${ant.number}</p>
+                            <p><strong>Numero:</strong> ${ant.applicationNumber || ant.number}</p>
                             <p><strong>Stato:</strong> ${ant.status}</p>
-                            <p><strong>Classi:</strong> ${ant.classes.join(', ')}</p>
+                            <p><strong>Classi:</strong> ${ant.classes}</p>
                             <p><strong>Titolare:</strong> ${ant.owner}</p>
                         </div>
                     </div>
