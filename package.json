@@ -1,19 +1,6 @@
 {
-  "name": "intellimark-mockup",
-  "version": "1.0.0",
-  "description": "Applicazione per la ricerca di marchi con backend su Vercel che interroga l'API EUIPO.",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [
-    "trademark",
-    "euipo",
-    "vercel",
-    "marchi"
-  ],
-  "author": "Celestino Quarato",
-  "license": "ISC",
+  "name": "intellimark-pro",
+  "version": "2.0.0",
   "dependencies": {
     "node-fetch": "^2.6.7"
   }
