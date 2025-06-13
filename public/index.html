@@ -447,6 +447,22 @@
                 
                 <!-- Search Form -->
                 <div class="premium-card p-8 mb-8">
+                    <!-- Backend Configuration Alert -->
+                    <div id="backendAlert" class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6" style="display: none;">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-exclamation-triangle text-yellow-400"></i>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm text-yellow-700">
+                                    <strong>Modalità Demo:</strong> Il backend non è configurato. 
+                                    I risultati mostrati sono esempi dimostrativi. 
+                                    Per risultati reali, configura l'URL del backend nel codice.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <form id="searchForm">
                         <!-- Search Type Selection -->
                         <div class="mb-6">
@@ -865,6 +881,21 @@
     </footer>
 
     <script>
+        // ====================================================================
+        // CONFIGURAZIONE IMPORTANTE - MODIFICA QUESTA SEZIONE
+        // ====================================================================
+        
+        // 1. BACKEND URL - Sostituisci con il tuo dominio Vercel reale
+        //    Esempio: https://intellimark-ai.vercel.app/api/search
+        const BACKEND_BASE_URL = 'https://intellimark-mockup.vercel.app/';
+        
+        // 2. Per test locale, usa:
+        // const BACKEND_BASE_URL = 'http://localhost:3000';
+        
+        // ====================================================================
+        // FINE CONFIGURAZIONE - NON MODIFICARE IL CODICE SOTTO
+        // ====================================================================
+        
         // DOM Elements
         const elements = {
             searchForm: document.getElementById('searchForm'),
@@ -915,7 +946,16 @@
             initializeFAQ();
             initializeFormHandlers();
             initializeSearchTypeHandlers();
+            checkBackendConfiguration();
         });
+        
+        // Check if backend is configured
+        function checkBackendConfiguration() {
+            // Check if the API URL contains the placeholder
+            if (api.isBackendConfigured && !api.isBackendConfigured()) {
+                document.getElementById('backendAlert').style.display = 'block';
+            }
+        }
 
         // Search Type Handlers
         function initializeSearchTypeHandlers() {
@@ -1510,18 +1550,26 @@
 
         // API functions
         const api = {
+            // Backend configuration check
+            isBackendConfigured() {
+                return !BACKEND_BASE_URL.includes('your-vercel-domain');
+            },
+            
             async searchBrand(brandName, products, countries, imageData, searchType) {
                 try {
-                    // CONFIGURAZIONE BACKEND:
-                    // 1. Sostituisci 'your-vercel-domain' con il tuo dominio Vercel reale
-                    // 2. Assicurati che le variabili d'ambiente EUIPO_CLIENT_ID e EUIPO_CLIENT_SECRET 
-                    //    siano configurate nel tuo progetto Vercel
-                    // 3. Per testare in locale, usa: http://localhost:3000/api/search
-                    const BACKEND_URL = 'https://your-vercel-domain.vercel.app/api/search';
+                    const BACKEND_URL = `${BACKEND_BASE_URL}/api/search`;
                     
-                    // Debug: verifica se l'immagine viene passata
-                    console.log('Invio richiesta con immagine:', imageData ? 'Sì' : 'No');
+                    // CONTROLLO: Se l'URL non è configurato, avvisa l'utente
+                    if (!this.isBackendConfigured()) {
+                        console.error('ATTENZIONE: Backend URL non configurato!');
+                        console.log('Configura BACKEND_BASE_URL all\'inizio del file JavaScript');
+                        console.log('Usando dati di esempio per dimostrazione...');
+                        throw new Error('Backend non configurato');
+                    }
+                    
+                    console.log('Invio richiesta a:', BACKEND_URL);
                     console.log('Tipo di ricerca:', searchType);
+                    console.log('Ha immagine:', imageData ? 'Sì' : 'No');
                     
                     const response = await fetch(BACKEND_URL, {
                         method: 'POST',
@@ -1536,6 +1584,40 @@
                             searchType: searchType || 'verbal'
                         })
                     });
+                    
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        console.error('Errore dal backend:', errorData);
+                        throw new Error(errorData.message || 'Errore nella ricerca');
+                    }
+                    
+                    const data = await response.json();
+                    console.log('Risposta ricevuta dal backend:', data);
+                    
+                    // Adatta la risposta al formato atteso dal frontend
+                    return {
+                        success: true,
+                        data: {
+                            brand: brandName,
+                            score: data.brandScore,
+                            classes: data.identifiedClasses,
+                            imageAnalysis: data.imageAnalysis,
+                            judgment: {
+                                level: this.mapRiskLevel(data.riskLevel),
+                                summary: this.extractSummary(data.syntheticJudgment),
+                                details: data.syntheticJudgment
+                            },
+                            verbalMarks: data.verbalMarks,
+                            figurativeMarks: data.figurativeMarks
+                        }
+                    };
+                } catch (error) {
+                    console.error('Errore API:', error);
+                    console.log('Fallback ai dati di esempio...');
+                    // Fallback ai dati mock se l'API non è disponibile
+                    return this.generateMockData(brandName, products, countries, imageData, searchType);
+                }
+            },
                     
                     if (!response.ok) {
                         const errorData = await response.json();
@@ -1624,13 +1706,130 @@
             },
             
             generateClasses(products) {
-                const allClasses = [
-                    { number: 9, title: "Software e apparecchi scientifici", description: "Apparecchi e strumenti scientifici, software, hardware informatico" },
-                    { number: 35, title: "Pubblicità e gestione aziendale", description: "Servizi di pubblicità, gestione degli affari commerciali, amministrazione" },
-                    { number: 42, title: "Servizi scientifici e tecnologici", description: "Servizi scientifici e tecnologici, ricerca e progettazione, sviluppo software" },
-                    { number: 45, title: "Servizi giuridici e di sicurezza", description: "Servizi giuridici, servizi di sicurezza per la protezione di beni e individui" }
-                ];
-                return allClasses.slice(0, Math.floor(Math.random() * 2) + 2);
+                // Analisi intelligente del testo per identificare le classi
+                const productLower = products.toLowerCase();
+                const identifiedClasses = [];
+                
+                // Mappatura prodotti -> classi di Nizza
+                const classMapping = {
+                    // Classe 25 - Abbigliamento
+                    25: ['scarpe', 'abbigliamento', 'vestiti', 'magliette', 'pantaloni', 'giacche', 'cappelli', 'calzature', 'sandali', 'stivali', 'camicie', 'gonne', 'abiti', 'cappotti', 'sciarpe', 'guanti', 'cinture', 'cravatte', 'calze', 'intimo', 'pigiami', 'costumi'],
+                    
+                    // Classe 9 - Software/Elettronica
+                    9: ['software', 'app', 'applicazione', 'computer', 'hardware', 'elettronica', 'smartphone', 'tablet', 'dispositivi', 'programmi', 'sistemi', 'piattaforma', 'digitale', 'intelligenza artificiale', 'ai', 'machine learning', 'blockchain', 'cloud', 'database', 'api'],
+                    
+                    // Classe 3 - Cosmetici
+                    3: ['cosmetici', 'profumi', 'trucco', 'shampoo', 'sapone', 'crema', 'lozione', 'deodorante', 'dentifricio', 'bagnoschiuma', 'prodotti bellezza', 'skincare', 'makeup', 'rossetto', 'smalto'],
+                    
+                    // Classe 16 - Carta/Cancelleria
+                    16: ['carta', 'quaderni', 'penne', 'matite', 'cancelleria', 'libri', 'stampati', 'adesivi', 'etichette', 'biglietti', 'cartoline', 'poster', 'calendari', 'agende', 'blocchi'],
+                    
+                    // Classe 18 - Pelletteria
+                    18: ['borse', 'valigie', 'zaini', 'portafogli', 'cinture in pelle', 'pelletteria', 'cuoio', 'marsupi', 'pochette', 'borselli', 'trolley', 'beauty case'],
+                    
+                    // Classe 21 - Utensili casa
+                    21: ['piatti', 'bicchieri', 'tazze', 'pentole', 'padelle', 'utensili cucina', 'contenitori', 'bottiglie', 'thermos', 'posate', 'vassoi', 'ciotole'],
+                    
+                    // Classe 30 - Alimenti
+                    30: ['caffè', 'tè', 'cioccolato', 'pasta', 'riso', 'pane', 'dolci', 'biscotti', 'pizza', 'gelato', 'miele', 'spezie', 'salse', 'farina', 'zucchero'],
+                    
+                    // Classe 35 - Servizi business
+                    35: ['pubblicità', 'marketing', 'consulenza aziendale', 'gestione affari', 'vendita al dettaglio', 'e-commerce', 'negozio online', 'servizi commerciali', 'import export', 'franchising', 'recruiting', 'contabilità'],
+                    
+                    // Classe 41 - Educazione/Entertainment
+                    41: ['formazione', 'corsi', 'educazione', 'scuola', 'università', 'eventi', 'concerti', 'spettacoli', 'sport', 'palestra', 'fitness', 'intrattenimento', 'giochi', 'coaching'],
+                    
+                    // Classe 42 - Servizi tecnologici
+                    42: ['sviluppo software', 'programmazione', 'web design', 'hosting', 'cloud computing', 'consulenza it', 'servizi informatici', 'ricerca scientifica', 'ingegneria', 'architettura', 'design industriale', 'analisi dati'],
+                    
+                    // Classe 43 - Ristorazione
+                    43: ['ristorante', 'bar', 'caffetteria', 'hotel', 'albergo', 'bed and breakfast', 'catering', 'pizzeria', 'trattoria', 'osteria', 'pub', 'servizi ristorazione'],
+                    
+                    // Classe 44 - Servizi medici/bellezza
+                    44: ['medico', 'dentista', 'fisioterapia', 'ospedale', 'clinica', 'veterinario', 'parrucchiere', 'estetista', 'spa', 'massaggi', 'cure bellezza', 'tatuaggi']
+                };
+                
+                // Cerca le classi pertinenti
+                for (const [classNum, keywords] of Object.entries(classMapping)) {
+                    for (const keyword of keywords) {
+                        if (productLower.includes(keyword)) {
+                            const classNumber = parseInt(classNum);
+                            if (!identifiedClasses.some(c => c.number === classNumber)) {
+                                identifiedClasses.push({
+                                    number: classNumber,
+                                    title: this.getClassTitle(classNumber),
+                                    description: this.getClassDescription(classNumber)
+                                });
+                            }
+                            break; // Passa alla prossima classe dopo aver trovato una corrispondenza
+                        }
+                    }
+                }
+                
+                // Se non trova classi specifiche, usa classi generiche basate sul contesto
+                if (identifiedClasses.length === 0) {
+                    if (productLower.includes('servizi') || productLower.includes('consulenza')) {
+                        identifiedClasses.push({
+                            number: 35,
+                            title: "Servizi di business",
+                            description: "Pubblicità; gestione di affari commerciali; amministrazione commerciale"
+                        });
+                    } else if (productLower.includes('online') || productLower.includes('internet')) {
+                        identifiedClasses.push({
+                            number: 42,
+                            title: "Servizi tecnologici",
+                            description: "Servizi scientifici e tecnologici; progettazione e sviluppo di computer e software"
+                        });
+                    } else {
+                        // Default generico
+                        identifiedClasses.push({
+                            number: 35,
+                            title: "Servizi commerciali",
+                            description: "Servizi di vendita e commercializzazione"
+                        });
+                    }
+                }
+                
+                // Limita a max 4 classi e ordina per numero
+                return identifiedClasses
+                    .slice(0, 4)
+                    .sort((a, b) => a.number - b.number);
+            },
+            
+            getClassTitle(classNum) {
+                const titles = {
+                    3: "Cosmetici e prodotti di pulizia",
+                    9: "Software e apparecchi scientifici",
+                    16: "Carta e materiali stampati",
+                    18: "Pelletteria e valigie",
+                    21: "Utensili per la casa e la cucina",
+                    25: "Abbigliamento, scarpe e cappelleria",
+                    30: "Prodotti alimentari",
+                    35: "Pubblicità e servizi di business",
+                    41: "Educazione e intrattenimento",
+                    42: "Servizi scientifici e tecnologici",
+                    43: "Servizi di ristorazione e alloggio",
+                    44: "Servizi medici e di bellezza"
+                };
+                return titles[classNum] || `Classe ${classNum}`;
+            },
+            
+            getClassDescription(classNum) {
+                const descriptions = {
+                    3: "Preparati per la pulizia, profumeria, oli essenziali, cosmetici, lozioni per capelli",
+                    9: "Apparecchi e strumenti scientifici, software, computer, dispositivi elettronici",
+                    16: "Carta, cartone e prodotti in queste materie; stampati; articoli per legatoria",
+                    18: "Cuoio e sue imitazioni; bauli e valigie; ombrelli; bastoni da passeggio",
+                    21: "Utensili e recipienti per uso domestico o di cucina; pettini e spugne",
+                    25: "Articoli di abbigliamento, scarpe, cappelleria",
+                    30: "Caffè, tè, cacao; riso; farina e preparati fatti di cereali; pane, pasticceria",
+                    35: "Pubblicità; gestione di affari commerciali; amministrazione commerciale; lavori di ufficio",
+                    41: "Educazione; formazione; divertimento; attività sportive e culturali",
+                    42: "Servizi scientifici e tecnologici; progettazione e sviluppo di hardware e software",
+                    43: "Servizi di ristorazione (alimentazione); alloggio temporaneo",
+                    44: "Servizi medici; servizi veterinari; cure d'igiene e di bellezza"
+                };
+                return descriptions[classNum] || "Prodotti e servizi vari";
             },
             
             generateImageAnalysis() {
@@ -1670,22 +1869,97 @@
             },
             
             generateVerbalMarks(brandName) {
-                const variations = ["TECH", "SMART", "DIGITAL", "PLUS", "PRO"];
-                const marks = [];
-                const count = Math.floor(Math.random() * 3) + 2;
+                // Genera variazioni più realistiche basate sul tipo di brand
+                const brandUpper = brandName.toUpperCase();
+                const brandLower = brandName.toLowerCase();
                 
+                // Suffissi comuni per diversi settori
+                const techSuffixes = ["TECH", "DIGITAL", "SOLUTIONS", "SYSTEMS", "SOFT", "NET", "CLOUD", "AI"];
+                const fashionSuffixes = ["STYLE", "FASHION", "WEAR", "DESIGN", "COLLECTION", "MILANO", "PARIS"];
+                const foodSuffixes = ["FOOD", "GOURMET", "TASTE", "FRESH", "ORGANIC", "NATURAL", "PLUS"];
+                const generalSuffixes = ["PRO", "PLUS", "GROUP", "INTERNATIONAL", "EUROPE", "ITALIA"];
+                
+                // Determina il settore dal nome del brand
+                let suffixes = generalSuffixes;
+                if (brandLower.includes('tech') || brandLower.includes('soft') || brandLower.includes('digital')) {
+                    suffixes = techSuffixes;
+                } else if (brandLower.includes('fashion') || brandLower.includes('style') || brandLower.includes('wear')) {
+                    suffixes = fashionSuffixes;
+                } else if (brandLower.includes('food') || brandLower.includes('eat') || brandLower.includes('taste')) {
+                    suffixes = foodSuffixes;
+                }
+                
+                const marks = [];
+                const count = Math.floor(Math.random() * 3) + 2; // 2-4 marchi
+                
+                // Genera marchi con similarità variabile
                 for (let i = 0; i < count; i++) {
+                    const suffix = suffixes[Math.floor(Math.random() * suffixes.length)];
+                    const similarity = 100 - (i * 15) - Math.floor(Math.random() * 10); // Similarità decrescente
+                    
+                    // Varia il nome in modi diversi
+                    let markName;
+                    if (i === 0 && similarity > 80) {
+                        // Molto simile - stesso nome con suffisso
+                        markName = `${brandUpper} ${suffix}`;
+                    } else if (i === 1) {
+                        // Moderatamente simile - variazione del nome
+                        const variations = [
+                            brandUpper.slice(0, -1), // Rimuovi ultima lettera
+                            brandUpper.slice(0, -2) + 'X', // Cambia finale
+                            brandUpper.replace(/[AEIOU]/g, match => match === 'A' ? 'E' : 'A') // Cambia vocali
+                        ];
+                        markName = variations[Math.floor(Math.random() * variations.length)] + ' ' + suffix;
+                    } else {
+                        // Meno simile - prefisso o modifiche maggiori
+                        const prefixes = ['EURO', 'MEGA', 'SUPER', 'ULTRA'];
+                        markName = prefixes[Math.floor(Math.random() * prefixes.length)] + ' ' + brandUpper;
+                    }
+                    
                     marks.push({
-                        name: brandName.toUpperCase() + " " + variations[i],
-                        applicationNumber: "EU" + Math.floor(Math.random() * 1000000 + 17000000),
-                        status: Math.random() > 0.5 ? "Registrato" : "In domanda",
-                        classes: "Cl. " + [9, 35, 42].sort(() => Math.random() - 0.5).slice(0, 2).join(', '),
-                        similarity: Math.floor(Math.random() * 30) + 60,
-                        owner: "Company " + String.fromCharCode(65 + i) + " S.r.l."
+                        name: markName,
+                        applicationNumber: "EU" + (17000000 + Math.floor(Math.random() * 2000000)),
+                        status: i === 0 ? "Registrato" : (Math.random() > 0.5 ? "Registrato" : "In domanda"),
+                        classes: this.generateRelevantClasses(),
+                        similarity: Math.max(40, similarity),
+                        owner: this.generateCompanyName(i),
+                        applicationDate: this.generateDate()
                     });
                 }
                 
                 return marks.sort((a, b) => b.similarity - a.similarity);
+            },
+            
+            generateRelevantClasses() {
+                // Genera classi più realistiche basate su combinazioni comuni
+                const classGroups = [
+                    "Cl. 25", // Abbigliamento
+                    "Cl. 9, 42", // Tech
+                    "Cl. 35, 41", // Business & Education  
+                    "Cl. 30, 43", // Food & Restaurant
+                    "Cl. 3, 44", // Beauty & Health
+                    "Cl. 16, 35", // Publishing & Advertising
+                    "Cl. 18, 25", // Fashion accessories
+                    "Cl. 9, 35, 42" // Tech completo
+                ];
+                return classGroups[Math.floor(Math.random() * classGroups.length)];
+            },
+            
+            generateCompanyName(index) {
+                const types = ['S.r.l.', 'S.p.A.', 'Ltd.', 'GmbH', 'B.V.', 'S.A.'];
+                const names = [
+                    'Global Brands', 'European Ventures', 'International Holdings',
+                    'Digital Solutions', 'Fashion Group', 'Tech Innovations',
+                    'Creative Industries', 'Business Partners', 'Trade Corporation'
+                ];
+                return names[index % names.length] + ' ' + types[Math.floor(Math.random() * types.length)];
+            },
+            
+            generateDate() {
+                const year = 2020 + Math.floor(Math.random() * 5);
+                const month = String(Math.floor(Math.random() * 12) + 1).padStart(2, '0');
+                const day = String(Math.floor(Math.random() * 28) + 1).padStart(2, '0');
+                return `${year}-${month}-${day}`;
             },
             
             generateFigurativeMarks() {
