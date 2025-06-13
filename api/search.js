@@ -522,15 +522,28 @@ module.exports = async (request, response) => {
             productDescription: payload.productDescription?.substring(0, 50) + '...',
             selectedCountries: payload.selectedCountries,
             hasImage: !!payload.imageData,
-            imageSize: payload.imageData ? payload.imageData.base64.length : 0
+            imageSize: payload.imageData ? payload.imageData.base64.length : 0,
+            searchType: payload.searchType || 'verbal'
         });
         
-        // Validazione input
-        if (!payload.brandName || !payload.productDescription) {
-            return response.status(400).json({ 
-                error: true,
-                message: 'Nome del brand e descrizione prodotti sono obbligatori.' 
-            });
+        // Determina il tipo di ricerca
+        const searchType = payload.searchType || 'verbal';
+        
+        // Validazione input basata sul tipo di ricerca
+        if (searchType === 'verbal' || searchType === 'combined') {
+            if (!payload.brandName || !payload.productDescription) {
+                return response.status(400).json({ 
+                    error: true,
+                    message: 'Nome del brand e descrizione prodotti sono obbligatori.' 
+                });
+            }
+        } else if (searchType === 'figurative') {
+            if (!payload.imageData || !payload.productDescription) {
+                return response.status(400).json({ 
+                    error: true,
+                    message: 'Immagine e descrizione prodotti sono obbligatori per marchi figurativi.' 
+                });
+            }
         }
         
         const { EUIPO_CLIENT_ID, EUIPO_CLIENT_SECRET } = process.env;
@@ -538,58 +551,82 @@ module.exports = async (request, response) => {
             throw new Error('Credenziali EUIPO non configurate correttamente su Vercel.');
         }
 
-        // FASE 1: Classificazione AI con Gemini Flash
+        // FASE 1: Classificazione AI migliorata con Gemini Flash
         const classificationPrompt = `Sei un esperto classificatore di marchi secondo la Classificazione di Nizza (12a edizione).
 
-ISTRUZIONI:
-1. Analizza attentamente la descrizione fornita
-2. Identifica TUTTE le classi pertinenti, considerando anche classi correlate
-3. Restituisci SOLO i numeri di classe separati da virgole, senza altro testo
+IMPORTANTE: Leggi ATTENTAMENTE la knowledge base fornita e identifica le classi CORRETTE per i prodotti/servizi descritti.
 
-KNOWLEDGE BASE:
+KNOWLEDGE BASE CLASSI DI NIZZA:
 ${NICE_CLASSES_KNOWLEDGE_BASE}
 
 DESCRIZIONE DA ANALIZZARE:
 "${payload.productDescription}"
 
+ISTRUZIONI PRECISE:
+1. Analizza la descrizione e identifica ESATTAMENTE cosa viene offerto
+2. Cerca nella knowledge base le classi che contengono LETTERALMENTE quei prodotti/servizi
+3. Per esempio:
+   - "scarpe" → Classe 25 (contiene "scarpe, cappelleria")
+   - "software" → Classe 9 (contiene "software")
+   - "abbigliamento" → Classe 25 (contiene "Articoli di abbigliamento")
+   - "consulenza aziendale" → Classe 35 (contiene "consulenza aziendale")
+4. NON inventare associazioni, usa SOLO quello che è scritto nella knowledge base
+5. Restituisci SOLO i numeri di classe pertinenti separati da virgole
+
 CLASSI PERTINENTI:`;
 
         const identifiedClassesString = await callGeminiAPI(classificationPrompt, false);
+        console.log('Classi identificate dall\'AI:', identifiedClassesString);
+        
         const identifiedClasses = identifiedClassesString
             .split(',')
             .map(c => parseInt(c.trim()))
-            .filter(c => !isNaN(c) && c >= 1 && c <= 45);
+            .filter(c => !isNaN(c) && c >= 1 && c <= 45)
+            .filter((v, i, a) => a.indexOf(v) === i); // Rimuovi duplicati
 
         if (identifiedClasses.length === 0) {
             throw new Error("Impossibile identificare classi di Nizza pertinenti.");
         }
+        
+        console.log('Classi finali:', identifiedClasses);
 
-        // FASE 2: Analisi dell'immagine se presente
+        // FASE 2: Analisi dell'immagine se presente o richiesta
         let imageAnalysis = null;
         let figurativeSearchResults = { similarMarks: [] };
         
-        if (payload.imageData) {
+        if (payload.imageData || searchType === 'figurative') {
+            if (!payload.imageData) {
+                throw new Error('Immagine richiesta per ricerca figurativa');
+            }
             console.log('Analizzando immagine del marchio...');
             try {
                 imageAnalysis = await analyzeTrademarkImage(payload.imageData);
                 console.log('Analisi immagine completata:', imageAnalysis);
             } catch (imageError) {
                 console.error('Errore analisi immagine:', imageError);
-                // Continua senza analisi immagine invece di bloccare tutto
+                // Per ricerca figurativa, l'analisi è essenziale
+                if (searchType === 'figurative') {
+                    throw new Error('Impossibile analizzare l\'immagine del marchio');
+                }
+                // Per altri tipi, continua senza analisi immagine
             }
         }
 
         // FASE 3: Ricerca su EUIPO
         const accessToken = await getAccessToken(EUIPO_CLIENT_ID, EUIPO_CLIENT_SECRET);
         
-        // Ricerca marchi verbali
-        const verbalSearchJson = await searchEuipoTrademarks(
-            payload.brandName, 
-            identifiedClasses, 
-            accessToken, 
-            EUIPO_CLIENT_ID
-        );
-        const verbalSearchResults = parseEuipoResponse(verbalSearchJson, payload.brandName);
+        // Ricerca marchi verbali (solo se non è una ricerca puramente figurativa)
+        let verbalSearchResults = { similarMarks: [] };
+        if (searchType !== 'figurative') {
+            const verbalSearchJson = await searchEuipoTrademarks(
+                payload.brandName, 
+                identifiedClasses, 
+                accessToken, 
+                EUIPO_CLIENT_ID
+            );
+            verbalSearchResults = parseEuipoResponse(verbalSearchJson, payload.brandName);
+            console.log(`Trovati ${verbalSearchResults.similarMarks.length} marchi verbali`);
+        }
 
         // Ricerca marchi figurativi se è stata caricata un'immagine
         if (imageAnalysis && imageAnalysis.viennaCodes.length > 0) {
@@ -618,8 +655,10 @@ CLASSI PERTINENTI:`;
 
 COMPITO: Fornisci un'analisi legale professionale e dettagliata sulla registrabilità del marchio proposto.
 
+TIPO DI RICERCA: ${searchType === 'verbal' ? 'Marchio Denominativo' : searchType === 'figurative' ? 'Marchio Figurativo' : 'Marchio Complesso (denominativo + figurativo)'}
+
 DATI DEL MARCHIO PROPOSTO:
-- Nome: "${payload.brandName}"
+${searchType !== 'figurative' ? `- Nome: "${payload.brandName}"` : ''}
 - Prodotti/Servizi: "${payload.productDescription}"
 - Classi di Nizza identificate: ${identifiedClasses.map(c => `Classe ${c}`).join(', ')}
 - Territori richiesti: ${payload.selectedCountries.join(', ')}
@@ -629,7 +668,7 @@ ${imageAnalysis ? `
   • Elementi distintivi: ${imageAnalysis.distinctiveElements.join(', ')}
   • Codici Vienna: ${imageAnalysis.viennaCodes.join(', ')}` : ''}
 
-MARCHI VERBALI ANTERIORI (dati EUIPO):
+${searchType !== 'figurative' ? `MARCHI VERBALI ANTERIORI (dati EUIPO):
 ${verbalSearchResults.similarMarks.length > 0 
     ? verbalSearchResults.similarMarks.map(mark => 
         `• "${mark.name}" (${mark.applicationNumber})
@@ -639,7 +678,7 @@ ${verbalSearchResults.similarMarks.length > 0
           Similarità verbale: ${mark.similarity}%
           Data deposito: ${mark.applicationDate || 'N/D'}`
       ).join('\n\n')
-    : "Nessun marchio verbale identico o molto simile trovato."}
+    : "Nessun marchio verbale identico o molto simile trovato."}` : ''}
 
 ${figurativeSearchResults.similarMarks.length > 0 ? `
 MARCHI FIGURATIVI ANTERIORI (dati EUIPO):
@@ -661,12 +700,12 @@ STRUTTURA RICHIESTA DELL'ANALISI:
 
 2. **IMPEDIMENTI ASSOLUTI** (con riferimenti normativi)
    - Capacità distintiva (${LEGAL_REFERENCES.CPI.art9}, ${LEGAL_REFERENCES.EUTMR.art7})
-   - Carattere descrittivo (${LEGAL_REFERENCES.CPI.art13})
+   ${searchType !== 'figurative' ? '- Carattere descrittivo (${LEGAL_REFERENCES.CPI.art13})' : ''}
    - Liceità (${LEGAL_REFERENCES.CPI.art10})
    ${imageAnalysis ? '- Distintività degli elementi figurativi' : ''}
 
 3. **IMPEDIMENTI RELATIVI** (con riferimenti normativi)
-   - Rischio di confusione elementi verbali (${LEGAL_REFERENCES.CPI.art12}, ${LEGAL_REFERENCES.EUTMR.art8})
+   ${searchType !== 'figurative' ? '- Rischio di confusione elementi verbali (${LEGAL_REFERENCES.CPI.art12}, ${LEGAL_REFERENCES.EUTMR.art8})' : ''}
    ${imageAnalysis ? '- Rischio di confusione elementi figurativi' : ''}
    - Analisi dei marchi anteriori trovati
    - Valutazione della somiglianza complessiva
@@ -679,7 +718,7 @@ STRUTTURA RICHIESTA DELL'ANALISI:
 5. **RACCOMANDAZIONI STRATEGICHE**
    - Suggerimenti per ridurre i rischi identificati
    ${imageAnalysis ? '- Possibili modifiche agli elementi figurativi' : ''}
-   - Possibili modifiche al marchio verbale
+   ${searchType !== 'figurative' ? '- Possibili modifiche al marchio verbale' : ''}
    - Strategie di deposito alternative
 
 6. **CONCLUSIONE**
@@ -688,7 +727,7 @@ STRUTTURA RICHIESTA DELL'ANALISI:
 
 IMPORTANTE: 
 - Cita sempre gli articoli di legge pertinenti
-- ${imageAnalysis ? 'Considera attentamente la combinazione di elementi verbali e figurativi' : ''}
+- Considera il tipo specifico di marchio (${searchType === 'verbal' ? 'denominativo' : searchType === 'figurative' ? 'figurativo' : 'complesso'})
 - Usa un linguaggio professionale ma comprensibile
 - Sii specifico e concreto nelle raccomandazioni`;
 
@@ -736,7 +775,8 @@ IMPORTANTE:
                 totalFigurativeResults: figurativeSearchResults.similarMarks.length,
                 databaseSource: 'EUIPO',
                 analysisModel: 'Gemini Pro 1.5',
-                imageAnalyzed: !!imageAnalysis
+                imageAnalyzed: !!imageAnalysis,
+                searchType: searchType
             }
         };
 

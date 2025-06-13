@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IntelliMark Pro - Analisi Avanzata Marchi</title>
+    <title>IntelliMark.ai - Analisi Avanzata Marchi</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -361,6 +361,21 @@
             transform: rotate(180deg);
         }
         
+        /* Search Type Radio Styles */
+        input[type="radio"][name="searchType"] {
+            accent-color: var(--color-primary);
+        }
+        
+        input[type="radio"][name="searchType"]:checked + div {
+            color: var(--color-primary);
+        }
+        
+        input[type="radio"][name="searchType"]:checked ~ * {
+            --tw-border-opacity: 1;
+            border-color: rgb(59 130 246 / var(--tw-border-opacity));
+            background-color: rgba(59, 130, 246, 0.05);
+        }
+        
         /* Smooth Transitions */
         .fade-in {
             animation: fadeIn 0.5s ease-out;
@@ -387,7 +402,7 @@
                     <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
                         <i class="fas fa-shield-alt text-white"></i>
                     </div>
-                    <h1 class="text-2xl font-bold gradient-text">IntelliMark Pro</h1>
+                    <h1 class="text-2xl font-bold gradient-text">IntelliMark.ai</h1>
                 </div>
                 <nav class="hidden md:flex gap-6">
                     <a href="#home" class="text-slate-700 hover:text-primary transition-colors">Home</a>
@@ -424,37 +439,8 @@
         </div>
     </section>
 
-    <!-- Features Section -->
-    <section class="py-16">
-        <div class="container mx-auto px-4">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-                <div class="premium-card p-8 text-center">
-                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-brain text-2xl text-blue-600"></i>
-                    </div>
-                    <h3 class="text-xl font-bold mb-2">AI Avanzata</h3>
-                    <p class="text-slate-600">Analisi semantica e visiva con Gemini Pro per valutazioni precise</p>
-                </div>
-                <div class="premium-card p-8 text-center">
-                    <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-database text-2xl text-indigo-600"></i>
-                    </div>
-                    <h3 class="text-xl font-bold mb-2">Database EUIPO</h3>
-                    <p class="text-slate-600">Ricerca in tempo reale su milioni di marchi registrati nell'UE</p>
-                </div>
-                <div class="premium-card p-8 text-center">
-                    <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-eye text-2xl text-purple-600"></i>
-                    </div>
-                    <h3 class="text-xl font-bold mb-2">Confronto Visivo</h3>
-                    <p class="text-slate-600">Analisi automatica della similarità tra marchi figurativi</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Analysis Section -->
-    <section id="analysis" class="py-20">
+    <!-- Analysis Section (moved up) -->
+    <section id="analysis" class="py-20 bg-slate-50">
         <div class="container mx-auto px-4">
             <div class="max-w-6xl mx-auto">
                 <h2 class="text-3xl font-bold text-center mb-12">Analizza il tuo marchio</h2>
@@ -462,9 +448,40 @@
                 <!-- Search Form -->
                 <div class="premium-card p-8 mb-8">
                     <form id="searchForm">
+                        <!-- Search Type Selection -->
+                        <div class="mb-6">
+                            <label class="block text-sm font-semibold text-slate-700 mb-3">
+                                <i class="fas fa-filter mr-1"></i>
+                                Tipo di Ricerca
+                            </label>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <label class="flex items-center p-4 border-2 border-slate-200 rounded-lg cursor-pointer hover:border-primary transition-colors">
+                                    <input type="radio" name="searchType" value="verbal" class="mr-3" checked>
+                                    <div>
+                                        <div class="font-semibold">Marchio Denominativo</div>
+                                        <div class="text-sm text-slate-600">Solo analisi testuale</div>
+                                    </div>
+                                </label>
+                                <label class="flex items-center p-4 border-2 border-slate-200 rounded-lg cursor-pointer hover:border-primary transition-colors">
+                                    <input type="radio" name="searchType" value="figurative" class="mr-3">
+                                    <div>
+                                        <div class="font-semibold">Marchio Figurativo</div>
+                                        <div class="text-sm text-slate-600">Solo analisi visiva</div>
+                                    </div>
+                                </label>
+                                <label class="flex items-center p-4 border-2 border-slate-200 rounded-lg cursor-pointer hover:border-primary transition-colors">
+                                    <input type="radio" name="searchType" value="combined" class="mr-3">
+                                    <div>
+                                        <div class="font-semibold">Marchio Complesso</div>
+                                        <div class="text-sm text-slate-600">Analisi testuale + visiva</div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                        
                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                             <!-- Brand Name Input -->
-                            <div>
+                            <div id="brandNameContainer">
                                 <label class="block text-sm font-semibold text-slate-700 mb-2">
                                     <i class="fas fa-tag mr-1"></i>
                                     Nome del Brand
@@ -479,10 +496,10 @@
                             </div>
                             
                             <!-- Image Upload -->
-                            <div>
+                            <div id="imageUploadContainer">
                                 <label class="block text-sm font-semibold text-slate-700 mb-2">
                                     <i class="fas fa-image mr-1"></i>
-                                    Logo/Marchio Figurativo (opzionale)
+                                    Logo/Marchio Figurativo
                                 </label>
                                 <div id="imageUploadArea" class="image-upload-area">
                                     <input type="file" id="imageInput" accept="image/*" class="hidden">
@@ -730,6 +747,35 @@
         </div>
     </section>
 
+    <!-- Features Section -->
+    <section class="py-16">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                <div class="premium-card p-8 text-center">
+                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-brain text-2xl text-blue-600"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">AI Avanzata</h3>
+                    <p class="text-slate-600">Analisi semantica e visiva con Gemini Pro per valutazioni precise</p>
+                </div>
+                <div class="premium-card p-8 text-center">
+                    <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-database text-2xl text-indigo-600"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Database EUIPO</h3>
+                    <p class="text-slate-600">Ricerca in tempo reale su milioni di marchi registrati nell'UE</p>
+                </div>
+                <div class="premium-card p-8 text-center">
+                    <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-eye text-2xl text-purple-600"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Confronto Visivo</h3>
+                    <p class="text-slate-600">Analisi automatica della similarità tra marchi figurativi</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- FAQ Section -->
     <section id="faq" class="py-20 bg-slate-50">
         <div class="container mx-auto px-4">
@@ -795,7 +841,7 @@
                     <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
                         <i class="fas fa-shield-alt text-white"></i>
                     </div>
-                    <h3 class="text-2xl font-bold">IntelliMark Pro</h3>
+                    <h3 class="text-2xl font-bold">IntelliMark.ai</h3>
                 </div>
                 <p class="text-slate-400 mb-6">
                     Analisi professionale dei marchi con intelligenza artificiale
@@ -812,7 +858,7 @@
                     </a>
                 </div>
                 <p class="text-sm text-slate-500 mt-8">
-                    © 2024 IntelliMark Pro. Tutti i diritti riservati.
+                    © 2024 IntelliMark.ai. Tutti i diritti riservati.
                 </p>
             </div>
         </div>
@@ -859,6 +905,7 @@
         let selectedCountries = ['EU'];
         let uploadedImage = null;
         let currentResults = null;
+        let selectedSearchType = 'verbal';
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
@@ -867,7 +914,65 @@
             initializeTabs();
             initializeFAQ();
             initializeFormHandlers();
+            initializeSearchTypeHandlers();
         });
+
+        // Search Type Handlers
+        function initializeSearchTypeHandlers() {
+            const searchTypeInputs = document.querySelectorAll('input[name="searchType"]');
+            const brandNameContainer = document.getElementById('brandNameContainer');
+            const imageUploadContainer = document.getElementById('imageUploadContainer');
+            const brandNameInput = document.getElementById('brandName');
+            const imageInput = document.getElementById('imageInput');
+            
+            searchTypeInputs.forEach(input => {
+                input.addEventListener('change', (e) => {
+                    selectedSearchType = e.target.value;
+                    
+                    // Update UI based on search type
+                    switch(selectedSearchType) {
+                        case 'verbal':
+                            brandNameContainer.style.display = 'block';
+                            imageUploadContainer.style.display = 'none';
+                            brandNameInput.required = true;
+                            // Clear image if switching from other types
+                            if (uploadedImage) {
+                                uploadedImage = null;
+                                elements.imageInput.value = '';
+                                elements.uploadPlaceholder.classList.remove('hidden');
+                                elements.imagePreviewContainer.classList.add('hidden');
+                            }
+                            break;
+                            
+                        case 'figurative':
+                            brandNameContainer.style.display = 'none';
+                            imageUploadContainer.style.display = 'block';
+                            brandNameInput.required = false;
+                            brandNameInput.value = ''; // Clear brand name
+                            break;
+                            
+                        case 'combined':
+                            brandNameContainer.style.display = 'block';
+                            imageUploadContainer.style.display = 'block';
+                            brandNameInput.required = true;
+                            break;
+                    }
+                    
+                    // Update parent container to adjust grid
+                    const parentGrid = brandNameContainer.parentElement;
+                    if (selectedSearchType === 'verbal' || selectedSearchType === 'figurative') {
+                        parentGrid.classList.remove('lg:grid-cols-2');
+                        parentGrid.classList.add('lg:grid-cols-1');
+                    } else {
+                        parentGrid.classList.remove('lg:grid-cols-1');
+                        parentGrid.classList.add('lg:grid-cols-2');
+                    }
+                });
+            });
+            
+            // Trigger initial setup
+            searchTypeInputs[0].dispatchEvent(new Event('change'));
+        }
 
         // Country Selection
         function initializeCountrySelection() {
@@ -1041,10 +1146,38 @@
         async function handleFormSubmit(e) {
             e.preventDefault();
             
-            const brandName = elements.brandName.value.trim();
+            // Validate based on search type
+            let brandName = '';
+            let hasValidInput = false;
+            
+            switch(selectedSearchType) {
+                case 'verbal':
+                    brandName = elements.brandName.value.trim();
+                    hasValidInput = brandName !== '';
+                    break;
+                    
+                case 'figurative':
+                    brandName = 'Marchio Figurativo'; // Default name for figurative-only
+                    hasValidInput = uploadedImage !== null;
+                    if (!hasValidInput) {
+                        alert('Per favore carica un\'immagine del marchio figurativo');
+                        return;
+                    }
+                    break;
+                    
+                case 'combined':
+                    brandName = elements.brandName.value.trim();
+                    hasValidInput = brandName !== '' && uploadedImage !== null;
+                    if (!uploadedImage) {
+                        alert('Per un marchio complesso, carica anche l\'immagine del logo');
+                        return;
+                    }
+                    break;
+            }
+            
             const productDescription = elements.productDescription.value.trim();
             
-            if (!brandName || !productDescription || selectedCountries.length === 0) {
+            if (!hasValidInput || !productDescription || selectedCountries.length === 0) {
                 alert('Per favore compila tutti i campi richiesti');
                 return;
             }
@@ -1053,8 +1186,14 @@
             showLoading();
             
             try {
-                // IMPORTANTE: Passa uploadedImage come quarto parametro
-                const results = await api.searchBrand(brandName, productDescription, selectedCountries, uploadedImage);
+                // Pass search type to API
+                const results = await api.searchBrand(
+                    brandName, 
+                    productDescription, 
+                    selectedCountries, 
+                    uploadedImage,
+                    selectedSearchType
+                );
                 
                 if (results.success) {
                     currentResults = results.data;
@@ -1120,12 +1259,28 @@
                 renderImageAnalysis(data.imageAnalysis);
                 elements.imageAnalysisCard.style.display = 'block';
                 elements.imageAnalysisCheck.style.display = 'flex';
-                elements.figurativeTabButton.style.display = 'inline-flex';
             } else {
                 console.log('Nessuna analisi immagine da mostrare');
                 elements.imageAnalysisCard.style.display = 'none';
                 elements.imageAnalysisCheck.style.display = 'none';
-                elements.figurativeTabButton.style.display = 'none';
+            }
+            
+            // Show/hide tabs based on search type and results
+            const verbalTabButton = document.querySelector('[data-tab="verbal"]');
+            const figurativeTabButton = elements.figurativeTabButton;
+            
+            // Show verbal tab only if we have verbal results or it's not a figurative-only search
+            if (selectedSearchType !== 'figurative' && data.verbalMarks && data.verbalMarks.length > 0) {
+                verbalTabButton.style.display = 'inline-flex';
+            } else {
+                verbalTabButton.style.display = 'none';
+            }
+            
+            // Show figurative tab only if we have figurative results
+            if (data.figurativeMarks && data.figurativeMarks.length > 0) {
+                figurativeTabButton.style.display = 'inline-flex';
+            } else {
+                figurativeTabButton.style.display = 'none';
             }
             
             // Display judgment
@@ -1142,6 +1297,12 @@
                 console.log('Nessun marchio figurativo da mostrare');
                 renderFigurativeMarks([]);
             }
+            
+            // Reset to judgment tab
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelector('[data-tab="judgment"]').classList.add('active');
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
+            document.getElementById('judgmentTab').classList.remove('hidden');
             
             // Scroll to results
             elements.resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -1332,7 +1493,11 @@
             elements.uploadPlaceholder.classList.remove('hidden');
             elements.imagePreviewContainer.classList.add('hidden');
             selectedCountries = ['EU'];
+            selectedSearchType = 'verbal';
             initializeCountrySelection();
+            // Reset search type to verbal
+            document.querySelector('input[name="searchType"][value="verbal"]').checked = true;
+            document.querySelector('input[name="searchType"][value="verbal"]').dispatchEvent(new Event('change'));
             elements.resultsSection.classList.add('hidden');
             elements.searchForm.parentElement.style.display = 'block';
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1345,7 +1510,7 @@
 
         // API functions
         const api = {
-            async searchBrand(brandName, products, countries, imageData) {
+            async searchBrand(brandName, products, countries, imageData, searchType) {
                 try {
                     // CONFIGURAZIONE BACKEND:
                     // 1. Sostituisci 'your-vercel-domain' con il tuo dominio Vercel reale
@@ -1356,6 +1521,7 @@
                     
                     // Debug: verifica se l'immagine viene passata
                     console.log('Invio richiesta con immagine:', imageData ? 'Sì' : 'No');
+                    console.log('Tipo di ricerca:', searchType);
                     
                     const response = await fetch(BACKEND_URL, {
                         method: 'POST',
@@ -1366,7 +1532,8 @@
                             brandName: brandName,
                             productDescription: products,
                             selectedCountries: countries,
-                            imageData: imageData // Assicurati che l'immagine sia inclusa
+                            imageData: imageData,
+                            searchType: searchType || 'verbal'
                         })
                     });
                     
@@ -1400,7 +1567,7 @@
                 } catch (error) {
                     console.error('Errore API:', error);
                     // Fallback ai dati mock se l'API non è disponibile
-                    return this.generateMockData(brandName, products, countries, imageData);
+                    return this.generateMockData(brandName, products, countries, imageData, searchType);
                 }
             },
             
@@ -1431,16 +1598,16 @@
             },
             
             // Dati mock di fallback
-            async generateMockData(brandName, products, countries, imageData) {
+            async generateMockData(brandName, products, countries, imageData, searchType) {
                 // Simulate API delay
                 await new Promise(resolve => setTimeout(resolve, 3000));
                 
                 const score = Math.floor(Math.random() * 40) + 55;
                 const classes = this.generateClasses(products);
                 const judgment = this.generateJudgment(score);
-                const verbalMarks = this.generateVerbalMarks(brandName);
-                const figurativeMarks = imageData ? this.generateFigurativeMarks() : [];
-                const imageAnalysis = imageData ? this.generateImageAnalysis() : null;
+                const verbalMarks = (searchType !== 'figurative') ? this.generateVerbalMarks(brandName) : [];
+                const figurativeMarks = (imageData || searchType === 'figurative') ? this.generateFigurativeMarks() : [];
+                const imageAnalysis = (imageData || searchType === 'figurative') ? this.generateImageAnalysis() : null;
                 
                 return {
                     success: true,
