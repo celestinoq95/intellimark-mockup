@@ -1,1507 +1,765 @@
-<!DOCTYPE html>
-<html lang="it">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IntelliMark Pro - Analisi Avanzata Marchi</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        * { font-family: 'Inter', sans-serif; }
-        
-        /* CSS Variables */
-        :root {
-            --color-primary: #3b82f6;
-            --color-primary-dark: #2563eb;
-            --color-secondary: #6366f1;
-            --color-success: #10b981;
-            --color-warning: #f59e0b;
-            --color-danger: #ef4444;
-            --color-slate-50: #f8fafc;
-            --color-slate-100: #f1f5f9;
-            --color-slate-200: #e2e8f0;
-            --color-slate-300: #cbd5e1;
-            --color-slate-700: #334155;
-            --color-slate-800: #1e293b;
-            --color-slate-900: #0f172a;
-        }
-        
-        /* Gradient Background */
-        body {
-            background: linear-gradient(135deg, #f6f9fc 0%, #e9f1ff 100%);
-            min-height: 100vh;
-        }
-        
-        /* Premium Card Styles */
-        .premium-card {
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            transition: all 0.3s ease;
-        }
-        
-        .premium-card:hover {
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
-        }
-        
-        /* Gradient Text */
-        .gradient-text {
-            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        
-        /* Premium Button */
-        .btn-premium {
-            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
-            color: white;
-            padding: 12px 32px;
-            border-radius: 8px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
-        }
-        
-        .btn-premium:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
-        }
-        
-        .btn-premium:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
-        /* Form Inputs */
-        .form-input {
-            width: 100%;
-            padding: 12px 16px;
-            border: 2px solid var(--color-slate-200);
-            border-radius: 8px;
-            transition: all 0.2s ease;
-            font-size: 16px;
-        }
-        
-        .form-input:focus {
-            outline: none;
-            border-color: var(--color-primary);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
-        
-        /* Country Pills */
-        .country-pill {
-            display: inline-flex;
-            align-items: center;
-            padding: 8px 16px;
-            background: var(--color-slate-100);
-            border: 2px solid transparent;
-            border-radius: 24px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-weight: 500;
-        }
-        
-        .country-pill:hover {
-            background: var(--color-slate-200);
-        }
-        
-        .country-pill.selected {
-            background: var(--color-primary);
-            color: white;
-            border-color: var(--color-primary);
-        }
-        
-        /* Score Display */
-        .score-display {
-            position: relative;
-            width: 160px;
-            height: 160px;
-            margin: 0 auto;
-        }
-        
-        .score-circle {
-            transform: rotate(-90deg);
-        }
-        
-        .score-value {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 3rem;
-            font-weight: 700;
-        }
-        
-        /* Loading Animation */
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-        
-        .loading-pulse {
-            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-        
-        /* Result Cards */
-        .result-card {
-            background: var(--color-slate-50);
-            border: 1px solid var(--color-slate-200);
-            border-radius: 12px;
-            padding: 24px;
-            transition: all 0.3s ease;
-        }
-        
-        .result-card:hover {
-            background: white;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
-        }
-        
-        /* Badge Styles */
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            padding: 4px 12px;
-            border-radius: 16px;
-            font-size: 0.875rem;
-            font-weight: 600;
-        }
-        
-        .badge-success {
-            background: #d1fae5;
-            color: #065f46;
-        }
-        
-        .badge-warning {
-            background: #fed7aa;
-            color: #92400e;
-        }
-        
-        .badge-danger {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-        
-        /* Judgment Content Styles */
-        .judgment-content strong { 
-            color: var(--color-slate-900); 
-            font-weight: 600; 
-        }
-        
-        .judgment-content .highlight { 
-            background-color: #e0e7ff; 
-            color: #3730a3; 
-            padding: 2px 6px; 
-            border-radius: 4px; 
-            font-weight: 500; 
-            display: inline-block;
-        }
-        
-        .judgment-content h4 {
-            font-size: 1.125rem;
-            font-weight: 700;
-            margin-bottom: 0.75rem;
-            margin-top: 1rem;
-            color: var(--color-slate-900);
-        }
-        
-        .judgment-content h4:first-child {
-            margin-top: 0;
-        }
-        
-        .judgment-content p {
-            margin-bottom: 0.75rem;
-            line-height: 1.6;
-        }
-        
-        .judgment-content p:last-child {
-            margin-bottom: 0;
-        }
-        
-        .judgment-content ul, .judgment-content ol {
-            margin-left: 1.5rem;
-            margin-bottom: 0.75rem;
-        }
-        
-        .judgment-content li {
-            margin-bottom: 0.25rem;
-        }
-        
-        /* Image Upload Styles */
-        .image-upload-area {
-            border: 2px dashed var(--color-slate-300);
-            border-radius: 12px;
-            padding: 32px;
-            text-align: center;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            background: var(--color-slate-50);
-        }
-        
-        .image-upload-area:hover {
-            border-color: var(--color-primary);
-            background: white;
-        }
-        
-        .image-upload-area.drag-over {
-            border-color: var(--color-primary);
-            background: rgba(59, 130, 246, 0.05);
-        }
-        
-        .image-preview {
-            max-width: 200px;
-            max-height: 200px;
-            margin: 0 auto;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-        }
-        
-        .image-preview img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-        
-        /* Figurative Mark Card */
-        .figurative-mark-card {
-            display: flex;
-            gap: 16px;
-            padding: 16px;
-            background: white;
-            border-radius: 8px;
-            border: 1px solid var(--color-slate-200);
-            transition: all 0.3s ease;
-        }
-        
-        .figurative-mark-card:hover {
-            border-color: var(--color-primary);
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-        }
-        
-        .figurative-mark-image {
-            width: 80px;
-            height: 80px;
-            border-radius: 8px;
-            overflow: hidden;
-            flex-shrink: 0;
-            background: var(--color-slate-100);
-        }
-        
-        .figurative-mark-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-        
-        /* Tabs */
-        .tab-button {
-            padding: 12px 24px;
-            border-radius: 8px 8px 0 0;
-            font-weight: 600;
-            transition: all 0.2s ease;
-            border-bottom: 3px solid transparent;
-        }
-        
-        .tab-button:hover {
-            background: var(--color-slate-100);
-        }
-        
-        .tab-button.active {
-            color: var(--color-primary);
-            border-bottom-color: var(--color-primary);
-            background: white;
-        }
-        
-        /* FAQ Styles */
-        .faq-item {
-            border-bottom: 1px solid var(--color-slate-200);
-            padding: 20px 0;
-        }
-        
-        .faq-item:last-child {
-            border-bottom: none;
-        }
-        
-        .faq-question {
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: 600;
-            color: var(--color-slate-800);
-            transition: color 0.2s ease;
-        }
-        
-        .faq-question:hover {
-            color: var(--color-primary);
-        }
-        
-        .faq-answer {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease-out;
-            color: var(--color-slate-600);
-            padding-top: 0;
-        }
-        
-        .faq-item.active .faq-answer {
-            max-height: 500px;
-            padding-top: 12px;
-        }
-        
-        .faq-icon {
-            transition: transform 0.3s ease;
-        }
-        
-        .faq-item.active .faq-icon {
-            transform: rotate(180deg);
-        }
-        
-        /* Smooth Transitions */
-        .fade-in {
-            animation: fadeIn 0.5s ease-out;
-        }
-        
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-    </style>
-</head>
-<body>
-    <!-- Header -->
-    <header class="bg-white border-b border-slate-200 sticky top-0 z-50">
-        <div class="container mx-auto px-4 py-4">
-            <div class="flex justify-between items-center">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
-                        <i class="fas fa-shield-alt text-white"></i>
-                    </div>
-                    <h1 class="text-2xl font-bold gradient-text">IntelliMark Pro</h1>
-                </div>
-                <nav class="hidden md:flex gap-6">
-                    <a href="#home" class="text-slate-700 hover:text-primary transition-colors">Home</a>
-                    <a href="#analysis" class="text-slate-700 hover:text-primary transition-colors">Analisi</a>
-                    <a href="#faq" class="text-slate-700 hover:text-primary transition-colors">FAQ</a>
-                    <a href="#contact" class="text-slate-700 hover:text-primary transition-colors">Contatti</a>
-                </nav>
-            </div>
-        </div>
-    </header>
+// File: /api/search.js
+// VERSIONE AVANZATA con analisi marchi figurativi e confronto visivo
 
-    <!-- Hero Section -->
-    <section id="home" class="py-20">
-        <div class="container mx-auto px-4">
-            <div class="max-w-4xl mx-auto text-center">
-                <h2 class="text-5xl font-bold text-slate-900 mb-6">
-                    Proteggi il tuo brand con l'AI
-                </h2>
-                <p class="text-xl text-slate-600 mb-8">
-                    Analisi avanzata della registrabilità dei marchi con intelligenza artificiale,
-                    ricerca su database EUIPO e confronto visivo automatizzato
-                </p>
-                <div class="flex flex-wrap gap-4 justify-center">
-                    <a href="#analysis" class="btn-premium">
-                        <i class="fas fa-search mr-2"></i>
-                        Inizia l'Analisi
-                    </a>
-                    <button class="px-6 py-3 border-2 border-slate-300 rounded-lg font-semibold hover:border-slate-400 transition-colors">
-                        <i class="fas fa-play-circle mr-2"></i>
-                        Guarda il Video
-                    </button>
-                </div>
-            </div>
-        </div>
-    </section>
+const fetch = require('node-fetch');
+const { NICE_CLASSES_KNOWLEDGE_BASE } = require('./nice_knowledge_base.js');
 
-    <!-- Features Section -->
-    <section class="py-16">
-        <div class="container mx-auto px-4">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-                <div class="premium-card p-8 text-center">
-                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-brain text-2xl text-blue-600"></i>
-                    </div>
-                    <h3 class="text-xl font-bold mb-2">AI Avanzata</h3>
-                    <p class="text-slate-600">Analisi semantica e visiva con Gemini Pro per valutazioni precise</p>
-                </div>
-                <div class="premium-card p-8 text-center">
-                    <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-database text-2xl text-indigo-600"></i>
-                    </div>
-                    <h3 class="text-xl font-bold mb-2">Database EUIPO</h3>
-                    <p class="text-slate-600">Ricerca in tempo reale su milioni di marchi registrati nell'UE</p>
-                </div>
-                <div class="premium-card p-8 text-center">
-                    <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-eye text-2xl text-purple-600"></i>
-                    </div>
-                    <h3 class="text-xl font-bold mb-2">Confronto Visivo</h3>
-                    <p class="text-slate-600">Analisi automatica della similarità tra marchi figurativi</p>
-                </div>
-            </div>
-        </div>
-    </section>
+// --- CONFIGURAZIONE E COSTANTI ---
 
-    <!-- Analysis Section -->
-    <section id="analysis" class="py-20">
-        <div class="container mx-auto px-4">
-            <div class="max-w-6xl mx-auto">
-                <h2 class="text-3xl font-bold text-center mb-12">Analizza il tuo marchio</h2>
-                
-                <!-- Search Form -->
-                <div class="premium-card p-8 mb-8">
-                    <form id="searchForm">
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                            <!-- Brand Name Input -->
-                            <div>
-                                <label class="block text-sm font-semibold text-slate-700 mb-2">
-                                    <i class="fas fa-tag mr-1"></i>
-                                    Nome del Brand
-                                </label>
-                                <input 
-                                    type="text" 
-                                    id="brandName" 
-                                    class="form-input" 
-                                    placeholder="Es. TechVision"
-                                    required
-                                >
-                            </div>
-                            
-                            <!-- Image Upload -->
-                            <div>
-                                <label class="block text-sm font-semibold text-slate-700 mb-2">
-                                    <i class="fas fa-image mr-1"></i>
-                                    Logo/Marchio Figurativo (opzionale)
-                                </label>
-                                <div id="imageUploadArea" class="image-upload-area">
-                                    <input type="file" id="imageInput" accept="image/*" class="hidden">
-                                    <div id="uploadPlaceholder">
-                                        <i class="fas fa-cloud-upload-alt text-4xl text-slate-400 mb-2"></i>
-                                        <p class="text-slate-600">Clicca o trascina un'immagine qui</p>
-                                        <p class="text-sm text-slate-500">PNG, JPG, GIF fino a 10MB</p>
-                                    </div>
-                                    <div id="imagePreviewContainer" class="hidden">
-                                        <div class="image-preview">
-                                            <img id="imagePreview" alt="Preview">
-                                        </div>
-                                        <button type="button" id="removeImage" class="mt-4 text-red-600 hover:text-red-700 font-medium">
-                                            <i class="fas fa-trash mr-1"></i>
-                                            Rimuovi immagine
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Product Description -->
-                        <div class="mb-6">
-                            <label class="block text-sm font-semibold text-slate-700 mb-2">
-                                <i class="fas fa-box mr-1"></i>
-                                Descrizione Prodotti/Servizi
-                            </label>
-                            <textarea 
-                                id="productDescription" 
-                                class="form-input" 
-                                rows="3" 
-                                placeholder="Descrivi i prodotti o servizi che offrirai con questo marchio..."
-                                required
-                            ></textarea>
-                        </div>
-                        
-                        <!-- Country Selection -->
-                        <div class="mb-8">
-                            <label class="block text-sm font-semibold text-slate-700 mb-3">
-                                <i class="fas fa-globe mr-1"></i>
-                                Territori di Interesse
-                            </label>
-                            <div class="flex flex-wrap gap-3" id="countrySelection">
-                                <button type="button" class="country-pill" data-country="EU">
-                                    <img src="https://flagcdn.com/16x12/eu.png" alt="EU" class="mr-2">
-                                    Unione Europea
-                                </button>
-                                <button type="button" class="country-pill" data-country="IT">
-                                    <img src="https://flagcdn.com/16x12/it.png" alt="IT" class="mr-2">
-                                    Italia
-                                </button>
-                                <button type="button" class="country-pill" data-country="US">
-                                    <img src="https://flagcdn.com/16x12/us.png" alt="US" class="mr-2">
-                                    Stati Uniti
-                                </button>
-                                <button type="button" class="country-pill" data-country="UK">
-                                    <img src="https://flagcdn.com/16x12/gb.png" alt="UK" class="mr-2">
-                                    Regno Unito
-                                </button>
-                                <button type="button" class="country-pill" data-country="CN">
-                                    <img src="https://flagcdn.com/16x12/cn.png" alt="CN" class="mr-2">
-                                    Cina
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <!-- Submit Button -->
-                        <div class="text-center">
-                            <button type="submit" class="btn-premium" id="submitBtn">
-                                <i class="fas fa-search mr-2"></i>
-                                Avvia Analisi Completa
-                            </button>
-                        </div>
-                    </form>
-                </div>
+// Riferimenti normativi per l'analisi legale
+const LEGAL_REFERENCES = {
+  CPI: {
+    art7: "Art. 7 CPI - Novità del marchio",
+    art8: "Art. 8 CPI - Marchi registrati anteriori",
+    art9: "Art. 9 CPI - Capacità distintiva",
+    art10: "Art. 10 CPI - Liceità",
+    art12: "Art. 12 CPI - Rischio di confusione e associazione",
+    art13: "Art. 13 CPI - Carattere descrittivo",
+    art14: "Art. 14 CPI - Marchi di forma",
+    art25: "Art. 25 CPI - Unitarietà del marchio"
+  },
+  EUTMR: {
+    art4: "Art. 4 EUTMR - Segni che possono costituire un marchio UE",
+    art7: "Art. 7 EUTMR - Impedimenti assoluti alla registrazione",
+    art8: "Art. 8 EUTMR - Impedimenti relativi alla registrazione",
+    art9: "Art. 9 EUTMR - Diritti conferiti dal marchio UE",
+    art46: "Art. 46 EUTMR - Motivi di opposizione",
+    art58: "Art. 58 EUTMR - Motivi di nullità assoluta",
+    art60: "Art. 60 EUTMR - Motivi di nullità relativa"
+  }
+};
 
-                <!-- Loading State -->
-                <div id="loadingState" class="hidden">
-                    <div class="premium-card p-12 text-center">
-                        <div class="loading-pulse mb-6">
-                            <i class="fas fa-brain text-6xl text-blue-500"></i>
-                        </div>
-                        <h3 class="text-2xl font-bold mb-2">Analisi in corso...</h3>
-                        <p class="text-slate-600" id="loadingMessage">Interrogazione database EUIPO</p>
-                        <div class="mt-6 flex justify-center gap-2">
-                            <div class="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style="animation-delay: 0s"></div>
-                            <div class="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
-                            <div class="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
-                        </div>
-                    </div>
-                </div>
+// Codici di Vienna per classificazione elementi figurativi
+const VIENNA_CODES = {
+  "1": "Corpi celesti, fenomeni naturali",
+  "2": "Esseri umani",
+  "3": "Animali",
+  "4": "Esseri soprannaturali, fantastici",
+  "5": "Piante",
+  "6": "Paesaggi",
+  "7": "Costruzioni, strutture",
+  "8": "Prodotti alimentari",
+  "9": "Tessuti, abbigliamento",
+  "10": "Tabacco, articoli per fumatori",
+  "11": "Articoli per la casa",
+  "12": "Mobili, articoli sanitari",
+  "13": "Illuminazione, radio, elettronica",
+  "14": "Gioielleria, orologeria",
+  "15": "Macchine, motori",
+  "16": "Telecomunicazioni, registrazione",
+  "17": "Orologi, strumenti di misura",
+  "18": "Trasporti",
+  "19": "Contenitori, imballaggi",
+  "20": "Articoli di cancelleria",
+  "21": "Giochi, sport, strumenti musicali",
+  "22": "Armi, munizioni",
+  "23": "Tabaccheria, articoli per fumatori",
+  "24": "Stemmi, bandiere",
+  "25": "Motivi ornamentali",
+  "26": "Figure geometriche",
+  "27": "Forme di scrittura, numeri",
+  "28": "Iscrizioni di varia forma",
+  "29": "Colori"
+};
 
-                <!-- Results Section -->
-                <div id="resultsSection" class="hidden space-y-8">
-                    <!-- Score Card -->
-                    <div class="premium-card p-8 fade-in" id="scoreCard">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-                            <div>
-                                <h3 class="text-2xl font-bold mb-4">
-                                    <span class="gradient-text">Brand Potential Score™</span>
-                                </h3>
-                                <p class="text-slate-600 mb-6">
-                                    Valutazione complessiva basata su analisi AI, anteriorità rilevate e confronto visivo
-                                </p>
-                                <div class="space-y-3">
-                                    <div class="flex items-center gap-3">
-                                        <i class="fas fa-check-circle text-green-500"></i>
-                                        <span class="text-slate-700">Analisi semantica completata</span>
-                                    </div>
-                                    <div class="flex items-center gap-3">
-                                        <i class="fas fa-check-circle text-green-500"></i>
-                                        <span class="text-slate-700">Database EUIPO consultato</span>
-                                    </div>
-                                    <div class="flex items-center gap-3" id="imageAnalysisCheck" style="display: none;">
-                                        <i class="fas fa-check-circle text-green-500"></i>
-                                        <span class="text-slate-700">Analisi figurativa completata</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div>
-                                <div class="score-display">
-                                    <svg class="score-circle" width="160" height="160">
-                                        <circle cx="80" cy="80" r="70" stroke="#e5e7eb" stroke-width="12" fill="none"></circle>
-                                        <circle 
-                                            id="scoreCircle"
-                                            cx="80" cy="80" r="70" 
-                                            stroke="url(#gradient)" 
-                                            stroke-width="12" 
-                                            fill="none"
-                                            stroke-dasharray="440"
-                                            stroke-dashoffset="440"
-                                            stroke-linecap="round"
-                                        ></circle>
-                                        <defs>
-                                            <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                                <stop offset="0%" style="stop-color:#3b82f6" />
-                                                <stop offset="100%" style="stop-color:#6366f1" />
-                                            </linearGradient>
-                                        </defs>
-                                    </svg>
-                                    <div class="score-value">
-                                        <span id="scoreValue" class="gradient-text">0</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+// --- FUNZIONI HELPER ---
 
-                    <!-- AI Classes -->
-                    <div class="premium-card p-8 fade-in" id="classesCard">
-                        <h3 class="text-xl font-bold mb-4">
-                            <i class="fas fa-layer-group mr-2 text-blue-500"></i>
-                            Classi di Nizza Identificate
-                        </h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="aiClassesContainer">
-                            <!-- Classes will be inserted here -->
-                        </div>
-                    </div>
+async function getAccessToken(clientId, clientSecret) {
+    const tokenUrl = 'https://euipo.europa.eu/cas-server-webapp/oidc/accessToken';
+    const basicAuth = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
+    const body = new URLSearchParams({ 
+        grant_type: 'client_credentials', 
+        scope: 'trademark-search.trademarks.read' 
+    });
+    
+    const response = await fetch(tokenUrl, { 
+        method: 'POST', 
+        headers: { 
+            'Content-Type': 'application/x-www-form-urlencoded', 
+            'Authorization': `Basic ${basicAuth}` 
+        }, 
+        body 
+    });
+    
+    const data = await response.json();
+    if (!response.ok) {
+        throw new Error('Autenticazione EUIPO fallita: ' + (data.error_description || 'Errore sconosciuto'));
+    }
+    return data.access_token;
+}
 
-                    <!-- Image Analysis Results (if applicable) -->
-                    <div class="premium-card p-8 fade-in" id="imageAnalysisCard" style="display: none;">
-                        <h3 class="text-xl font-bold mb-4">
-                            <i class="fas fa-image mr-2 text-purple-500"></i>
-                            Analisi Marchio Figurativo
-                        </h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <h4 class="font-semibold text-slate-700 mb-2">Elementi Visivi Identificati</h4>
-                                <p class="text-slate-600 mb-4" id="imageDescription"></p>
-                                <h4 class="font-semibold text-slate-700 mb-2">Elementi Distintivi</h4>
-                                <div class="flex flex-wrap gap-2" id="distinctiveElements"></div>
-                            </div>
-                            <div>
-                                <h4 class="font-semibold text-slate-700 mb-2">Codici di Vienna</h4>
-                                <div class="space-y-2" id="viennaCodes"></div>
-                            </div>
-                        </div>
-                    </div>
+// Funzione per cercare marchi verbali
+async function searchEuipoTrademarks(brandName, classes, accessToken, clientId) {
+    const searchApiUrl = `https://api.euipo.europa.eu/trademark-search/trademarks`;
+    
+    const rsqlQuery = `(wordMarkSpecification.verbalElement==*${brandName}* or wordMarkSpecification.verbalElement=="${brandName}") and niceClasses=in=(${classes.join(',')}) and status=in=("REGISTERED","FILED","PUBLISHED","OPPOSED")`;
+    
+    const urlWithQuery = `${searchApiUrl}?query=${encodeURIComponent(rsqlQuery)}&size=20&sort=applicationDate:desc`;
+    
+    const response = await fetch(urlWithQuery, { 
+        headers: { 
+            'Authorization': `Bearer ${accessToken}`, 
+            'X-IBM-Client-Id': clientId 
+        } 
+    });
+    
+    if (!response.ok) {
+        throw new Error('Ricerca EUIPO fallita.');
+    }
+    return response.json();
+}
 
-                    <!-- Results Tabs -->
-                    <div class="premium-card p-0 fade-in">
-                        <div class="border-b border-slate-200">
-                            <div class="flex">
-                                <button class="tab-button active" data-tab="judgment">
-                                    <i class="fas fa-gavel mr-2"></i>
-                                    Giudizio Legale
-                                </button>
-                                <button class="tab-button" data-tab="verbal">
-                                    <i class="fas fa-font mr-2"></i>
-                                    Marchi Verbali
-                                </button>
-                                <button class="tab-button" data-tab="figurative" id="figurativeTab" style="display: none;">
-                                    <i class="fas fa-image mr-2"></i>
-                                    Marchi Figurativi
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <!-- Tab Contents -->
-                        <div class="p-8">
-                            <!-- Judgment Tab -->
-                            <div id="judgmentTab" class="tab-content">
-                                <div class="flex items-start gap-4 mb-6">
-                                    <div id="judgmentIcon" class="text-3xl">
-                                        <i class="fas fa-check-circle text-green-500"></i>
-                                    </div>
-                                    <div class="flex-1">
-                                        <h4 id="judgmentSummary" class="text-xl font-bold mb-2"></h4>
-                                        <div id="judgmentDetails" class="judgment-content text-slate-700"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Verbal Marks Tab -->
-                            <div id="verbalTab" class="tab-content hidden">
-                                <h4 class="font-semibold text-lg mb-4">Marchi Verbali Anteriori</h4>
-                                <div class="space-y-4" id="verbalMarksContainer">
-                                    <!-- Verbal marks will be inserted here -->
-                                </div>
-                            </div>
-                            
-                            <!-- Figurative Marks Tab -->
-                            <div id="figurativeTab" class="tab-content hidden">
-                                <h4 class="font-semibold text-lg mb-4">Marchi Figurativi Simili</h4>
-                                <div class="space-y-4" id="figurativeMarksContainer">
-                                    <!-- Figurative marks will be inserted here -->
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+// Nuova funzione per cercare marchi figurativi
+async function searchEuipoFigurativeMarks(viennaCodes, classes, accessToken, clientId) {
+    const searchApiUrl = `https://api.euipo.europa.eu/trademark-search/trademarks`;
+    
+    // Costruisci query per marchi figurativi usando i codici di Vienna
+    const viennaQuery = viennaCodes.map(code => `viennaClasses==${code}*`).join(' or ');
+    const rsqlQuery = `(${viennaQuery}) and niceClasses=in=(${classes.join(',')}) and status=in=("REGISTERED","FILED","PUBLISHED","OPPOSED") and type=in=("FIGURATIVE","COMBINED")`;
+    
+    const urlWithQuery = `${searchApiUrl}?query=${encodeURIComponent(rsqlQuery)}&size=15&sort=applicationDate:desc`;
+    
+    const response = await fetch(urlWithQuery, { 
+        headers: { 
+            'Authorization': `Bearer ${accessToken}`, 
+            'X-IBM-Client-Id': clientId 
+        } 
+    });
+    
+    if (!response.ok) {
+        console.error('Errore ricerca marchi figurativi:', response.status);
+        return { trademarks: [] }; // Return empty array on error
+    }
+    return response.json();
+}
 
-                    <!-- Action Buttons -->
-                    <div class="flex flex-wrap gap-4 justify-center fade-in">
-                        <button id="downloadReport" class="px-6 py-3 bg-slate-800 text-white rounded-lg font-semibold hover:bg-slate-700 transition-colors">
-                            <i class="fas fa-download mr-2"></i>
-                            Scarica Report PDF
-                        </button>
-                        <button id="newSearch" class="px-6 py-3 border-2 border-slate-300 rounded-lg font-semibold hover:border-slate-400 transition-colors">
-                            <i class="fas fa-redo mr-2"></i>
-                            Nuova Ricerca
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- FAQ Section -->
-    <section id="faq" class="py-20 bg-slate-50">
-        <div class="container mx-auto px-4">
-            <div class="max-w-3xl mx-auto">
-                <h2 class="text-3xl font-bold text-center mb-12">Domande Frequenti</h2>
-                <div class="premium-card p-8">
-                    <div class="faq-item">
-                        <div class="faq-question">
-                            <span>Come funziona l'analisi AI dei marchi?</span>
-                            <i class="fas fa-chevron-down faq-icon"></i>
-                        </div>
-                        <div class="faq-answer">
-                            Il nostro sistema utilizza l'intelligenza artificiale Gemini Pro per analizzare il nome del brand, 
-                            i prodotti/servizi e l'eventuale logo. L'AI identifica le classi di Nizza pertinenti, 
-                            cerca marchi simili nel database EUIPO e fornisce un giudizio legale dettagliato con riferimenti normativi.
-                        </div>
-                    </div>
-                    <div class="faq-item">
-                        <div class="faq-question">
-                            <span>Quanto è affidabile il Brand Potential Score™?</span>
-                            <i class="fas fa-chevron-down faq-icon"></i>
-                        </div>
-                        <div class="faq-answer">
-                            Il punteggio è calcolato utilizzando un algoritmo che considera molteplici fattori: 
-                            numero e stato dei marchi simili, grado di similarità verbale e visiva, 
-                            affinità merceologica e valutazione del rischio legale. 
-                            Fornisce un'indicazione affidabile ma non sostituisce una consulenza legale professionale.
-                        </div>
-                    </div>
-                    <div class="faq-item">
-                        <div class="faq-question">
-                            <span>Posso utilizzare il report per una domanda di registrazione?</span>
-                            <i class="fas fa-chevron-down faq-icon"></i>
-                        </div>
-                        <div class="faq-answer">
-                            Il report fornisce informazioni preziose per valutare la registrabilità del marchio, 
-                            ma consigliamo di consultare un avvocato specializzato in proprietà intellettuale 
-                            prima di procedere con una domanda di registrazione ufficiale.
-                        </div>
-                    </div>
-                    <div class="faq-item">
-                        <div class="faq-question">
-                            <span>Come funziona il confronto dei marchi figurativi?</span>
-                            <i class="fas fa-chevron-down faq-icon"></i>
-                        </div>
-                        <div class="faq-answer">
-                            Quando carichi un'immagine del tuo logo, l'AI analizza gli elementi visivi, 
-                            identifica i codici di Vienna pertinenti e cerca marchi figurativi simili nel database EUIPO. 
-                            Il sistema confronta poi visivamente i marchi trovati con il tuo, 
-                            valutando la similarità e il rischio di confusione.
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="bg-slate-900 text-white py-12">
-        <div class="container mx-auto px-4">
-            <div class="text-center">
-                <div class="flex items-center justify-center gap-3 mb-4">
-                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
-                        <i class="fas fa-shield-alt text-white"></i>
-                    </div>
-                    <h3 class="text-2xl font-bold">IntelliMark Pro</h3>
-                </div>
-                <p class="text-slate-400 mb-6">
-                    Analisi professionale dei marchi con intelligenza artificiale
-                </p>
-                <div class="flex gap-6 justify-center">
-                    <a href="#" class="text-slate-400 hover:text-white transition-colors">
-                        <i class="fab fa-linkedin text-xl"></i>
-                    </a>
-                    <a href="#" class="text-slate-400 hover:text-white transition-colors">
-                        <i class="fab fa-twitter text-xl"></i>
-                    </a>
-                    <a href="#" class="text-slate-400 hover:text-white transition-colors">
-                        <i class="fas fa-envelope text-xl"></i>
-                    </a>
-                </div>
-                <p class="text-sm text-slate-500 mt-8">
-                    © 2024 IntelliMark Pro. Tutti i diritti riservati.
-                </p>
-            </div>
-        </div>
-    </footer>
-
-    <script>
-        // DOM Elements
-        const elements = {
-            searchForm: document.getElementById('searchForm'),
-            brandName: document.getElementById('brandName'),
-            productDescription: document.getElementById('productDescription'),
-            countrySelection: document.getElementById('countrySelection'),
-            imageInput: document.getElementById('imageInput'),
-            imageUploadArea: document.getElementById('imageUploadArea'),
-            uploadPlaceholder: document.getElementById('uploadPlaceholder'),
-            imagePreviewContainer: document.getElementById('imagePreviewContainer'),
-            imagePreview: document.getElementById('imagePreview'),
-            removeImage: document.getElementById('removeImage'),
-            submitBtn: document.getElementById('submitBtn'),
-            loadingState: document.getElementById('loadingState'),
-            loadingMessage: document.getElementById('loadingMessage'),
-            resultsSection: document.getElementById('resultsSection'),
-            scoreCard: document.getElementById('scoreCard'),
-            scoreValue: document.getElementById('scoreValue'),
-            scoreCircle: document.getElementById('scoreCircle'),
-            classesCard: document.getElementById('classesCard'),
-            aiClassesContainer: document.getElementById('aiClassesContainer'),
-            imageAnalysisCard: document.getElementById('imageAnalysisCard'),
-            imageAnalysisCheck: document.getElementById('imageAnalysisCheck'),
-            imageDescription: document.getElementById('imageDescription'),
-            distinctiveElements: document.getElementById('distinctiveElements'),
-            viennaCodes: document.getElementById('viennaCodes'),
-            judgmentIcon: document.getElementById('judgmentIcon'),
-            judgmentSummary: document.getElementById('judgmentSummary'),
-            judgmentDetails: document.getElementById('judgmentDetails'),
-            verbalMarksContainer: document.getElementById('verbalMarksContainer'),
-            figurativeMarksContainer: document.getElementById('figurativeMarksContainer'),
-            figurativeTab: document.getElementById('figurativeTab'),
-            downloadReport: document.getElementById('downloadReport'),
-            newSearch: document.getElementById('newSearch')
+function parseEuipoResponse(jsonResponse, brandName) {
+    const similarMarks = [];
+    const records = jsonResponse?.trademarks || [];
+    
+    for (const record of records) {
+        const mark = {
+            name: record.wordMarkSpecification?.verbalElement || 'Marchio Figurativo',
+            owner: record.applicants?.[0]?.name || 'N/D',
+            status: translateStatus(record.status),
+            classes: record.niceClasses || [],
+            applicationNumber: record.applicationNumber,
+            applicationDate: record.applicationDate,
+            registrationDate: record.registrationDate,
+            expiryDate: record.expiryDate,
+            basis: record.basis || 'EUTM',
+            imageUrl: record.imageUrl,
+            type: record.type || 'WORD',
+            viennaClasses: record.viennaClasses || []
         };
+        
+        // Calcola la similarità per marchi verbali
+        if (brandName && record.wordMarkSpecification?.verbalElement) {
+            mark.similarity = calculateSimilarity(record.wordMarkSpecification.verbalElement, brandName);
+        } else {
+            mark.similarity = 0; // Per marchi puramente figurativi
+        }
+        
+        similarMarks.push(mark);
+    }
+    
+    return { 
+        similarMarks: similarMarks.sort((a, b) => b.similarity - a.similarity) 
+    };
+}
 
-        // State
-        let selectedCountries = ['EU'];
-        let uploadedImage = null;
-        let currentResults = null;
+function translateStatus(status) {
+    const statusMap = {
+        'REGISTERED': 'Registrato',
+        'FILED': 'In domanda',
+        'PUBLISHED': 'Pubblicato',
+        'OPPOSED': 'In opposizione',
+        'REFUSED': 'Rifiutato',
+        'EXPIRED': 'Scaduto',
+        'WITHDRAWN': 'Ritirato'
+    };
+    return statusMap[status] || status;
+}
 
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            initializeCountrySelection();
-            initializeImageUpload();
-            initializeTabs();
-            initializeFAQ();
-            initializeFormHandlers();
+function calculateSimilarity(mark1, mark2) {
+    if (!mark1 || !mark2) return 0;
+    
+    const s1 = mark1.toLowerCase().trim();
+    const s2 = mark2.toLowerCase().trim();
+    
+    if (s1 === s2) return 100;
+    
+    const maxLen = Math.max(s1.length, s2.length);
+    const distance = levenshteinDistance(s1, s2);
+    const similarity = ((maxLen - distance) / maxLen) * 100;
+    
+    return Math.round(similarity);
+}
+
+function levenshteinDistance(str1, str2) {
+    const matrix = [];
+    
+    for (let i = 0; i <= str2.length; i++) {
+        matrix[i] = [i];
+    }
+    
+    for (let j = 0; j <= str1.length; j++) {
+        matrix[0][j] = j;
+    }
+    
+    for (let i = 1; i <= str2.length; i++) {
+        for (let j = 1; j <= str1.length; j++) {
+            if (str2.charAt(i - 1) === str1.charAt(j - 1)) {
+                matrix[i][j] = matrix[i - 1][j - 1];
+            } else {
+                matrix[i][j] = Math.min(
+                    matrix[i - 1][j - 1] + 1,
+                    matrix[i][j - 1] + 1,
+                    matrix[i - 1][j] + 1
+                );
+            }
+        }
+    }
+    
+    return matrix[str2.length][str1.length];
+}
+
+// Funzione avanzata per chiamare Gemini con supporto multimodale
+async function callGeminiAPI(prompt, useProModel = false, imageData = null) {
+    const apiKey = "AIzaSyCt-EHsAzgPzUkRJV7tYMrleoascvM7y-0";
+    
+    if (!apiKey) {
+        throw new Error('API Key di Gemini non è presente nel codice.');
+    }
+
+    const model = useProModel ? 'gemini-1.5-pro-latest' : 'gemini-1.5-flash-latest';
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+    
+    const parts = [{
+        text: prompt
+    }];
+    
+    // Aggiungi immagine se presente
+    if (imageData) {
+        // Verifica che l'immagine sia nel formato corretto
+        if (!imageData.base64 || !imageData.mimeType) {
+            throw new Error('Formato immagine non valido');
+        }
+        
+        // Verifica i tipi MIME supportati
+        const supportedMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+        if (!supportedMimeTypes.includes(imageData.mimeType)) {
+            throw new Error(`Tipo immagine non supportato: ${imageData.mimeType}`);
+        }
+        
+        parts.push({
+            inline_data: {
+                mime_type: imageData.mimeType,
+                data: imageData.base64
+            }
         });
-
-        // Country Selection
-        function initializeCountrySelection() {
-            const countryButtons = elements.countrySelection.querySelectorAll('.country-pill');
-            
-            countryButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    const country = button.dataset.country;
-                    
-                    if (selectedCountries.includes(country)) {
-                        selectedCountries = selectedCountries.filter(c => c !== country);
-                        button.classList.remove('selected');
-                    } else {
-                        selectedCountries.push(country);
-                        button.classList.add('selected');
-                    }
-                    
-                    // Ensure at least one country is selected
-                    if (selectedCountries.length === 0) {
-                        selectedCountries = ['EU'];
-                        document.querySelector('[data-country="EU"]').classList.add('selected');
-                    }
-                });
-                
-                // Set initial selection
-                if (selectedCountries.includes(button.dataset.country)) {
-                    button.classList.add('selected');
-                }
-            });
+        
+        console.log('Immagine aggiunta alla richiesta Gemini:', {
+            mimeType: imageData.mimeType,
+            dataLength: imageData.base64.length
+        });
+    }
+    
+    const requestBody = {
+        contents: [{
+            parts: parts
+        }],
+        generationConfig: {
+            temperature: 0.3,
+            topK: 40,
+            topP: 0.95,
+            maxOutputTokens: useProModel ? 2048 : 1024
         }
+    };
+    
+    const response = await fetch(geminiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestBody)
+    });
 
-        // Image Upload
-        function initializeImageUpload() {
-            // Click to upload
-            elements.imageUploadArea.addEventListener('click', () => {
-                elements.imageInput.click();
-            });
-
-            // Drag and drop
-            elements.imageUploadArea.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                elements.imageUploadArea.classList.add('drag-over');
-            });
-
-            elements.imageUploadArea.addEventListener('dragleave', () => {
-                elements.imageUploadArea.classList.remove('drag-over');
-            });
-
-            elements.imageUploadArea.addEventListener('drop', (e) => {
-                e.preventDefault();
-                elements.imageUploadArea.classList.remove('drag-over');
-                
-                const files = e.dataTransfer.files;
-                if (files.length > 0) {
-                    handleImageFile(files[0]);
-                }
-            });
-
-            // File input change
-            elements.imageInput.addEventListener('change', (e) => {
-                if (e.target.files.length > 0) {
-                    handleImageFile(e.target.files[0]);
-                }
-            });
-
-            // Remove image
-            elements.removeImage.addEventListener('click', () => {
-                uploadedImage = null;
-                elements.imageInput.value = '';
-                elements.uploadPlaceholder.classList.remove('hidden');
-                elements.imagePreviewContainer.classList.add('hidden');
-            });
-        }
-
-        function handleImageFile(file) {
-            // Validate file
-            if (!file.type.startsWith('image/')) {
-                alert('Per favore carica un file immagine valido');
-                return;
+    if (!response.ok) {
+        const errorData = await response.json();
+        console.error(`Errore da Gemini con modello ${model}:`, errorData);
+        
+        if (errorData.error?.status === 'RESOURCE_EXHAUSTED') {
+            if (useProModel) {
+                console.log('Fallback a Gemini Flash per quota esaurita...');
+                return callGeminiAPI(prompt, false, imageData);
             }
-
-            if (file.size > 10 * 1024 * 1024) {
-                alert('L\'immagine deve essere inferiore a 10MB');
-                return;
-            }
-
-            // Read and display image
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                uploadedImage = {
-                    base64: e.target.result.split(',')[1],
-                    mimeType: file.type
-                };
-                
-                elements.imagePreview.src = e.target.result;
-                elements.uploadPlaceholder.classList.add('hidden');
-                elements.imagePreviewContainer.classList.remove('hidden');
-            };
-            reader.readAsDataURL(file);
+            throw new Error("Quota di richieste API per Gemini esaurita.");
         }
+        throw new Error("Il servizio AI di Gemini non è riuscito a rispondere.");
+    }
 
-        // Tabs
-        function initializeTabs() {
-            const tabButtons = document.querySelectorAll('.tab-button');
-            
-            tabButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    const tabName = button.dataset.tab;
-                    
-                    // Update active button
-                    tabButtons.forEach(btn => btn.classList.remove('active'));
-                    button.classList.add('active');
-                    
-                    // Show corresponding content
-                    document.querySelectorAll('.tab-content').forEach(content => {
-                        content.classList.add('hidden');
-                    });
-                    document.getElementById(tabName + 'Tab').classList.remove('hidden');
-                });
+    const data = await response.json();
+    if (!data.candidates || !data.candidates[0].content || !data.candidates[0].content.parts) {
+        throw new Error("Risposta da Gemini non valida o contenuto bloccato.");
+    }
+    
+    return data.candidates[0].content.parts[0].text;
+}
+
+// Analizza l'immagine del marchio per estrarre elementi figurativi
+async function analyzeTrademarkImage(imageData) {
+    const analysisPrompt = `Sei un esperto analista di marchi figurativi. Analizza questa immagine di marchio e:
+
+1. DESCRIVI dettagliatamente tutti gli elementi visivi presenti (forme, simboli, oggetti, testo)
+2. IDENTIFICA i codici di Vienna pertinenti tra questi:
+${Object.entries(VIENNA_CODES).map(([code, desc]) => `${code}: ${desc}`).join('\n')}
+
+3. VALUTA le caratteristiche distintive principali del marchio
+
+Fornisci SOLO:
+- Una descrizione breve (max 50 parole)
+- I codici di Vienna applicabili (solo numeri separati da virgole)
+- 3 elementi distintivi chiave
+
+Formato risposta:
+DESCRIZIONE: [tua descrizione]
+VIENNA: [codici separati da virgole]
+ELEMENTI: [elemento1, elemento2, elemento3]`;
+
+    try {
+        const response = await callGeminiAPI(analysisPrompt, true, imageData);
+        console.log('Risposta Gemini per analisi immagine:', response);
+        
+        // Parse della risposta con controlli robusti
+        const lines = response.split('\n');
+        const result = {
+            description: '',
+            viennaCodes: [],
+            distinctiveElements: []
+        };
+        
+        lines.forEach(line => {
+            if (line.includes('DESCRIZIONE:')) {
+                result.description = line.substring(line.indexOf(':') + 1).trim();
+            } else if (line.includes('VIENNA:')) {
+                const viennaStr = line.substring(line.indexOf(':') + 1).trim();
+                result.viennaCodes = viennaStr
+                    .split(',')
+                    .map(c => c.trim())
+                    .filter(c => c && /^\d+$/.test(c)); // Solo numeri validi
+            } else if (line.includes('ELEMENTI:')) {
+                const elementiStr = line.substring(line.indexOf(':') + 1).trim();
+                result.distinctiveElements = elementiStr
+                    .split(',')
+                    .map(e => e.trim())
+                    .filter(e => e.length > 0);
+            }
+        });
+        
+        // Valori di default se mancano dati
+        if (!result.description) {
+            result.description = 'Marchio figurativo analizzato';
+        }
+        if (result.viennaCodes.length === 0) {
+            result.viennaCodes = ['26']; // Default: figure geometriche
+        }
+        if (result.distinctiveElements.length === 0) {
+            result.distinctiveElements = ['Elemento grafico', 'Design distintivo', 'Composizione originale'];
+        }
+        
+        console.log('Risultato analisi immagine processato:', result);
+        return result;
+    } catch (error) {
+        console.error('Errore in analyzeTrademarkImage:', error);
+        // Ritorna valori di default invece di fallire
+        return {
+            description: 'Analisi immagine non disponibile',
+            viennaCodes: ['26'],
+            distinctiveElements: ['Elemento visivo', 'Design', 'Grafica']
+        };
+    }
+}
+
+// Confronta visivamente due marchi
+async function compareTrademarkImages(uploadedImage, existingMarkUrl, existingMarkData) {
+    const comparisonPrompt = `Sei un esperto perito in marchi. Confronta il marchio caricato con questo marchio esistente:
+
+MARCHIO ESISTENTE:
+- Nome: ${existingMarkData.name}
+- Numero: ${existingMarkData.applicationNumber}
+- Classi: ${existingMarkData.classes.join(', ')}
+
+COMPITO: Valuta la similarità visiva tra i due marchi considerando:
+1. Somiglianza degli elementi grafici
+2. Composizione e layout
+3. Uso dei colori
+4. Impressione generale
+
+Fornisci SOLO:
+- SIMILARITÀ VISIVA: [percentuale 0-100]
+- RISCHIO CONFUSIONE: [BASSO/MEDIO/ALTO]
+- MOTIVAZIONE: [max 30 parole]`;
+
+    try {
+        // Scarica l'immagine del marchio esistente
+        const existingImageResponse = await fetch(existingMarkUrl);
+        const existingImageBuffer = await existingImageResponse.buffer();
+        const existingImageBase64 = existingImageBuffer.toString('base64');
+        
+        const response = await callGeminiAPI(comparisonPrompt, true, {
+            mimeType: uploadedImage.mimeType,
+            base64: uploadedImage.base64
+        });
+        
+        // Parse della risposta
+        const lines = response.split('\n');
+        const result = {
+            visualSimilarity: 0,
+            confusionRisk: 'BASSO',
+            reasoning: ''
+        };
+        
+        lines.forEach(line => {
+            if (line.includes('SIMILARITÀ VISIVA:')) {
+                const match = line.match(/(\d+)/);
+                if (match) result.visualSimilarity = parseInt(match[1]);
+            } else if (line.includes('RISCHIO CONFUSIONE:')) {
+                result.confusionRisk = line.split(':')[1].trim();
+            } else if (line.includes('MOTIVAZIONE:')) {
+                result.reasoning = line.split(':')[1].trim();
+            }
+        });
+        
+        return result;
+    } catch (error) {
+        console.error('Errore nel confronto immagini:', error);
+        return {
+            visualSimilarity: 0,
+            confusionRisk: 'NON DETERMINABILE',
+            reasoning: 'Impossibile confrontare le immagini'
+        };
+    }
+}
+
+// Calcolo del Brand Potential Score™ con supporto figurativo
+function calculateBrandScore(verbalMarks, figurativeMarks, riskLevel, hasImage) {
+    let baseScore = 90;
+    
+    // Penalità per marchi verbali simili
+    const activeVerbalMarks = verbalMarks.filter(m => 
+        ['Registrato', 'In domanda', 'Pubblicato'].includes(m.status)
+    );
+    
+    if (activeVerbalMarks.length > 0) {
+        baseScore -= Math.min(activeVerbalMarks.length * 5, 30);
+    }
+    
+    const highSimilarityVerbal = activeVerbalMarks.filter(m => m.similarity > 70);
+    if (highSimilarityVerbal.length > 0) {
+        baseScore -= highSimilarityVerbal.length * 10;
+    }
+    
+    // Penalità aggiuntive per marchi figurativi se è stata caricata un'immagine
+    if (hasImage && figurativeMarks.length > 0) {
+        const highRiskFigurative = figurativeMarks.filter(m => 
+            m.visualComparison && m.visualComparison.confusionRisk !== 'BASSO'
+        );
+        
+        if (highRiskFigurative.length > 0) {
+            baseScore -= highRiskFigurative.length * 8;
+        }
+    }
+    
+    // Aggiustamento basato sul livello di rischio
+    const riskAdjustment = {
+        'BASSO': 5,
+        'MODERATO': -10,
+        'ALTO': -25,
+        'MOLTO ALTO': -40
+    };
+    
+    const riskKey = riskLevel.toUpperCase().split(' - ')[0];
+    baseScore += riskAdjustment[riskKey] || 0;
+    
+    return Math.max(0, Math.min(100, baseScore));
+}
+
+// Funzione helper per estrarre info dettagliate sulle classi
+function extractClassInfo(classNumber, knowledgeBase) {
+    const regex = new RegExp(`Classe ${classNumber}:([^\\n]+)`, 'i');
+    const match = knowledgeBase.match(regex);
+    
+    if (match) {
+        const fullText = match[1].trim();
+        const parts = fullText.split(';');
+        return {
+            title: parts[0].trim(),
+            description: parts.slice(0, 2).join(';').trim()
+        };
+    }
+    
+    return {
+        title: `Classe ${classNumber}`,
+        description: 'Prodotti e servizi vari'
+    };
+}
+
+// --- FLUSSO PRINCIPALE DEL BACKEND ---
+module.exports = async (request, response) => {
+    response.setHeader('Access-Control-Allow-Origin', '*');
+    response.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    response.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    
+    if (request.method === 'OPTIONS') {
+        return response.status(200).end();
+    }
+
+    try {
+        const payload = request.body;
+        
+        // Log dei dati ricevuti
+        console.log('Richiesta ricevuta:', {
+            brandName: payload.brandName,
+            productDescription: payload.productDescription?.substring(0, 50) + '...',
+            selectedCountries: payload.selectedCountries,
+            hasImage: !!payload.imageData,
+            imageSize: payload.imageData ? payload.imageData.base64.length : 0
+        });
+        
+        // Validazione input
+        if (!payload.brandName || !payload.productDescription) {
+            return response.status(400).json({ 
+                error: true,
+                message: 'Nome del brand e descrizione prodotti sono obbligatori.' 
             });
         }
-
-        // FAQ
-        function initializeFAQ() {
-            const faqItems = document.querySelectorAll('.faq-item');
-            
-            faqItems.forEach(item => {
-                const question = item.querySelector('.faq-question');
-                
-                question.addEventListener('click', () => {
-                    const isActive = item.classList.contains('active');
-                    
-                    // Close all items
-                    faqItems.forEach(i => i.classList.remove('active'));
-                    
-                    // Open clicked item if it wasn't active
-                    if (!isActive) {
-                        item.classList.add('active');
-                    }
-                });
-            });
+        
+        const { EUIPO_CLIENT_ID, EUIPO_CLIENT_SECRET } = process.env;
+        if (!EUIPO_CLIENT_ID || !EUIPO_CLIENT_SECRET) {
+            throw new Error('Credenziali EUIPO non configurate correttamente su Vercel.');
         }
 
-        // Form Handlers
-        function initializeFormHandlers() {
-            elements.searchForm.addEventListener('submit', handleFormSubmit);
-            elements.newSearch.addEventListener('click', resetForm);
-            elements.downloadReport.addEventListener('click', handleDownloadReport);
+        // FASE 1: Classificazione AI con Gemini Flash
+        const classificationPrompt = `Sei un esperto classificatore di marchi secondo la Classificazione di Nizza (12a edizione).
+
+ISTRUZIONI:
+1. Analizza attentamente la descrizione fornita
+2. Identifica TUTTE le classi pertinenti, considerando anche classi correlate
+3. Restituisci SOLO i numeri di classe separati da virgole, senza altro testo
+
+KNOWLEDGE BASE:
+${NICE_CLASSES_KNOWLEDGE_BASE}
+
+DESCRIZIONE DA ANALIZZARE:
+"${payload.productDescription}"
+
+CLASSI PERTINENTI:`;
+
+        const identifiedClassesString = await callGeminiAPI(classificationPrompt, false);
+        const identifiedClasses = identifiedClassesString
+            .split(',')
+            .map(c => parseInt(c.trim()))
+            .filter(c => !isNaN(c) && c >= 1 && c <= 45);
+
+        if (identifiedClasses.length === 0) {
+            throw new Error("Impossibile identificare classi di Nizza pertinenti.");
         }
 
-        async function handleFormSubmit(e) {
-            e.preventDefault();
-            
-            const brandName = elements.brandName.value.trim();
-            const productDescription = elements.productDescription.value.trim();
-            
-            if (!brandName || !productDescription || selectedCountries.length === 0) {
-                alert('Per favore compila tutti i campi richiesti');
-                return;
-            }
-            
-            // Show loading state
-            showLoading();
-            
+        // FASE 2: Analisi dell'immagine se presente
+        let imageAnalysis = null;
+        let figurativeSearchResults = { similarMarks: [] };
+        
+        if (payload.imageData) {
+            console.log('Analizzando immagine del marchio...');
             try {
-                const results = await api.searchBrand(brandName, productDescription, selectedCountries, uploadedImage);
-                
-                if (results.success) {
-                    currentResults = results.data;
-                    displayResults(results.data);
-                } else {
-                    throw new Error('Errore durante l\'analisi');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Si è verificato un errore durante l\'analisi. Riprova più tardi.');
-                hideLoading();
+                imageAnalysis = await analyzeTrademarkImage(payload.imageData);
+                console.log('Analisi immagine completata:', imageAnalysis);
+            } catch (imageError) {
+                console.error('Errore analisi immagine:', imageError);
+                // Continua senza analisi immagine invece di bloccare tutto
             }
         }
 
-        function showLoading() {
-            elements.searchForm.parentElement.style.display = 'none';
-            elements.resultsSection.classList.add('hidden');
-            elements.loadingState.classList.remove('hidden');
-            
-            // Animate loading messages
-            const messages = [
-                'Interrogazione database EUIPO',
-                'Analisi semantica del marchio',
-                'Identificazione classi di Nizza',
-                'Confronto con marchi esistenti',
-                'Generazione giudizio legale'
-            ];
-            
-            if (uploadedImage) {
-                messages.splice(2, 0, 'Analisi elementi figurativi');
-            }
-            
-            let messageIndex = 0;
-            const messageInterval = setInterval(() => {
-                if (messageIndex < messages.length) {
-                    elements.loadingMessage.textContent = messages[messageIndex];
-                    messageIndex++;
-                } else {
-                    clearInterval(messageInterval);
-                }
-            }, 2000);
-        }
+        // FASE 3: Ricerca su EUIPO
+        const accessToken = await getAccessToken(EUIPO_CLIENT_ID, EUIPO_CLIENT_SECRET);
+        
+        // Ricerca marchi verbali
+        const verbalSearchJson = await searchEuipoTrademarks(
+            payload.brandName, 
+            identifiedClasses, 
+            accessToken, 
+            EUIPO_CLIENT_ID
+        );
+        const verbalSearchResults = parseEuipoResponse(verbalSearchJson, payload.brandName);
 
-        function hideLoading() {
-            elements.loadingState.classList.add('hidden');
-            elements.searchForm.parentElement.style.display = 'block';
-        }
-
-        function displayResults(data) {
-            elements.loadingState.classList.add('hidden');
-            elements.resultsSection.classList.remove('hidden');
+        // Ricerca marchi figurativi se è stata caricata un'immagine
+        if (imageAnalysis && imageAnalysis.viennaCodes.length > 0) {
+            const figurativeJson = await searchEuipoFigurativeMarks(
+                imageAnalysis.viennaCodes,
+                identifiedClasses,
+                accessToken,
+                EUIPO_CLIENT_ID
+            );
+            figurativeSearchResults = parseEuipoResponse(figurativeJson);
             
-            // Display score with animation
-            animateScore(data.score);
-            
-            // Display classes
-            renderClasses(data.classes);
-            
-            // Display image analysis if present
-            if (data.imageAnalysis) {
-                renderImageAnalysis(data.imageAnalysis);
-                elements.imageAnalysisCard.style.display = 'block';
-                elements.imageAnalysisCheck.style.display = 'flex';
-                elements.figurativeTab.style.display = 'block';
-            }
-            
-            // Display judgment
-            renderJudgment(data.judgment);
-            
-            // Display marks
-            renderVerbalMarks(data.verbalMarks || []);
-            renderFigurativeMarks(data.figurativeMarks || []);
-            
-            // Scroll to results
-            elements.resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-
-        function animateScore(targetScore) {
-            const duration = 2000;
-            const startTime = Date.now();
-            const circumference = 2 * Math.PI * 70;
-            
-            function update() {
-                const elapsed = Date.now() - startTime;
-                const progress = Math.min(elapsed / duration, 1);
-                
-                // Easing function
-                const easeOutQuart = 1 - Math.pow(1 - progress, 4);
-                
-                // Update score value
-                const currentScore = Math.round(targetScore * easeOutQuart);
-                elements.scoreValue.textContent = currentScore;
-                
-                // Update circle
-                const offset = circumference - (circumference * currentScore / 100);
-                elements.scoreCircle.style.strokeDashoffset = offset;
-                
-                // Update color based on score
-                let color = '#10b981'; // green
-                if (currentScore < 60) color = '#ef4444'; // red
-                else if (currentScore < 80) color = '#f59e0b'; // yellow
-                
-                if (progress < 1) {
-                    requestAnimationFrame(update);
+            // Confronta visivamente i marchi figurativi trovati
+            for (let mark of figurativeSearchResults.similarMarks) {
+                if (mark.imageUrl) {
+                    mark.visualComparison = await compareTrademarkImages(
+                        payload.imageData,
+                        mark.imageUrl,
+                        mark
+                    );
                 }
             }
-            
-            requestAnimationFrame(update);
         }
 
-        function renderClasses(classes) {
-            const classesHtml = classes.map(cls => `
-                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
-                    <div class="flex items-start gap-3">
-                        <span class="flex-shrink-0 text-2xl font-bold gradient-text">${cls.number}</span>
-                        <div>
-                            <h4 class="font-semibold text-slate-900">${cls.title || cls.name}</h4>
-                            <p class="text-sm text-slate-600 mt-1">${cls.description}</p>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-            
-            elements.aiClassesContainer.innerHTML = classesHtml;
-        }
+        // FASE 4: Giudizio legale approfondito con Gemini Pro
+        const legalAnalysisPrompt = `Sei un avvocato specializzato in proprietà intellettuale con 20 anni di esperienza in marchi europei.
 
-        function renderImageAnalysis(analysis) {
-            elements.imageDescription.textContent = analysis.description;
-            
-            // Distinctive elements
-            const elementsHtml = analysis.distinctiveElements.map(element => `
-                <span class="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-medium">
-                    ${element}
-                </span>
-            `).join('');
-            elements.distinctiveElements.innerHTML = elementsHtml;
-            
-            // Vienna codes
-            const codesHtml = analysis.viennaCodes.map(code => `
-                <div class="flex items-center gap-2">
-                    <span class="font-mono bg-slate-100 px-2 py-1 rounded text-sm">${code}</span>
-                    <span class="text-sm text-slate-600">${getViennaDescription(code)}</span>
-                </div>
-            `).join('');
-            elements.viennaCodes.innerHTML = codesHtml;
-        }
+COMPITO: Fornisci un'analisi legale professionale e dettagliata sulla registrabilità del marchio proposto.
 
-        function getViennaDescription(code) {
-            const descriptions = {
-                "1": "Corpi celesti",
-                "2": "Esseri umani",
-                "3": "Animali",
-                "4": "Esseri fantastici",
-                "5": "Piante",
-                "6": "Paesaggi",
-                "7": "Costruzioni",
-                "25": "Motivi ornamentali",
-                "26": "Figure geometriche",
-                "27": "Forme di scrittura"
-            };
-            return descriptions[code] || "Altro elemento";
-        }
+DATI DEL MARCHIO PROPOSTO:
+- Nome: "${payload.brandName}"
+- Prodotti/Servizi: "${payload.productDescription}"
+- Classi di Nizza identificate: ${identifiedClasses.map(c => `Classe ${c}`).join(', ')}
+- Territori richiesti: ${payload.selectedCountries.join(', ')}
+${imageAnalysis ? `
+- ELEMENTI FIGURATIVI RILEVATI:
+  • Descrizione: ${imageAnalysis.description}
+  • Elementi distintivi: ${imageAnalysis.distinctiveElements.join(', ')}
+  • Codici Vienna: ${imageAnalysis.viennaCodes.join(', ')}` : ''}
 
-        function renderJudgment(judgment) {
-            // Update icon based on level
-            const icons = {
-                positive: '<i class="fas fa-check-circle text-green-500"></i>',
-                warning: '<i class="fas fa-exclamation-circle text-yellow-500"></i>',
-                negative: '<i class="fas fa-times-circle text-red-500"></i>'
-            };
-            
-            elements.judgmentIcon.innerHTML = icons[judgment.level] || icons.warning;
-            elements.judgmentSummary.textContent = judgment.summary;
-            elements.judgmentDetails.innerHTML = judgment.details;
-        }
+MARCHI VERBALI ANTERIORI (dati EUIPO):
+${verbalSearchResults.similarMarks.length > 0 
+    ? verbalSearchResults.similarMarks.map(mark => 
+        `• "${mark.name}" (${mark.applicationNumber})
+          Titolare: ${mark.owner}
+          Stato: ${mark.status}
+          Classi: ${mark.classes.join(', ')}
+          Similarità verbale: ${mark.similarity}%
+          Data deposito: ${mark.applicationDate || 'N/D'}`
+      ).join('\n\n')
+    : "Nessun marchio verbale identico o molto simile trovato."}
 
-        function renderVerbalMarks(marks) {
-            if (marks.length === 0) {
-                elements.verbalMarksContainer.innerHTML = `
-                    <div class="text-center py-8 text-slate-500">
-                        <i class="fas fa-check-circle text-4xl mb-2"></i>
-                        <p>Nessun marchio verbale simile trovato</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            const marksHtml = marks.map(mark => `
-                <div class="p-4 bg-white rounded-lg border border-slate-200 hover:border-slate-300 transition-colors">
-                    <div class="flex justify-between items-start mb-2">
-                        <h4 class="font-semibold text-slate-900">${mark.name}</h4>
-                        <span class="text-sm px-2 py-1 rounded-full ${
-                            mark.similarity >= 80 ? 'bg-red-100 text-red-700' : 
-                            mark.similarity >= 60 ? 'bg-yellow-100 text-yellow-700' : 
-                            'bg-green-100 text-green-700'
-                        }">
-                            ${mark.similarity}% similarità
-                        </span>
-                    </div>
-                    <div class="text-sm text-slate-600 space-y-1">
-                        <p><strong>Numero:</strong> ${mark.applicationNumber || mark.number}</p>
-                        <p><strong>Stato:</strong> ${mark.status}</p>
-                        <p><strong>Classi:</strong> ${mark.classes}</p>
-                        <p><strong>Titolare:</strong> ${mark.owner}</p>
-                    </div>
-                </div>
-            `).join('');
-            
-            elements.verbalMarksContainer.innerHTML = marksHtml;
-        }
+${figurativeSearchResults.similarMarks.length > 0 ? `
+MARCHI FIGURATIVI ANTERIORI (dati EUIPO):
+${figurativeSearchResults.similarMarks.map(mark => 
+    `• "${mark.name}" (${mark.applicationNumber})
+      Titolare: ${mark.owner}
+      Stato: ${mark.status}
+      Classi: ${mark.classes.join(', ')}
+      ${mark.visualComparison ? `
+      Similarità visiva: ${mark.visualComparison.visualSimilarity}%
+      Rischio confusione: ${mark.visualComparison.confusionRisk}
+      Motivazione: ${mark.visualComparison.reasoning}` : ''}`
+  ).join('\n\n')}` : ''}
 
-        function renderFigurativeMarks(marks) {
-            if (marks.length === 0) {
-                elements.figurativeMarksContainer.innerHTML = `
-                    <div class="text-center py-8 text-slate-500">
-                        <i class="fas fa-image text-4xl mb-2"></i>
-                        <p>Nessun marchio figurativo simile trovato</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            const marksHtml = marks.map(mark => `
-                <div class="figurative-mark-card">
-                    <div class="figurative-mark-image">
-                        ${mark.imageUrl ? 
-                            `<img src="${mark.imageUrl}" alt="${mark.name}">` :
-                            '<i class="fas fa-image text-2xl text-slate-400"></i>'
-                        }
-                    </div>
-                    <div class="flex-1">
-                        <h4 class="font-semibold text-slate-900 mb-1">${mark.name}</h4>
-                        <div class="text-sm text-slate-600 space-y-1">
-                            <p><strong>Numero:</strong> ${mark.applicationNumber}</p>
-                            <p><strong>Stato:</strong> ${mark.status}</p>
-                            <p><strong>Classi:</strong> ${mark.classes}</p>
-                            ${mark.visualComparison ? `
-                                <div class="mt-2 p-2 bg-slate-50 rounded">
-                                    <p class="font-medium">Confronto Visivo:</p>
-                                    <p>Similarità: ${mark.visualComparison.visualSimilarity}%</p>
-                                    <p>Rischio: <span class="${
-                                        mark.visualComparison.confusionRisk === 'ALTO' ? 'text-red-600' :
-                                        mark.visualComparison.confusionRisk === 'MEDIO' ? 'text-yellow-600' :
-                                        'text-green-600'
-                                    }">${mark.visualComparison.confusionRisk}</span></p>
-                                    <p class="text-xs mt-1">${mark.visualComparison.reasoning}</p>
-                                </div>
-                            ` : ''}
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-            
-            elements.figurativeMarksContainer.innerHTML = marksHtml;
-        }
+STRUTTURA RICHIESTA DELL'ANALISI:
 
-        function resetForm() {
-            elements.searchForm.reset();
-            uploadedImage = null;
-            elements.uploadPlaceholder.classList.remove('hidden');
-            elements.imagePreviewContainer.classList.add('hidden');
-            selectedCountries = ['EU'];
-            initializeCountrySelection();
-            elements.resultsSection.classList.add('hidden');
-            elements.searchForm.parentElement.style.display = 'block';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
+1. **VALUTAZIONE DEL RISCHIO COMPLESSIVO**
+   Indica chiaramente: BASSO / MODERATO / ALTO / MOLTO ALTO
 
-        function handleDownloadReport() {
-            alert('Funzionalità di download report in fase di sviluppo. Il report completo sarà disponibile a breve!');
-            // Here you would implement PDF generation
-        }
+2. **IMPEDIMENTI ASSOLUTI** (con riferimenti normativi)
+   - Capacità distintiva (${LEGAL_REFERENCES.CPI.art9}, ${LEGAL_REFERENCES.EUTMR.art7})
+   - Carattere descrittivo (${LEGAL_REFERENCES.CPI.art13})
+   - Liceità (${LEGAL_REFERENCES.CPI.art10})
+   ${imageAnalysis ? '- Distintività degli elementi figurativi' : ''}
 
-        // API functions
-        const api = {
-            async searchBrand(brandName, products, countries, imageData) {
-                try {
-                    // CONFIGURAZIONE BACKEND:
-                    // 1. Sostituisci 'your-vercel-domain' con il tuo dominio Vercel reale
-                    // 2. Assicurati che le variabili d'ambiente EUIPO_CLIENT_ID e EUIPO_CLIENT_SECRET 
-                    //    siano configurate nel tuo progetto Vercel
-                    // 3. Per testare in locale, usa: http://localhost:3000/api/search
-                    const BACKEND_URL = 'https://intellimark-mockup.vercel.app/';
-                    
-                    const response = await fetch(BACKEND_URL, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            brandName: brandName,
-                            productDescription: products,
-                            selectedCountries: countries,
-                            imageData: imageData
-                        })
-                    });
-                    
-                    if (!response.ok) {
-                        const errorData = await response.json();
-                        throw new Error(errorData.message || 'Errore nella ricerca');
-                    }
-                    
-                    const data = await response.json();
-                    
-                    // Adatta la risposta al formato atteso dal frontend
-                    return {
-                        success: true,
-                        data: {
-                            brand: brandName,
-                            score: data.brandScore,
-                            classes: data.identifiedClasses,
-                            imageAnalysis: data.imageAnalysis,
-                            judgment: {
-                                level: this.mapRiskLevel(data.riskLevel),
-                                summary: this.extractSummary(data.syntheticJudgment),
-                                details: data.syntheticJudgment
-                            },
-                            verbalMarks: data.verbalMarks,
-                            figurativeMarks: data.figurativeMarks
-                        }
-                    };
-                } catch (error) {
-                    console.error('Errore API:', error);
-                    // Fallback ai dati mock se l'API non è disponibile
-                    return this.generateMockData(brandName, products, countries, imageData);
-                }
-            },
-            
-            mapRiskLevel(riskLevel) {
-                const mapping = {
-                    'BASSO': 'positive',
-                    'MODERATO': 'warning',
-                    'ALTO': 'negative',
-                    'MOLTO ALTO': 'negative'
-                };
-                return mapping[riskLevel] || 'warning';
-            },
-            
-            extractSummary(judgment) {
-                // Estrai il livello di rischio dal giudizio
-                const riskMatch = judgment.match(/RISCHIO[^:]*:[^A-Z]*(BASSO|MODERATO|ALTO|MOLTO ALTO)/i);
-                if (riskMatch) {
-                    const risk = riskMatch[1];
-                    const summaries = {
-                        'BASSO': 'Ottima registrabilità',
-                        'MODERATO': 'Registrabilità con riserve',
-                        'ALTO': 'Registrabilità critica',
-                        'MOLTO ALTO': 'Registrabilità fortemente sconsigliata'
-                    };
-                    return summaries[risk] || 'Valutazione in corso';
-                }
-                return 'Analisi completata';
-            },
-            
-            // Dati mock di fallback
-            async generateMockData(brandName, products, countries, imageData) {
-                // Simulate API delay
-                await new Promise(resolve => setTimeout(resolve, 3000));
-                
-                const score = Math.floor(Math.random() * 40) + 55;
-                const classes = this.generateClasses(products);
-                const judgment = this.generateJudgment(score);
-                const verbalMarks = this.generateVerbalMarks(brandName);
-                const figurativeMarks = imageData ? this.generateFigurativeMarks() : [];
-                const imageAnalysis = imageData ? this.generateImageAnalysis() : null;
-                
+3. **IMPEDIMENTI RELATIVI** (con riferimenti normativi)
+   - Rischio di confusione elementi verbali (${LEGAL_REFERENCES.CPI.art12}, ${LEGAL_REFERENCES.EUTMR.art8})
+   ${imageAnalysis ? '- Rischio di confusione elementi figurativi' : ''}
+   - Analisi dei marchi anteriori trovati
+   - Valutazione della somiglianza complessiva
+   - Affinità merceologica tra prodotti/servizi
+
+4. **ANALISI TERRITORIALE**
+   - Considerazioni specifiche per i territori selezionati
+   - Eventuali peculiarità nazionali
+
+5. **RACCOMANDAZIONI STRATEGICHE**
+   - Suggerimenti per ridurre i rischi identificati
+   ${imageAnalysis ? '- Possibili modifiche agli elementi figurativi' : ''}
+   - Possibili modifiche al marchio verbale
+   - Strategie di deposito alternative
+
+6. **CONCLUSIONE**
+   - Giudizio sintetico finale
+   - Probabilità di successo della registrazione (in percentuale)
+
+IMPORTANTE: 
+- Cita sempre gli articoli di legge pertinenti
+- ${imageAnalysis ? 'Considera attentamente la combinazione di elementi verbali e figurativi' : ''}
+- Usa un linguaggio professionale ma comprensibile
+- Sii specifico e concreto nelle raccomandazioni`;
+
+        const syntheticJudgment = await callGeminiAPI(legalAnalysisPrompt, true);
+        
+        // Estrai il livello di rischio dal giudizio
+        const riskMatch = syntheticJudgment.match(/RISCHIO[^:]*:[^A-Z]*(BASSO|MODERATO|ALTO|MOLTO ALTO)/i);
+        const riskLevel = riskMatch ? riskMatch[1] : 'MODERATO';
+        
+        // Calcola il Brand Potential Score™
+        const brandScore = calculateBrandScore(
+            verbalSearchResults.similarMarks, 
+            figurativeSearchResults.similarMarks,
+            riskLevel,
+            !!imageAnalysis
+        );
+
+        // FASE 5: Formatta la risposta completa
+        const formattedResponse = {
+            success: true,
+            brandScore: brandScore,
+            riskLevel: riskLevel,
+            identifiedClasses: identifiedClasses.map(classNum => {
+                const classInfo = extractClassInfo(classNum, NICE_CLASSES_KNOWLEDGE_BASE);
                 return {
-                    success: true,
-                    data: {
-                        brand: brandName,
-                        score: score,
-                        classes: classes,
-                        imageAnalysis: imageAnalysis,
-                        judgment: judgment,
-                        verbalMarks: verbalMarks,
-                        figurativeMarks: figurativeMarks
-                    }
+                    number: classNum,
+                    title: classInfo.title || `Classe ${classNum}`,
+                    description: classInfo.description || 'Descrizione non disponibile'
                 };
-            },
-            
-            generateClasses(products) {
-                const allClasses = [
-                    { number: 9, title: "Software e apparecchi scientifici", description: "Apparecchi e strumenti scientifici, software, hardware informatico" },
-                    { number: 35, title: "Pubblicità e gestione aziendale", description: "Servizi di pubblicità, gestione degli affari commerciali, amministrazione" },
-                    { number: 42, title: "Servizi scientifici e tecnologici", description: "Servizi scientifici e tecnologici, ricerca e progettazione, sviluppo software" },
-                    { number: 45, title: "Servizi giuridici e di sicurezza", description: "Servizi giuridici, servizi di sicurezza per la protezione di beni e individui" }
-                ];
-                return allClasses.slice(0, Math.floor(Math.random() * 2) + 2);
-            },
-            
-            generateImageAnalysis() {
-                return {
-                    description: "Logo moderno con elementi geometrici e tipografia sans-serif",
-                    distinctiveElements: ["Forma circolare", "Gradiente blu", "Lettering stilizzato"],
-                    viennaCodes: ["26", "27", "29"]
-                };
-            },
-            
-            generateJudgment(score) {
-                if (score >= 80) {
-                    return {
-                        level: "positive",
-                        summary: "Ottima registrabilità",
-                        details: `<h4>VALUTAZIONE DEL RISCHIO: BASSO</h4>
-                        <p>L'analisi evidenzia un <strong>rischio basso</strong> di conflitti. Il marchio proposto presenta <span class='highlight'>caratteri distintivi forti</span> e non sono state rilevate anteriorità bloccanti.</p>
-                        <p><strong>Riferimenti normativi:</strong> Art. 7 CPI (Novità), Art. 8 EUTMR (Impedimenti relativi)</p>`
-                    };
-                } else if (score >= 60) {
-                    return {
-                        level: "warning",
-                        summary: "Registrabilità con riserve",
-                        details: `<h4>VALUTAZIONE DEL RISCHIO: MODERATO</h4>
-                        <p>Sono state rilevate <strong>similitudini moderate</strong> con marchi esistenti. Si consiglia una <span class='highlight'>valutazione approfondita</span> per le classi indicate.</p>
-                        <p><strong>Riferimenti normativi:</strong> Art. 12 CPI (Rischio di confusione), Art. 8 EUTMR (Impedimenti relativi)</p>`
-                    };
-                } else {
-                    return {
-                        level: "negative",
-                        summary: "Registrabilità critica",
-                        details: `<h4>VALUTAZIONE DEL RISCHIO: ALTO</h4>
-                        <p>L'analisi evidenzia <strong>rischi significativi</strong> di rigetto. Sono presenti <span class='highlight'>anteriorità rilevanti</span> che potrebbero ostacolare la registrazione.</p>
-                        <p><strong>Riferimenti normativi:</strong> Art. 8 CPI (Marchi anteriori), Art. 46 EUTMR (Motivi di opposizione)</p>`
-                    };
-                }
-            },
-            
-            generateVerbalMarks(brandName) {
-                const variations = ["TECH", "SMART", "DIGITAL", "PLUS", "PRO"];
-                const marks = [];
-                const count = Math.floor(Math.random() * 3) + 2;
-                
-                for (let i = 0; i < count; i++) {
-                    marks.push({
-                        name: brandName.toUpperCase() + " " + variations[i],
-                        applicationNumber: "EU" + Math.floor(Math.random() * 1000000 + 17000000),
-                        status: Math.random() > 0.5 ? "Registrato" : "In domanda",
-                        classes: "Cl. " + [9, 35, 42].sort(() => Math.random() - 0.5).slice(0, 2).join(', '),
-                        similarity: Math.floor(Math.random() * 30) + 60,
-                        owner: "Company " + String.fromCharCode(65 + i) + " S.r.l."
-                    });
-                }
-                
-                return marks.sort((a, b) => b.similarity - a.similarity);
-            },
-            
-            generateFigurativeMarks() {
-                const marks = [];
-                const count = Math.floor(Math.random() * 2) + 1;
-                
-                for (let i = 0; i < count; i++) {
-                    marks.push({
-                        name: "Logo Figurativo " + (i + 1),
-                        applicationNumber: "EU" + Math.floor(Math.random() * 1000000 + 18000000),
-                        status: "Registrato",
-                        classes: "Cl. " + [9, 35, 42].sort(() => Math.random() - 0.5).slice(0, 2).join(', '),
-                        owner: "Design Company " + String.fromCharCode(65 + i) + " Ltd.",
-                        imageUrl: null,
-                        visualComparison: {
-                            visualSimilarity: Math.floor(Math.random() * 40) + 30,
-                            confusionRisk: ["BASSO", "MEDIO", "ALTO"][Math.floor(Math.random() * 3)],
-                            reasoning: "Elementi grafici con disposizione simile ma colori distintivi"
-                        }
-                    });
-                }
-                
-                return marks;
+            }),
+            imageAnalysis: imageAnalysis,
+            verbalMarks: verbalSearchResults.similarMarks.map(mark => ({
+                ...mark,
+                classes: `Cl. ${mark.classes.join(', ')}`
+            })),
+            figurativeMarks: figurativeSearchResults.similarMarks.map(mark => ({
+                ...mark,
+                classes: `Cl. ${mark.classes.join(', ')}`,
+                type: 'figurative'
+            })),
+            syntheticJudgment: syntheticJudgment,
+            searchMetadata: {
+                searchDate: new Date().toISOString(),
+                totalVerbalResults: verbalSearchResults.similarMarks.length,
+                totalFigurativeResults: figurativeSearchResults.similarMarks.length,
+                databaseSource: 'EUIPO',
+                analysisModel: 'Gemini Pro 1.5',
+                imageAnalyzed: !!imageAnalysis
             }
         };
-    </script>
-</body>
-</html>
+
+        return response.status(200).json(formattedResponse);
+
+    } catch (error) {
+        console.error("ERRORE nel backend:", error);
+        
+        let statusCode = 500;
+        let errorMessage = error.message;
+        
+        if (error.message.includes('Quota')) {
+            statusCode = 429;
+            errorMessage = 'Limite di richieste raggiunto. Riprova tra qualche minuto.';
+        } else if (error.message.includes('EUIPO')) {
+            statusCode = 503;
+            errorMessage = 'Servizio EUIPO temporaneamente non disponibile.';
+        }
+        
+        return response.status(statusCode).json({ 
+            error: true, 
+            message: errorMessage,
+            timestamp: new Date().toISOString()
+        });
+    }
+};

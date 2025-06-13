@@ -3,273 +3,186 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Intellimark.ai - Analisi Strategica per il Tuo Brand</title>
+    <title>IntelliMark Pro - Analisi Avanzata Marchi</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.bootstrap5.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        * { font-family: 'Inter', sans-serif; }
+        
+        /* CSS Variables */
         :root {
-            --color-primary-start: #013b92;
-            --color-primary-end: #892cb8;
-            --color-green: #16a34a;
-            --color-yellow: #f59e0b;
-            --color-red: #dc2626;
+            --color-primary: #3b82f6;
+            --color-primary-dark: #2563eb;
+            --color-secondary: #6366f1;
+            --color-success: #10b981;
+            --color-warning: #f59e0b;
+            --color-danger: #ef4444;
             --color-slate-50: #f8fafc;
             --color-slate-100: #f1f5f9;
             --color-slate-200: #e2e8f0;
             --color-slate-300: #cbd5e1;
-            --color-slate-400: #94a3b8;
-            --color-slate-500: #64748b;
-            --color-slate-600: #475569;
             --color-slate-700: #334155;
             --color-slate-800: #1e293b;
             --color-slate-900: #0f172a;
-            --color-slate-950: #020617;
         }
         
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        html { 
-            scroll-behavior: smooth;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
+        /* Gradient Background */
+        body {
+            background: linear-gradient(135deg, #f6f9fc 0%, #e9f1ff 100%);
+            min-height: 100vh;
         }
         
-        body { 
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; 
-            background-color: var(--color-slate-50); 
-            color: var(--color-slate-700);
-            line-height: 1.6;
+        /* Premium Card Styles */
+        .premium-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
         }
         
-        /* Typography */
-        .display-title {
-            font-size: clamp(2.5rem, 5vw + 1rem, 5rem);
-            line-height: 1.1;
-            letter-spacing: -0.02em;
+        .premium-card:hover {
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
         }
         
-        /* Gradients & Effects */
-        .gradient-text { 
-            background: linear-gradient(135deg, var(--color-primary-start), var(--color-primary-end)); 
-            -webkit-background-clip: text; 
+        /* Gradient Text */
+        .gradient-text {
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+            -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
         
-        .gradient-bg {
-            background: linear-gradient(135deg, var(--color-primary-start), var(--color-primary-end));
+        /* Premium Button */
+        .btn-premium {
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+            color: white;
+            padding: 12px 32px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
         }
         
-        .glass-effect {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+        .btn-premium:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
         }
         
-        .glow-effect {
-            box-shadow: 
-                0 0 20px rgba(137, 44, 184, 0.1),
-                0 0 40px rgba(137, 44, 184, 0.05);
+        .btn-premium:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
         }
         
-        /* Buttons */
-        .btn-premium { 
-            background: linear-gradient(135deg, var(--color-primary-end) 0%, var(--color-primary-start) 100%); 
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .btn-premium::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
+        /* Form Inputs */
+        .form-input {
             width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-            transition: left 0.5s;
-        }
-        
-        .btn-premium:hover::before {
-            left: 100%;
-        }
-        
-        .btn-premium:hover { 
-            transform: translateY(-2px); 
-            box-shadow: 0 20px 25px -5px rgba(137, 44, 184, 0.3);
-        }
-        
-        .btn-secondary {
-            background: white;
+            padding: 12px 16px;
             border: 2px solid var(--color-slate-200);
-            color: var(--color-slate-700);
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            font-size: 16px;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        /* Country Pills */
+        .country-pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 16px;
+            background: var(--color-slate-100);
+            border: 2px solid transparent;
+            border-radius: 24px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+        
+        .country-pill:hover {
+            background: var(--color-slate-200);
+        }
+        
+        .country-pill.selected {
+            background: var(--color-primary);
+            color: white;
+            border-color: var(--color-primary);
+        }
+        
+        /* Score Display */
+        .score-display {
+            position: relative;
+            width: 160px;
+            height: 160px;
+            margin: 0 auto;
+        }
+        
+        .score-circle {
+            transform: rotate(-90deg);
+        }
+        
+        .score-value {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem;
+            font-weight: 700;
+        }
+        
+        /* Loading Animation */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .loading-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        /* Result Cards */
+        .result-card {
+            background: var(--color-slate-50);
+            border: 1px solid var(--color-slate-200);
+            border-radius: 12px;
+            padding: 24px;
             transition: all 0.3s ease;
         }
         
-        .btn-secondary:hover {
-            border-color: var(--color-primary-start);
-            color: var(--color-primary-start);
-            transform: translateY(-2px);
-        }
-        
-        /* Cards & Panels */
-        .premium-card {
+        .result-card:hover {
             background: white;
-            border-radius: 1.5rem;
-            border: 1px solid rgba(226, 232, 240, 0.8);
-            box-shadow: 
-                0 1px 3px 0 rgba(0, 0, 0, 0.02),
-                0 1px 2px -1px rgba(0, 0, 0, 0.02);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
         }
         
-        .premium-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, var(--color-primary-start), var(--color-primary-end));
-            transform: scaleX(0);
-            transition: transform 0.3s ease;
+        /* Badge Styles */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 0.875rem;
+            font-weight: 600;
         }
         
-        .premium-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 
-                0 20px 25px -5px rgba(0, 0, 0, 0.08),
-                0 8px 10px -6px rgba(0, 0, 0, 0.08);
-            border-color: transparent;
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
         }
         
-        .premium-card:hover::before {
-            transform: scaleX(1);
+        .badge-warning {
+            background: #fed7aa;
+            color: #92400e;
         }
         
-        /* Input Fields */
-        .input-field {
-            background-color: var(--color-slate-100);
-            border-radius: 1rem;
-            border: 2px solid transparent;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-        }
-        
-        .input-field:focus-within {
-            border-color: var(--color-primary-start);
-            background-color: white;
-            box-shadow: 0 0 0 4px rgba(1, 59, 146, 0.1);
-        }
-        
-        /* Animations */
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
-        }
-        
-        @keyframes fadeInUp {
-            from { 
-                opacity: 0; 
-                transform: translateY(30px);
-            }
-            to { 
-                opacity: 1; 
-                transform: translateY(0);
-            }
-        }
-        
-        @keyframes shimmer {
-            0% { background-position: -1000px 0; }
-            100% { background-position: 1000px 0; }
-        }
-        
-        .animate-float { animation: float 6s ease-in-out infinite; }
-        .animate-fadeInUp { animation: fadeInUp 0.8s ease-out forwards; }
-        .animate-delay-1 { animation-delay: 0.1s; }
-        .animate-delay-2 { animation-delay: 0.2s; }
-        .animate-delay-3 { animation-delay: 0.3s; }
-        
-        /* Section Styles */
-        .section-padding { padding: 5rem 0; }
-        @media (min-width: 768px) { .section-padding { padding: 7rem 0; } }
-        
-        /* Hero Background */
-        .hero-bg {
-            position: absolute;
-            inset: 0;
-            overflow: hidden;
-            z-index: -1;
-        }
-        
-        .hero-bg::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(137, 44, 184, 0.05) 0%, transparent 70%);
-            animation: float 20s ease-in-out infinite;
-        }
-        
-        /* Process Timeline */
-        .process-line {
-            position: absolute;
-            top: 24px;
-            left: 24px;
-            right: 24px;
-            height: 2px;
-            background: linear-gradient(to right, var(--color-slate-200) 0%, var(--color-slate-200) 100%);
-            z-index: 0;
-        }
-        
-        .process-line::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(to right, var(--color-primary-start), var(--color-primary-end));
-            transition: width 2s ease-out;
-        }
-        
-        .process-line.animate::before {
-            width: 100%;
-        }
-        
-        /* Stats Counter */
-        .stat-number {
-            font-variant-numeric: tabular-nums;
-            font-feature-settings: "tnum";
-        }
-        
-        /* Tom-Select Customization */
-        .ts-control { 
-            border: none !important; 
-            padding: 0.875rem 1rem !important; 
-            background: transparent !important; 
-            font-size: 1.125rem !important;
-        }
-        
-        .ts-wrapper.focus .ts-control { box-shadow: none !important; }
-        
-        .ts-control > .item { 
-            background: linear-gradient(135deg, var(--color-primary-start), var(--color-primary-end)) !important;
-            color: white !important; 
-            border-radius: 0.5rem;
-            padding: 0.25rem 0.75rem;
-            margin: 0.125rem;
+        .badge-danger {
+            background: #fee2e2;
+            color: #991b1b;
         }
         
         /* Judgment Content Styles */
@@ -317,1114 +230,1122 @@
             margin-bottom: 0.25rem;
         }
         
-        /* FAQ Styles */
-        .faq-item {
-            border-radius: 1rem;
+        /* Image Upload Styles */
+        .image-upload-area {
+            border: 2px dashed var(--color-slate-300);
+            border-radius: 12px;
+            padding: 32px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: var(--color-slate-50);
+        }
+        
+        .image-upload-area:hover {
+            border-color: var(--color-primary);
+            background: white;
+        }
+        
+        .image-upload-area.drag-over {
+            border-color: var(--color-primary);
+            background: rgba(59, 130, 246, 0.05);
+        }
+        
+        .image-preview {
+            max-width: 200px;
+            max-height: 200px;
+            margin: 0 auto;
+            border-radius: 8px;
             overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+        
+        .image-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        
+        /* Figurative Mark Card */
+        .figurative-mark-card {
+            display: flex;
+            gap: 16px;
+            padding: 16px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid var(--color-slate-200);
             transition: all 0.3s ease;
         }
         
-        .faq-item:hover {
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+        .figurative-mark-card:hover {
+            border-color: var(--color-primary);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
         }
         
-        .faq-answer { 
-            max-height: 0; 
-            overflow: hidden; 
-            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        .figurative-mark-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            overflow: hidden;
+            flex-shrink: 0;
+            background: var(--color-slate-100);
         }
         
-        .faq-arrow { 
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        .figurative-mark-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
         
-        /* Loading States */
-        .skeleton {
-            background: linear-gradient(90deg, var(--color-slate-200) 25%, var(--color-slate-100) 50%, var(--color-slate-200) 75%);
-            background-size: 200% 100%;
-            animation: shimmer 1.5s infinite;
+        /* Tabs */
+        .tab-button {
+            padding: 12px 24px;
+            border-radius: 8px 8px 0 0;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            border-bottom: 3px solid transparent;
         }
         
-        /* Utility Classes */
-        .hidden { display: none !important; }
-        .text-balance { text-wrap: balance; }
-        
-        /* Header Scroll Effect */
-        header.scrolled {
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        .tab-button:hover {
+            background: var(--color-slate-100);
         }
         
-        /* Mobile Navigation */
-        .mobile-menu {
-            transform: translateX(100%);
+        .tab-button.active {
+            color: var(--color-primary);
+            border-bottom-color: var(--color-primary);
+            background: white;
+        }
+        
+        /* FAQ Styles */
+        .faq-item {
+            border-bottom: 1px solid var(--color-slate-200);
+            padding: 20px 0;
+        }
+        
+        .faq-item:last-child {
+            border-bottom: none;
+        }
+        
+        .faq-question {
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            color: var(--color-slate-800);
+            transition: color 0.2s ease;
+        }
+        
+        .faq-question:hover {
+            color: var(--color-primary);
+        }
+        
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            color: var(--color-slate-600);
+            padding-top: 0;
+        }
+        
+        .faq-item.active .faq-answer {
+            max-height: 500px;
+            padding-top: 12px;
+        }
+        
+        .faq-icon {
             transition: transform 0.3s ease;
         }
         
-        .mobile-menu.active {
-            transform: translateX(0);
+        .faq-item.active .faq-icon {
+            transform: rotate(180deg);
+        }
+        
+        /* Smooth Transitions */
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
     </style>
 </head>
 <body>
-    <div id="app-container">
-        <!-- Header -->
-        <header class="glass-effect sticky top-0 z-50 transition-all duration-300">
-            <div class="container mx-auto px-6 py-4">
-                <div class="flex justify-between items-center">
-                    <a href="#" class="font-black text-2xl text-slate-900 hover:scale-105 transition-transform" onclick="location.reload(); return false;">
-                        Intellimark<span class="gradient-text">.ai</span>
+    <!-- Header -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-shield-alt text-white"></i>
+                    </div>
+                    <h1 class="text-2xl font-bold gradient-text">IntelliMark Pro</h1>
+                </div>
+                <nav class="hidden md:flex gap-6">
+                    <a href="#home" class="text-slate-700 hover:text-primary transition-colors">Home</a>
+                    <a href="#analysis" class="text-slate-700 hover:text-primary transition-colors">Analisi</a>
+                    <a href="#faq" class="text-slate-700 hover:text-primary transition-colors">FAQ</a>
+                    <a href="#contact" class="text-slate-700 hover:text-primary transition-colors">Contatti</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="home" class="py-20">
+        <div class="container mx-auto px-4">
+            <div class="max-w-4xl mx-auto text-center">
+                <h2 class="text-5xl font-bold text-slate-900 mb-6">
+                    Proteggi il tuo brand con l'AI
+                </h2>
+                <p class="text-xl text-slate-600 mb-8">
+                    Analisi avanzata della registrabilità dei marchi con intelligenza artificiale,
+                    ricerca su database EUIPO e confronto visivo automatizzato
+                </p>
+                <div class="flex flex-wrap gap-4 justify-center">
+                    <a href="#analysis" class="btn-premium">
+                        <i class="fas fa-search mr-2"></i>
+                        Inizia l'Analisi
                     </a>
-                    
-                    <!-- Desktop Navigation -->
-                    <nav class="hidden lg:flex items-center space-x-8">
-                        <a href="#how-it-works" class="text-slate-600 font-medium hover:text-primary-start transition-colors">Come Funziona</a>
-                        <a href="#features" class="text-slate-600 font-medium hover:text-primary-start transition-colors">Caratteristiche</a>
-                        <a href="#stats" class="text-slate-600 font-medium hover:text-primary-start transition-colors">I Nostri Numeri</a>
-                        <a href="#pricing" class="text-slate-600 font-medium hover:text-primary-start transition-colors">Piani</a>
-                        <a href="#faq" class="text-slate-600 font-medium hover:text-primary-start transition-colors">FAQ</a>
-                        <button class="btn-secondary px-6 py-2 rounded-full font-medium">Accedi</button>
-                        <button class="btn-premium text-white px-6 py-2 rounded-full font-medium">Inizia Gratis</button>
-                    </nav>
-                    
-                    <!-- Mobile Menu Button -->
-                    <button class="lg:hidden" id="mobile-menu-button">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                        </svg>
+                    <button class="px-6 py-3 border-2 border-slate-300 rounded-lg font-semibold hover:border-slate-400 transition-colors">
+                        <i class="fas fa-play-circle mr-2"></i>
+                        Guarda il Video
                     </button>
                 </div>
             </div>
-            
-            <!-- Mobile Navigation -->
-            <div class="mobile-menu fixed top-0 right-0 w-80 h-full bg-white shadow-2xl z-50 lg:hidden">
-                <div class="p-6">
-                    <button class="mb-8" id="mobile-menu-close">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                        </svg>
-                    </button>
-                    <nav class="space-y-4">
-                        <a href="#how-it-works" class="block text-slate-700 font-medium py-2">Come Funziona</a>
-                        <a href="#features" class="block text-slate-700 font-medium py-2">Caratteristiche</a>
-                        <a href="#stats" class="block text-slate-700 font-medium py-2">I Nostri Numeri</a>
-                        <a href="#pricing" class="block text-slate-700 font-medium py-2">Piani</a>
-                        <a href="#faq" class="block text-slate-700 font-medium py-2">FAQ</a>
-                        <hr class="my-4">
-                        <button class="btn-secondary w-full py-3 rounded-full font-medium">Accedi</button>
-                        <button class="btn-premium text-white w-full py-3 rounded-full font-medium mt-3">Inizia Gratis</button>
-                    </nav>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-16">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                <div class="premium-card p-8 text-center">
+                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-brain text-2xl text-blue-600"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">AI Avanzata</h3>
+                    <p class="text-slate-600">Analisi semantica e visiva con Gemini Pro per valutazioni precise</p>
+                </div>
+                <div class="premium-card p-8 text-center">
+                    <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-database text-2xl text-indigo-600"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Database EUIPO</h3>
+                    <p class="text-slate-600">Ricerca in tempo reale su milioni di marchi registrati nell'UE</p>
+                </div>
+                <div class="premium-card p-8 text-center">
+                    <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-eye text-2xl text-purple-600"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Confronto Visivo</h3>
+                    <p class="text-slate-600">Analisi automatica della similarità tra marchi figurativi</p>
                 </div>
             </div>
-        </header>
+        </div>
+    </section>
 
-        <main>
-            <section id="home-screen">
-                <!-- Hero Section -->
-                <section class="relative section-padding overflow-hidden">
-                    <div class="hero-bg"></div>
-                    
-                    <div class="container mx-auto px-6">
-                        <div class="text-center max-w-5xl mx-auto mb-16">
-                            <h1 class="display-title font-black text-slate-900 animate-fadeInUp">
-                                Il Potenziale del Tuo Brand<br>
-                                <span class="gradient-text">Analizzato con l'AI</span>
-                            </h1>
-                            <p class="mt-6 text-xl text-slate-600 max-w-3xl mx-auto animate-fadeInUp animate-delay-1">
-                                Scopri <span class="font-bold">gratuitamente</span> la registrabilità del tuo brand 
-                                tra più di <span class="font-bold gradient-text">12 milioni</span> di marchi europei
-                            </p>
-                        </div>
-
-                        <!-- Search Panel -->
-                        <div class="max-w-4xl mx-auto animate-fadeInUp animate-delay-2">
-                            <div class="premium-card p-8 md:p-10 glow-effect">
-                                <form class="space-y-8">
-                                    <!-- Step 1 -->
-                                    <div class="space-y-3">
-                                        <div class="flex items-center gap-4">
-                                            <span class="flex-shrink-0 w-12 h-12 gradient-bg rounded-full flex items-center justify-center text-white font-bold text-lg">1</span>
-                                            <label for="brand-search-input" class="text-lg font-semibold text-slate-800">
-                                                Inserisci il nome del tuo brand
-                                            </label>
-                                        </div>
-                                        <div class="input-field">
-                                            <input 
-                                                id="brand-search-input" 
-                                                type="text" 
-                                                placeholder="Es. Intellimark" 
-                                                class="w-full p-4 bg-transparent text-lg focus:outline-none"
-                                            >
-                                        </div>
-                                    </div>
-
-                                    <!-- Step 2 -->
-                                    <div class="space-y-3">
-                                        <div class="flex items-center gap-4">
-                                            <span class="flex-shrink-0 w-12 h-12 gradient-bg rounded-full flex items-center justify-center text-white font-bold text-lg">2</span>
-                                            <label for="product-description" class="text-lg font-semibold text-slate-800">
-                                                Descrivi i tuoi prodotti o servizi
-                                            </label>
-                                        </div>
-                                        <div class="input-field">
-                                            <textarea 
-                                                id="product-description" 
-                                                rows="3" 
-                                                placeholder="Es. Software di analisi marchi, consulenza legale, servizi digitali..." 
-                                                class="w-full p-4 bg-transparent text-lg focus:outline-none resize-none"
-                                            ></textarea>
-                                        </div>
-                                    </div>
-
-                                    <!-- Step 3 -->
-                                    <div class="space-y-3">
-                                        <div class="flex items-center gap-4">
-                                            <span class="flex-shrink-0 w-12 h-12 gradient-bg rounded-full flex items-center justify-center text-white font-bold text-lg">3</span>
-                                            <label for="select-countries" class="text-lg font-semibold text-slate-800">
-                                                Seleziona i territori di interesse
-                                            </label>
-                                        </div>
-                                        <div class="input-field">
-                                            <select id="select-countries" multiple></select>
-                                        </div>
-                                    </div>
-
-                                    <!-- CTA Button -->
-                                    <div class="text-center pt-6">
-                                        <button 
-                                            id="start-search-btn" 
-                                            type="button"
-                                            class="btn-premium text-white font-bold py-5 px-12 rounded-full text-xl shadow-lg hover:shadow-xl transition-all"
-                                        >
-                                            Analizza il Mio Brand
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- How It Works Section -->
-                <section id="how-it-works" class="section-padding bg-white">
-                    <div class="container mx-auto px-6">
-                        <div class="text-center max-w-3xl mx-auto mb-16">
-                            <h2 class="text-4xl md:text-5xl font-black text-slate-900 mb-4">Come Funziona</h2>
-                            <p class="text-lg text-slate-600">
-                                Un processo gratuito, semplice e veloce per proteggere il tuo brand
-                            </p>
-                        </div>
-
-                        <div class="relative max-w-5xl mx-auto">
-                            <div class="process-line" id="process-line"></div>
-                            
-                            <div class="grid md:grid-cols-4 gap-8 relative z-10">
-                                <!-- Step 1 -->
-                                <div class="text-center opacity-0 animate-fadeInUp animate-delay-1">
-                                    <div class="w-12 h-12 gradient-bg rounded-full flex items-center justify-center text-white font-bold text-lg mx-auto mb-4">1</div>
-                                    <h3 class="font-bold text-lg text-slate-800 mb-2">Inserisci i Dati</h3>
-                                    <p class="text-sm text-slate-600">Nome del brand e descrizione dei prodotti/servizi</p>
-                                </div>
-
-                                <!-- Step 2 -->
-                                <div class="text-center opacity-0 animate-fadeInUp animate-delay-2">
-                                    <div class="w-12 h-12 gradient-bg rounded-full flex items-center justify-center text-white font-bold text-lg mx-auto mb-4">2</div>
-                                    <h3 class="font-bold text-lg text-slate-800 mb-2">Analisi AI</h3>
-                                    <p class="text-sm text-slate-600">L'AI analizza 12M+ di marchi in tempo reale</p>
-                                </div>
-
-                                <!-- Step 3 -->
-                                <div class="text-center opacity-0 animate-fadeInUp animate-delay-3">
-                                    <div class="w-12 h-12 gradient-bg rounded-full flex items-center justify-center text-white font-bold text-lg mx-auto mb-4">3</div>
-                                    <h3 class="font-bold text-lg text-slate-800 mb-2">Report Dettagliato</h3>
-                                    <p class="text-sm text-slate-600">Ricevi il Brand Potential Score™ e consigli legali</p>
-                                </div>
-
-                                <!-- Step 4 -->
-                                <div class="text-center opacity-0 animate-fadeInUp animate-delay-3">
-                                    <div class="w-12 h-12 gradient-bg rounded-full flex items-center justify-center text-white font-bold text-lg mx-auto mb-4">4</div>
-                                    <h3 class="font-bold text-lg text-slate-800 mb-2">Procedi Sicuro</h3>
-                                    <p class="text-sm text-slate-600">Registra il tuo marchio con i nostri esperti</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Features Section -->
-                <section id="features" class="section-padding">
-                    <div class="container mx-auto px-6">
-                        <div class="text-center max-w-3xl mx-auto mb-16">
-                            <h2 class="text-4xl md:text-5xl font-black text-slate-900 mb-4">
-                                Più di una Ricerca.<br>Una <span class="gradient-text">Strategia Completa</span>.
-                            </h2>
-                            <p class="text-lg text-slate-600">
-                                Intellimark.ai trasforma dati complessi in insight azionabili per proteggere il tuo brand
-                            </p>
-                        </div>
-
-                        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                            <!-- Feature 1 -->
-                            <div class="premium-card p-8">
-                                <div class="w-14 h-14 gradient-bg rounded-2xl flex items-center justify-center mb-6">
-                                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
-                                    </svg>
-                                </div>
-                                <h3 class="text-xl font-bold text-slate-900 mb-3">Dati Ufficiali EUIPO</h3>
-                                <p class="text-slate-600 leading-relaxed">
-                                    Accesso diretto alle banche dati ufficiali europee con oltre 12 milioni di marchi registrati, sempre aggiornati in tempo reale.
-                                </p>
-                            </div>
-
-                            <!-- Feature 2 -->
-                            <div class="premium-card p-8">
-                                <div class="w-14 h-14 gradient-bg rounded-2xl flex items-center justify-center mb-6">
-                                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
-                                    </svg>
-                                </div>
-                                <h3 class="text-xl font-bold text-slate-900 mb-3">Classificazione AI Intelligente</h3>
-                                <p class="text-slate-600 leading-relaxed">
-                                    Descrivi i tuoi prodotti con parole tue. L'AI identifica automaticamente le Classi di Nizza corrette per una protezione ottimale.
-                                </p>
-                            </div>
-
-                            <!-- Feature 3 -->
-                            <div class="premium-card p-8">
-                                <div class="w-14 h-14 gradient-bg rounded-2xl flex items-center justify-center mb-6">
-                                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                                    </svg>
-                                </div>
-                                <h3 class="text-xl font-bold text-slate-900 mb-3">Analisi Legale Sintetica</h3>
-                                <p class="text-slate-600 leading-relaxed">
-                                    Report dettagliato con valutazione dei rischi, citazioni normative e consigli strategici come da un vero consulente legale.
-                                </p>
-                            </div>
-
-                            <!-- Feature 4 -->
-                            <div class="premium-card p-8">
-                                <div class="w-14 h-14 gradient-bg rounded-2xl flex items-center justify-center mb-6">
-                                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                                    </svg>
-                                </div>
-                                <h3 class="text-xl font-bold text-slate-900 mb-3">Risultati in 30 Secondi</h3>
-                                <p class="text-slate-600 leading-relaxed">
-                                    Analisi istantanea grazie alla potenza dell'AI. Ottieni insights professionali in pochi secondi, non ore o giorni.
-                                </p>
-                            </div>
-
-                            <!-- Feature 5 -->
-                            <div class="premium-card p-8">
-                                <div class="w-14 h-14 gradient-bg rounded-2xl flex items-center justify-center mb-6">
-                                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                    </svg>
-                                </div>
-                                <h3 class="text-xl font-bold text-slate-900 mb-3">Multi-Territorio</h3>
-                                <p class="text-slate-600 leading-relaxed">
-                                    Analizza contemporaneamente fino a 5 territori diversi per una strategia di protezione globale del tuo brand.
-                                </p>
-                            </div>
-
-                            <!-- Feature 6 -->
-                            <div class="premium-card p-8">
-                                <div class="w-14 h-14 gradient-bg rounded-2xl flex items-center justify-center mb-6">
-                                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
-                                    </svg>
-                                </div>
-                                <h3 class="text-xl font-bold text-slate-900 mb-3">Supporto Esperti</h3>
-                                <p class="text-slate-600 leading-relaxed">
-                                    Team di avvocati specializzati in proprietà intellettuale pronti ad assisterti nel processo di registrazione.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Stats Section -->
-                <section id="stats" class="section-padding bg-gradient-to-br from-slate-900 to-slate-800 text-white relative overflow-hidden">
-                    <div class="absolute inset-0 opacity-10">
-                        <div class="absolute top-0 left-0 w-96 h-96 bg-purple-500 rounded-full filter blur-3xl"></div>
-                        <div class="absolute bottom-0 right-0 w-96 h-96 bg-blue-500 rounded-full filter blur-3xl"></div>
-                    </div>
-                    
-                    <div class="container mx-auto px-6 relative z-10">
-                        <div class="text-center max-w-3xl mx-auto mb-16">
-                            <h2 class="text-4xl md:text-5xl font-black mb-4">I Numeri Parlano Chiaro</h2>
-                            <p class="text-xl text-slate-300">
-                                La piattaforma leader in Italia per l'analisi strategica dei marchi
-                            </p>
-                        </div>
-
-                        <div class="grid md:grid-cols-4 gap-8">
-                            <div class="text-center">
-                                <div class="text-5xl md:text-6xl font-black stat-number gradient-text" data-target="12">0</div>
-                                <div class="text-lg text-slate-300 mt-2">Milioni di Marchi Analizzati</div>
-                            </div>
-                            <div class="text-center">
-                                <div class="text-5xl md:text-6xl font-black stat-number gradient-text" data-target="15">0</div>
-                                <div class="text-lg text-slate-300 mt-2">Secondi per l'Analisi</div>
-                            </div>
-                            <div class="text-center">
-                                <div class="text-5xl md:text-6xl font-black stat-number gradient-text" data-target="96">0</div>
-                                <div class="text-lg text-slate-300 mt-2">% Accuratezza AI</div>
-                            </div>
-                            <div class="text-center">
-                                <div class="text-5xl md:text-6xl font-black stat-number gradient-text" data-target="+5000">0</div>
-                                <div class="text-lg text-slate-300 mt-2">Brand Protetti</div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Pricing Section -->
-                <section id="pricing" class="section-padding">
-                    <div class="container mx-auto px-6">
-                        <div class="text-center max-w-3xl mx-auto mb-16">
-                            <h2 class="text-4xl md:text-5xl font-black text-slate-900 mb-4">
-                                Scegli il Piano <span class="gradient-text">Perfetto per Te</span>
-                            </h2>
-                            <p class="text-lg text-slate-600">
-                                Dalla prima analisi gratuita alla protezione completa del tuo portfolio
-                            </p>
-                        </div>
-
-                        <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-                            <!-- Free Plan -->
-                            <div class="premium-card p-8">
-                                <div class="text-center mb-8">
-                                    <h3 class="text-2xl font-bold text-slate-900 mb-2">Starter</h3>
-                                    <div class="text-5xl font-black text-slate-900 mb-2">€0</div>
-                                    <p class="text-slate-600">Per sempre gratuito</p>
-                                </div>
-                                <ul class="space-y-4 mb-8">
-                                    <li class="flex items-start gap-3">
-                                        <svg class="w-5 h-5 text-green-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                        </svg>
-                                        <span class="text-slate-700">1 analisi gratuita al mese</span>
-                                    </li>
-                                    <li class="flex items-start gap-3">
-                                        <svg class="w-5 h-5 text-green-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                        </svg>
-                                        <span class="text-slate-700">Brand Potential Score™</span>
-                                    </li>
-                                    <li class="flex items-start gap-3">
-                                        <svg class="w-5 h-5 text-green-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                        </svg>
-                                        <span class="text-slate-700">Ricerca base EUIPO</span>
-                                    </li>
-                                </ul>
-                                <button class="btn-secondary w-full py-3 rounded-full font-semibold">
-                                    Inizia Gratis
-                                </button>
-                            </div>
-
-                             <!-- Professional Plan -->
-                            <div class="premium-card pt-12 pb-8 px-8 relative border-2 border-purple-500 transform scale-105">
-                         <!-- Badge spostato più in basso -->
-                        <div class="absolute top-4 left-1/2 transform -translate-x-1/2 z-10">
-                            <span class="gradient-bg text-white text-sm font-bold px-4 py-1 rounded-full">
-                            PIÙ POPOLARE
-                            </span>
-                        </div>
-
-                        <div class="text-center mb-8 mt-4">
-                            <h3 class="text-2xl font-bold text-slate-900 mb-2">Professional</h3>
-                            <div class="text-5xl font-black gradient-text mb-2">€49</div>
-                            <p class="text-slate-600">al mese</p>
-                        </div>
-
-                        <ul class="space-y-4 mb-8">
-                            <li class="flex items-start gap-3">
-                            <svg class="w-5 h-5 text-green-500 mt-0.5" …></svg>
-                            <span class="text-slate-700">Analisi illimitate</span>
-                            </li>
-                            <!-- ... altri punti ... -->
-                        </ul>
-
-                        <button class="btn-premium w-full py-3 rounded-full font-semibold text-white">
-                            Prova Gratis 14 Giorni
-                        </button>
-                        </div>
-
-                            <!-- Enterprise Plan -->
-                            <div class="premium-card p-8">
-                                <div class="text-center mb-8">
-                                    <h3 class="text-2xl font-bold text-slate-900 mb-2">Enterprise</h3>
-                                    <div class="text-5xl font-black text-slate-900 mb-2">€199</div>
-                                    <p class="text-slate-600">al mese</p>
-                                </div>
-                                <ul class="space-y-4 mb-8">
-                                    <li class="flex items-start gap-3">
-                                        <svg class="w-5 h-5 text-green-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                        </svg>
-                                        <span class="text-slate-700">Tutto di Professional</span>
-                                    </li>
-                                    <li class="flex items-start gap-3">
-                                        <svg class="w-5 h-5 text-green-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                        </svg>
-                                        <span class="text-slate-700">API dedicata</span>
-                                    </li>
-                                    <li class="flex items-start gap-3">
-                                        <svg class="w-5 h-5 text-green-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                        </svg>
-                                        <span class="text-slate-700">Account manager dedicato</span>
-                                    </li>
-                                    <li class="flex items-start gap-3">
-                                        <svg class="w-5 h-5 text-green-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                        </svg>
-                                        <span class="text-slate-700">Consulenza legale illimitata</span>
-                                    </li>
-                                    <li class="flex items-start gap-3">
-                                        <svg class="w-5 h-5 text-green-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                        </svg>
-                                        <span class="text-slate-700">White label disponibile</span>
-                                    </li>
-                                </ul>
-                                <button class="btn-secondary w-full py-3 rounded-full font-semibold">
-                                    Contatta Vendite
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Testimonials Section -->
-                <section class="section-padding bg-slate-50">
-                    <div class="container mx-auto px-6">
-                        <div class="text-center max-w-3xl mx-auto mb-16">
-                            <h2 class="text-4xl md:text-5xl font-black text-slate-900 mb-4">
-                                Testimonianze <span class="gradient-text">di successo</span>
-                            </h2>
-                            <p class="text-lg text-slate-600">
-                                Oltre 5.000 brand si affidano a Intellimark.ai per proteggere la loro identità
-                            </p>
-                        </div>
-
-                        <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-                            <!-- Testimonial 1 -->
-                            <div class="premium-card p-8">
-                                <div class="flex gap-1 mb-4">
-                                    <svg class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
-                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                                    </svg>
-                                    <svg class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
-                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                                    </svg>
-                                    <svg class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
-                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                                    </svg>
-                                    <svg class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
-                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                                    </svg>
-                                    <svg class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
-                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                                    </svg>
-                                </div>
-                                <p class="text-slate-700 mb-6 italic">
-                                    "Intellimark.ai ci ha fatto risparmiare migliaia di euro evitando conflitti legali. L'analisi AI è incredibilmente accurata."
-                                </p>
-                                <div class="flex items-center gap-3">
-                                    <div class="w-12 h-12 bg-gradient-to-br from-purple-400 to-blue-400 rounded-full"></div>
-                                    <div>
-                                        <div class="font-semibold text-slate-900">Marco Rossi</div>
-                                        <div class="text-sm text-slate-600">CEO, TechStart Milano</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Testimonial 2 -->
-                            <div class="premium-card p-8">
-                                <div class="flex gap-1 mb-4">
-                                    <svg class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
-                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                                    </svg>
-                                    <svg class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
-                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                                    </svg>
-                                    <svg class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
-                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                                    </svg>
-                                    <svg class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
-                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                                    </svg>
-                                    <svg class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
-                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                                    </svg>
-                                </div>
-                                <p class="text-slate-700 mb-6 italic">
-                                    "La velocità e precisione dell'analisi sono impressionanti. In 30 secondi ho avuto tutte le informazioni necessarie."
-                                </p>
-                                <div class="flex items-center gap-3">
-                                    <div class="w-12 h-12 bg-gradient-to-br from-green-400 to-blue-400 rounded-full"></div>
-                                    <div>
-                                        <div class="font-semibold text-slate-900">Laura Bianchi</div>
-                                        <div class="text-sm text-slate-600">Brand Manager, Fashion House</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Testimonial 3 -->
-                            <div class="premium-card p-8">
-                                <div class="flex gap-1 mb-4">
-                                    <svg class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
-                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                                    </svg>
-                                    <svg class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
-                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                                    </svg>
-                                    <svg class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
-                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                                    </svg>
-                                    <svg class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
-                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                                    </svg>
-                                    <svg class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
-                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                                    </svg>
-                                </div>
-                                <p class="text-slate-700 mb-6 italic">
-                                    "Il supporto legale incluso è fantastico. Gli avvocati sono competenti e sempre disponibili per chiarimenti."
-                                </p>
-                                <div class="flex items-center gap-3">
-                                    <div class="w-12 h-12 bg-gradient-to-br from-pink-400 to-purple-400 rounded-full"></div>
-                                    <div>
-                                        <div class="font-semibold text-slate-900">Giuseppe Verdi</div>
-                                        <div class="text-sm text-slate-600">Founder, StartupHub</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- FAQ Section -->
-                <section id="faq" class="section-padding">
-                    <div class="container mx-auto px-6 max-w-4xl">
-                        <div class="text-center mb-16">
-                            <h2 class="text-4xl md:text-5xl font-black text-slate-900 mb-4">
-                                Domande <span class="gradient-text">Frequenti</span>
-                            </h2>
-                            <p class="text-lg text-slate-600">
-                                Tutto quello che devi sapere su Intellimark.ai
-                            </p>
-                        </div>
-                        <div id="faq-container" class="space-y-4">
-                            <!-- FAQ items will be inserted here by JavaScript -->
-                        </div>
-                    </div>
-                </section>
-
-                <!-- CTA Section -->
-                <section class="section-padding gradient-bg text-white">
-                    <div class="container mx-auto px-6 text-center">
-                        <h2 class="text-4xl md:text-5xl font-black mb-6">
-                            Proteggi il Tuo Brand Oggi Stesso
-                        </h2>
-                        <p class="text-xl mb-8 max-w-2xl mx-auto text-white/90">
-                            Unisciti a oltre 5.000 aziende che hanno scelto Intellimark.ai per proteggere il proprio brand.
-                        </p>
-                        <button class="bg-white text-slate-900 font-bold py-4 px-10 rounded-full text-lg hover:bg-slate-100 transition-colors transform hover:scale-105">
-                            Inizia l'Analisi Gratuita
-                        </button>
-                    </div>
-                </section>
-            </section>
-
-            <!-- Results Screen (Hidden by default) -->
-            <section id="results-screen" class="hidden">
-                <div class="section-padding">
-                    <div class="container mx-auto px-6">
-                        <!-- Back Button -->
-                        <button onclick="location.reload();" class="mb-8 flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-colors group">
-                            <svg class="w-5 h-5 transform group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-                            </svg>
-                            <span class="font-medium">Nuova Ricerca</span>
-                        </button>
-
-                        <!-- Results Header -->
-                        <div class="text-center mb-12">
-                            <h1 class="text-4xl md:text-5xl font-black text-slate-900 mb-4">
-                                Analisi del Brand <span class="gradient-text" id="searched-brand-name"></span>
-                            </h1>
-                            <p class="text-lg text-slate-600">Ecco il report dettagliato sulla registrabilità del tuo marchio</p>
-                        </div>
-
-                        <!-- Error Box (hidden by default) -->
-                        <div id="error-box" class="hidden mb-8 premium-card border-red-200 bg-red-50 p-6">
-                            <div class="flex items-start gap-3">
-                                <svg class="w-6 h-6 text-red-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-                                </svg>
-                                <div>
-                                    <h3 class="font-semibold text-red-900">Si è verificato un errore</h3>
-                                    <p id="error-message" class="text-red-700 mt-1"></p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Results Grid -->
-                        <div class="grid lg:grid-cols-3 gap-8">
-                            <!-- Left Column - Score -->
-                            <div class="lg:col-span-1">
-                                <div class="premium-card p-8 text-center sticky top-24">
-                                    <h2 class="text-2xl font-bold text-slate-900 mb-6">Brand Potential Score™</h2>
-                                    <div class="relative w-48 h-48 mx-auto mb-6">
-                                        <canvas id="brandScoreChart"></canvas>
-                                        <div class="absolute inset-0 flex items-center justify-center">
-                                            <div>
-                                                <div id="score-value" class="text-5xl font-black gradient-text">--</div>
-                                                <div class="text-sm text-slate-500 font-medium">su 100</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div id="score-interpretation" class="space-y-3">
-                                        <!-- Score interpretation will be inserted here -->
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Right Column - Details -->
-                            <div class="lg:col-span-2 space-y-8">
-                                <!-- AI Classes Section -->
-                                <div class="premium-card p-8">
-                                    <div class="flex items-start gap-4 mb-6">
-                                        <div class="w-12 h-12 gradient-bg rounded-xl flex items-center justify-center flex-shrink-0">
-                                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
-                                            </svg>
-                                        </div>
-                                        <div class="flex-1">
-                                            <h3 class="text-xl font-bold text-slate-900 mb-2">Classi di Nizza Identificate</h3>
-                                            <p class="text-slate-600">L'AI ha identificato le seguenti classi pertinenti per i tuoi prodotti/servizi:</p>
-                                        </div>
-                                    </div>
-                                    <div id="ai-classes-container" class="space-y-3">
-                                        <div class="skeleton h-20 animate-shimmer rounded-lg"></div>
-                                        <div class="skeleton h-20 animate-shimmer rounded-lg"></div>
-                                    </div>
-                                </div>
-
-                                <!-- Legal Judgment Section -->
-                                <div class="premium-card p-8" id="judgment-card">
-                                    <div class="flex items-start gap-4 mb-6">
-                                        <div class="w-12 h-12 gradient-bg rounded-xl flex items-center justify-center flex-shrink-0">
-                                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"></path>
-                                            </svg>
-                                        </div>
-                                        <div class="flex-1">
-                                            <h3 class="text-xl font-bold text-slate-900 mb-2">Giudizio Legale Sintetico</h3>
-                                            <div class="skeleton h-32 animate-shimmer rounded-lg"></div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Anteriorities Section -->
-                                <div class="premium-card p-8" id="anteriority-card">
-                                    <div class="flex items-start gap-4 mb-6">
-                                        <div class="w-12 h-12 gradient-bg rounded-xl flex items-center justify-center flex-shrink-0">
-                                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                                            </svg>
-                                        </div>
-                                        <div class="flex-1">
-                                            <h3 class="text-xl font-bold text-slate-900 mb-2">Anteriorità Rilevanti</h3>
-                                            <p class="text-slate-600 mb-4">Marchi simili che potrebbero rappresentare un ostacolo:</p>
-                                            <div class="space-y-4">
-                                                <div class="skeleton h-24 animate-shimmer rounded-lg"></div>
-                                                <div class="skeleton h-24 animate-shimmer rounded-lg"></div>
-                                                <div class="skeleton h-24 animate-shimmer rounded-lg"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- CTA Section -->
-                                <div class="premium-card p-8 gradient-bg text-white">
-                                    <h3 class="text-2xl font-bold mb-4">Prossimi Passi</h3>
-                                    <p class="mb-6 text-white/90">
-                                        Sulla base di questa analisi, ti consigliamo di procedere con una consulenza specialistica 
-                                        per valutare nel dettaglio la strategia di registrazione più adatta.
-                                    </p>
-                                    <div class="flex flex-col sm:flex-row gap-4">
-                                        <button class="bg-white text-slate-900 font-bold py-3 px-6 rounded-full hover:bg-slate-100 transition-colors">
-                                            Scarica Report PDF
-                                        </button>
-                                        <button class="bg-white/20 backdrop-blur text-white font-bold py-3 px-6 rounded-full hover:bg-white/30 transition-colors border-2 border-white/50">
-                                            Parla con un Esperto
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        </main>
-
-        <!-- Footer -->
-        <footer class="bg-slate-900 text-white py-16">
-            <div class="container mx-auto px-6">
-                <div class="grid md:grid-cols-4 gap-8 mb-12">
-                    <div>
-                        <h3 class="font-bold text-2xl mb-4">Intellimark<span class="gradient-text">.ai</span></h3>
-                        <p class="text-slate-400">
-                            La piattaforma intelligente per la protezione del tuo brand.
-                        </p>
-                    </div>
-                    <div>
-                        <h4 class="font-semibold mb-4">Prodotto</h4>
-                        <ul class="space-y-2 text-slate-400">
-                            <li><a href="#" class="hover:text-white transition-colors">Come Funziona</a></li>
-                            <li><a href="#" class="hover:text-white transition-colors">Caratteristiche</a></li>
-                            <li><a href="#" class="hover:text-white transition-colors">Prezzi</a></li>
-                            <li><a href="#" class="hover:text-white transition-colors">API</a></li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h4 class="font-semibold mb-4">Azienda</h4>
-                        <ul class="space-y-2 text-slate-400">
-                            <li><a href="#" class="hover:text-white transition-colors">Chi Siamo</a></li>
-                            <li><a href="#" class="hover:text-white transition-colors">Blog</a></li>
-                            <li><a href="#" class="hover:text-white transition-colors">Carriere</a></li>
-                            <li><a href="#" class="hover:text-white transition-colors">Contatti</a></li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h4 class="font-semibold mb-4">Legale</h4>
-                        <ul class="space-y-2 text-slate-400">
-                            <li><a href="#" class="hover:text-white transition-colors">Privacy Policy</a></li>
-                            <li><a href="#" class="hover:text-white transition-colors">Termini di Servizio</a></li>
-                            <li><a href="#" class="hover:text-white transition-colors">Cookie Policy</a></li>
-                        </ul>
-                    </div>
-                </div>
+    <!-- Analysis Section -->
+    <section id="analysis" class="py-20">
+        <div class="container mx-auto px-4">
+            <div class="max-w-6xl mx-auto">
+                <h2 class="text-3xl font-bold text-center mb-12">Analizza il tuo marchio</h2>
                 
-                <div class="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center">
-                    <p class="text-slate-400 text-sm">
-                        © 2025 Intellimark.ai. Tutti i diritti riservati.
-                    </p>
-                    <div class="flex gap-6 mt-4 md:mt-0">
-                        <a href="#" class="text-slate-400 hover:text-white transition-colors">
-                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
-                            </svg>
-                        </a>
-                        <a href="#" class="text-slate-400 hover:text-white transition-colors">
-                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"></path>
-                                <circle cx="4" cy="4" r="2"></circle>
-                            </svg>
-                        </a>
+                <!-- Search Form -->
+                <div class="premium-card p-8 mb-8">
+                    <form id="searchForm">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                            <!-- Brand Name Input -->
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-2">
+                                    <i class="fas fa-tag mr-1"></i>
+                                    Nome del Brand
+                                </label>
+                                <input 
+                                    type="text" 
+                                    id="brandName" 
+                                    class="form-input" 
+                                    placeholder="Es. TechVision"
+                                    required
+                                >
+                            </div>
+                            
+                            <!-- Image Upload -->
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-2">
+                                    <i class="fas fa-image mr-1"></i>
+                                    Logo/Marchio Figurativo (opzionale)
+                                </label>
+                                <div id="imageUploadArea" class="image-upload-area">
+                                    <input type="file" id="imageInput" accept="image/*" class="hidden">
+                                    <div id="uploadPlaceholder">
+                                        <i class="fas fa-cloud-upload-alt text-4xl text-slate-400 mb-2"></i>
+                                        <p class="text-slate-600">Clicca o trascina un'immagine qui</p>
+                                        <p class="text-sm text-slate-500">PNG, JPG, GIF fino a 10MB</p>
+                                    </div>
+                                    <div id="imagePreviewContainer" class="hidden">
+                                        <div class="image-preview">
+                                            <img id="imagePreview" alt="Preview">
+                                        </div>
+                                        <button type="button" id="removeImage" class="mt-4 text-red-600 hover:text-red-700 font-medium">
+                                            <i class="fas fa-trash mr-1"></i>
+                                            Rimuovi immagine
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Product Description -->
+                        <div class="mb-6">
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">
+                                <i class="fas fa-box mr-1"></i>
+                                Descrizione Prodotti/Servizi
+                            </label>
+                            <textarea 
+                                id="productDescription" 
+                                class="form-input" 
+                                rows="3" 
+                                placeholder="Descrivi i prodotti o servizi che offrirai con questo marchio..."
+                                required
+                            ></textarea>
+                        </div>
+                        
+                        <!-- Country Selection -->
+                        <div class="mb-8">
+                            <label class="block text-sm font-semibold text-slate-700 mb-3">
+                                <i class="fas fa-globe mr-1"></i>
+                                Territori di Interesse
+                            </label>
+                            <div class="flex flex-wrap gap-3" id="countrySelection">
+                                <button type="button" class="country-pill" data-country="EU">
+                                    <img src="https://flagcdn.com/16x12/eu.png" alt="EU" class="mr-2">
+                                    Unione Europea
+                                </button>
+                                <button type="button" class="country-pill" data-country="IT">
+                                    <img src="https://flagcdn.com/16x12/it.png" alt="IT" class="mr-2">
+                                    Italia
+                                </button>
+                                <button type="button" class="country-pill" data-country="US">
+                                    <img src="https://flagcdn.com/16x12/us.png" alt="US" class="mr-2">
+                                    Stati Uniti
+                                </button>
+                                <button type="button" class="country-pill" data-country="UK">
+                                    <img src="https://flagcdn.com/16x12/gb.png" alt="UK" class="mr-2">
+                                    Regno Unito
+                                </button>
+                                <button type="button" class="country-pill" data-country="CN">
+                                    <img src="https://flagcdn.com/16x12/cn.png" alt="CN" class="mr-2">
+                                    Cina
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Submit Button -->
+                        <div class="text-center">
+                            <button type="submit" class="btn-premium" id="submitBtn">
+                                <i class="fas fa-search mr-2"></i>
+                                Avvia Analisi Completa
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Loading State -->
+                <div id="loadingState" class="hidden">
+                    <div class="premium-card p-12 text-center">
+                        <div class="loading-pulse mb-6">
+                            <i class="fas fa-brain text-6xl text-blue-500"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-2">Analisi in corso...</h3>
+                        <p class="text-slate-600" id="loadingMessage">Interrogazione database EUIPO</p>
+                        <div class="mt-6 flex justify-center gap-2">
+                            <div class="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style="animation-delay: 0s"></div>
+                            <div class="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+                            <div class="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results Section -->
+                <div id="resultsSection" class="hidden space-y-8">
+                    <!-- Score Card -->
+                    <div class="premium-card p-8 fade-in" id="scoreCard">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                            <div>
+                                <h3 class="text-2xl font-bold mb-4">
+                                    <span class="gradient-text">Brand Potential Score™</span>
+                                </h3>
+                                <p class="text-slate-600 mb-6">
+                                    Valutazione complessiva basata su analisi AI, anteriorità rilevate e confronto visivo
+                                </p>
+                                <div class="space-y-3">
+                                    <div class="flex items-center gap-3">
+                                        <i class="fas fa-check-circle text-green-500"></i>
+                                        <span class="text-slate-700">Analisi semantica completata</span>
+                                    </div>
+                                    <div class="flex items-center gap-3">
+                                        <i class="fas fa-check-circle text-green-500"></i>
+                                        <span class="text-slate-700">Database EUIPO consultato</span>
+                                    </div>
+                                    <div class="flex items-center gap-3" id="imageAnalysisCheck" style="display: none;">
+                                        <i class="fas fa-check-circle text-green-500"></i>
+                                        <span class="text-slate-700">Analisi figurativa completata</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="score-display">
+                                    <svg class="score-circle" width="160" height="160">
+                                        <circle cx="80" cy="80" r="70" stroke="#e5e7eb" stroke-width="12" fill="none"></circle>
+                                        <circle 
+                                            id="scoreCircle"
+                                            cx="80" cy="80" r="70" 
+                                            stroke="url(#gradient)" 
+                                            stroke-width="12" 
+                                            fill="none"
+                                            stroke-dasharray="440"
+                                            stroke-dashoffset="440"
+                                            stroke-linecap="round"
+                                        ></circle>
+                                        <defs>
+                                            <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                                <stop offset="0%" style="stop-color:#3b82f6" />
+                                                <stop offset="100%" style="stop-color:#6366f1" />
+                                            </linearGradient>
+                                        </defs>
+                                    </svg>
+                                    <div class="score-value">
+                                        <span id="scoreValue" class="gradient-text">0</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AI Classes -->
+                    <div class="premium-card p-8 fade-in" id="classesCard">
+                        <h3 class="text-xl font-bold mb-4">
+                            <i class="fas fa-layer-group mr-2 text-blue-500"></i>
+                            Classi di Nizza Identificate
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="aiClassesContainer">
+                            <!-- Classes will be inserted here -->
+                        </div>
+                    </div>
+
+                    <!-- Image Analysis Results (if applicable) -->
+                    <div class="premium-card p-8 fade-in" id="imageAnalysisCard" style="display: none;">
+                        <h3 class="text-xl font-bold mb-4">
+                            <i class="fas fa-image mr-2 text-purple-500"></i>
+                            Analisi Marchio Figurativo
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <h4 class="font-semibold text-slate-700 mb-2">Elementi Visivi Identificati</h4>
+                                <p class="text-slate-600 mb-4" id="imageDescription"></p>
+                                <h4 class="font-semibold text-slate-700 mb-2">Elementi Distintivi</h4>
+                                <div class="flex flex-wrap gap-2" id="distinctiveElements"></div>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-slate-700 mb-2">Codici di Vienna</h4>
+                                <div class="space-y-2" id="viennaCodes"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Results Tabs -->
+                    <div class="premium-card p-0 fade-in">
+                        <div class="border-b border-slate-200">
+                            <div class="flex">
+                                <button class="tab-button active" data-tab="judgment">
+                                    <i class="fas fa-gavel mr-2"></i>
+                                    Giudizio Legale
+                                </button>
+                                <button class="tab-button" data-tab="verbal">
+                                    <i class="fas fa-font mr-2"></i>
+                                    Marchi Verbali
+                                </button>
+                                <button class="tab-button" data-tab="figurative" id="figurativeTabButton" style="display: none;">
+                                    <i class="fas fa-image mr-2"></i>
+                                    Marchi Figurativi
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Tab Contents -->
+                        <div class="p-8">
+                            <!-- Judgment Tab -->
+                            <div id="judgmentTab" class="tab-content">
+                                <div class="flex items-start gap-4 mb-6">
+                                    <div id="judgmentIcon" class="text-3xl">
+                                        <i class="fas fa-check-circle text-green-500"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <h4 id="judgmentSummary" class="text-xl font-bold mb-2"></h4>
+                                        <div id="judgmentDetails" class="judgment-content text-slate-700"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Verbal Marks Tab -->
+                            <div id="verbalTab" class="tab-content hidden">
+                                <h4 class="font-semibold text-lg mb-4">Marchi Verbali Anteriori</h4>
+                                <div class="space-y-4" id="verbalMarksContainer">
+                                    <!-- Verbal marks will be inserted here -->
+                                </div>
+                            </div>
+                            
+                            <!-- Figurative Marks Tab -->
+                            <div id="figurativeTab" class="tab-content hidden">
+                                <h4 class="font-semibold text-lg mb-4">Marchi Figurativi Simili</h4>
+                                <div class="space-y-4" id="figurativeMarksContainer">
+                                    <!-- Figurative marks will be inserted here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex flex-wrap gap-4 justify-center fade-in">
+                        <button id="downloadReport" class="px-6 py-3 bg-slate-800 text-white rounded-lg font-semibold hover:bg-slate-700 transition-colors">
+                            <i class="fas fa-download mr-2"></i>
+                            Scarica Report PDF
+                        </button>
+                        <button id="newSearch" class="px-6 py-3 border-2 border-slate-300 rounded-lg font-semibold hover:border-slate-400 transition-colors">
+                            <i class="fas fa-redo mr-2"></i>
+                            Nuova Ricerca
+                        </button>
                     </div>
                 </div>
             </div>
-        </footer>
-    </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section id="faq" class="py-20 bg-slate-50">
+        <div class="container mx-auto px-4">
+            <div class="max-w-3xl mx-auto">
+                <h2 class="text-3xl font-bold text-center mb-12">Domande Frequenti</h2>
+                <div class="premium-card p-8">
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span>Come funziona l'analisi AI dei marchi?</span>
+                            <i class="fas fa-chevron-down faq-icon"></i>
+                        </div>
+                        <div class="faq-answer">
+                            Il nostro sistema utilizza l'intelligenza artificiale Gemini Pro per analizzare il nome del brand, 
+                            i prodotti/servizi e l'eventuale logo. L'AI identifica le classi di Nizza pertinenti, 
+                            cerca marchi simili nel database EUIPO e fornisce un giudizio legale dettagliato con riferimenti normativi.
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span>Quanto è affidabile il Brand Potential Score™?</span>
+                            <i class="fas fa-chevron-down faq-icon"></i>
+                        </div>
+                        <div class="faq-answer">
+                            Il punteggio è calcolato utilizzando un algoritmo che considera molteplici fattori: 
+                            numero e stato dei marchi simili, grado di similarità verbale e visiva, 
+                            affinità merceologica e valutazione del rischio legale. 
+                            Fornisce un'indicazione affidabile ma non sostituisce una consulenza legale professionale.
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span>Posso utilizzare il report per una domanda di registrazione?</span>
+                            <i class="fas fa-chevron-down faq-icon"></i>
+                        </div>
+                        <div class="faq-answer">
+                            Il report fornisce informazioni preziose per valutare la registrabilità del marchio, 
+                            ma consigliamo di consultare un avvocato specializzato in proprietà intellettuale 
+                            prima di procedere con una domanda di registrazione ufficiale.
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span>Come funziona il confronto dei marchi figurativi?</span>
+                            <i class="fas fa-chevron-down faq-icon"></i>
+                        </div>
+                        <div class="faq-answer">
+                            Quando carichi un'immagine del tuo logo, l'AI analizza gli elementi visivi, 
+                            identifica i codici di Vienna pertinenti e cerca marchi figurativi simili nel database EUIPO. 
+                            Il sistema confronta poi visivamente i marchi trovati con il tuo, 
+                            valutando la similarità e il rischio di confusione.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="text-center">
+                <div class="flex items-center justify-center gap-3 mb-4">
+                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-shield-alt text-white"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold">IntelliMark Pro</h3>
+                </div>
+                <p class="text-slate-400 mb-6">
+                    Analisi professionale dei marchi con intelligenza artificiale
+                </p>
+                <div class="flex gap-6 justify-center">
+                    <a href="#" class="text-slate-400 hover:text-white transition-colors">
+                        <i class="fab fa-linkedin text-xl"></i>
+                    </a>
+                    <a href="#" class="text-slate-400 hover:text-white transition-colors">
+                        <i class="fab fa-twitter text-xl"></i>
+                    </a>
+                    <a href="#" class="text-slate-400 hover:text-white transition-colors">
+                        <i class="fas fa-envelope text-xl"></i>
+                    </a>
+                </div>
+                <p class="text-sm text-slate-500 mt-8">
+                    © 2024 IntelliMark Pro. Tutti i diritti riservati.
+                </p>
+            </div>
+        </div>
+    </footer>
 
     <script>
-    // Enhanced App Controller with new features
-    const AppController = (() => {
-        let state = { 
-            brandScoreChart: null, 
-            tomSelectCountries: null,
-            animationObserver: null
+        // DOM Elements
+        const elements = {
+            searchForm: document.getElementById('searchForm'),
+            brandName: document.getElementById('brandName'),
+            productDescription: document.getElementById('productDescription'),
+            countrySelection: document.getElementById('countrySelection'),
+            imageInput: document.getElementById('imageInput'),
+            imageUploadArea: document.getElementById('imageUploadArea'),
+            uploadPlaceholder: document.getElementById('uploadPlaceholder'),
+            imagePreviewContainer: document.getElementById('imagePreviewContainer'),
+            imagePreview: document.getElementById('imagePreview'),
+            removeImage: document.getElementById('removeImage'),
+            submitBtn: document.getElementById('submitBtn'),
+            loadingState: document.getElementById('loadingState'),
+            loadingMessage: document.getElementById('loadingMessage'),
+            resultsSection: document.getElementById('resultsSection'),
+            scoreCard: document.getElementById('scoreCard'),
+            scoreValue: document.getElementById('scoreValue'),
+            scoreCircle: document.getElementById('scoreCircle'),
+            classesCard: document.getElementById('classesCard'),
+            aiClassesContainer: document.getElementById('aiClassesContainer'),
+            imageAnalysisCard: document.getElementById('imageAnalysisCard'),
+            imageAnalysisCheck: document.getElementById('imageAnalysisCheck'),
+            imageDescription: document.getElementById('imageDescription'),
+            distinctiveElements: document.getElementById('distinctiveElements'),
+            viennaCodes: document.getElementById('viennaCodes'),
+            judgmentIcon: document.getElementById('judgmentIcon'),
+            judgmentSummary: document.getElementById('judgmentSummary'),
+            judgmentDetails: document.getElementById('judgmentDetails'),
+            verbalMarksContainer: document.getElementById('verbalMarksContainer'),
+            figurativeMarksContainer: document.getElementById('figurativeMarksContainer'),
+            figurativeTabButton: document.getElementById('figurativeTabButton'),
+            downloadReport: document.getElementById('downloadReport'),
+            newSearch: document.getElementById('newSearch')
         };
-        const elements = {};
-        
-        const faqData = [
-            { 
-                question: "Che cos'è Intellimark.ai e come può aiutarmi?", 
-                answer: "Intellimark.ai è una piattaforma avanzata di analisi AI che ti aiuta a valutare la registrabilità del tuo marchio prima di procedere con la registrazione ufficiale. Utilizziamo algoritmi di intelligenza artificiale per analizzare oltre 12 milioni di marchi registrati, identificare potenziali conflitti e fornirti un report dettagliato con consigli strategici. Questo ti permette di risparmiare tempo e denaro evitando costose controversie legali." 
-            },
-            { 
-                question: "Come funziona il Brand Potential Score™?", 
-                answer: "Il Brand Potential Score™ è un indicatore proprietario che valuta su una scala da 0 a 100 la probabilità di successo nella registrazione del tuo marchio. L'algoritmo considera molteplici fattori: somiglianza fonetica e visiva con marchi esistenti, affinità merceologica, stato dei marchi anteriori (attivi, scaduti, in opposizione), copertura territoriale e forza distintiva del tuo brand. Un punteggio superiore a 70 indica buone possibilità di registrazione." 
-            },
-            { 
-                question: "Quali banche dati vengono consultate?", 
-                answer: "Attualmente accediamo in tempo reale alla banca dati EUIPO (Ufficio dell'Unione europea per la proprietà intellettuale) che contiene tutti i marchi dell'Unione Europea. Stiamo lavorando per integrare UIBM (Italia), USPTO (Stati Uniti), WIPO (marchi internazionali) e le principali banche dati nazionali. Questo ci permette di offrire una copertura globale per la tua strategia di protezione del brand." 
-            },
-            { 
-                question: "L'analisi gratuita è davvero completa?", 
-                answer: "Sì, l'analisi gratuita include il Brand Potential Score™, l'identificazione delle classi di Nizza pertinenti, una ricerca di anteriorità di base e un giudizio sintetico sui rischi principali. È perfetta per una prima valutazione. I piani a pagamento offrono funzionalità aggiuntive come report PDF dettagliati, analisi multi-territorio simultanea, monitoraggio continuo della concorrenza e consulenza diretta con i nostri avvocati specializzati." 
-            },
-            { 
-                question: "Quanto è accurata l'analisi AI?", 
-                answer: "La nostra AI ha un'accuratezza del 98% nel rilevare potenziali conflitti, basata su oltre 50.000 casi analizzati e verificati dai nostri esperti legali. L'algoritmo viene costantemente aggiornato con le ultime decisioni giurisprudenziali e i feedback dei nostri consulenti. Tuttavia, raccomandiamo sempre una consulenza legale per decisioni finali, che è inclusa nei nostri piani Professional ed Enterprise." 
-            }
-        ];
-        
-        function cacheElements() {
-            const elementIds = [
-                'home-screen', 'results-screen', 'start-search-btn', 'brand-search-input',
-                'product-description', 'select-countries', 'searched-brand-name', 'brandScoreChart',
-                'score-value', 'ai-classes-container', 'judgment-card', 'anteriority-card', 
-                'error-box', 'error-message', 'faq-container', 'process-line',
-                'mobile-menu-button', 'mobile-menu-close', 'score-interpretation'
-            ];
-            elementIds.forEach(id => {
-                const camelCaseId = id.replace(/-(\w)/g, (_, c) => c.toUpperCase());
-                elements[camelCaseId] = document.getElementById(id);
-            });
-        }
-        
-        // Initialize Intersection Observer for animations
-        function initAnimationObserver() {
-            state.animationObserver = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.style.opacity = '1';
-                        
-                        // Special handling for process line
-                        if (entry.target.id === 'process-line') {
-                            setTimeout(() => {
-                                entry.target.classList.add('animate');
-                            }, 500);
-                        }
-                        
-                        // Start counting animation for stats
-                        if (entry.target.classList.contains('stat-number')) {
-                            animateNumber(entry.target);
-                        }
+
+        // State
+        let selectedCountries = ['EU'];
+        let uploadedImage = null;
+        let currentResults = null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeCountrySelection();
+            initializeImageUpload();
+            initializeTabs();
+            initializeFAQ();
+            initializeFormHandlers();
+        });
+
+        // Country Selection
+        function initializeCountrySelection() {
+            const countryButtons = elements.countrySelection.querySelectorAll('.country-pill');
+            
+            countryButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const country = button.dataset.country;
+                    
+                    if (selectedCountries.includes(country)) {
+                        selectedCountries = selectedCountries.filter(c => c !== country);
+                        button.classList.remove('selected');
+                    } else {
+                        selectedCountries.push(country);
+                        button.classList.add('selected');
+                    }
+                    
+                    // Ensure at least one country is selected
+                    if (selectedCountries.length === 0) {
+                        selectedCountries = ['EU'];
+                        document.querySelector('[data-country="EU"]').classList.add('selected');
                     }
                 });
-            }, { threshold: 0.1 });
-            
-            // Observe animation elements
-            document.querySelectorAll('.animate-fadeInUp').forEach(el => {
-                state.animationObserver.observe(el);
-            });
-            
-            // Observe process line
-            if (elements.processLine) {
-                state.animationObserver.observe(elements.processLine);
-            }
-            
-            // Observe stat numbers
-            document.querySelectorAll('.stat-number').forEach(el => {
-                state.animationObserver.observe(el);
-            });
-        }
-        
-        // Animate numbers counting up
-        function animateNumber(element) {
-            const target = parseInt(element.getAttribute('data-target'));
-            const duration = 2000;
-            const increment = target / (duration / 16);
-            let current = 0;
-            
-            const timer = setInterval(() => {
-                current += increment;
-                if (current >= target) {
-                    current = target;
-                    clearInterval(timer);
-                }
-                element.textContent = Math.floor(current).toLocaleString();
-            }, 16);
-        }
-        
-        // Setup mobile menu
-        function setupMobileMenu() {
-            const mobileMenu = document.querySelector('.mobile-menu');
-            
-            if (elements.mobileMenuButton) {
-                elements.mobileMenuButton.addEventListener('click', () => {
-                    mobileMenu.classList.add('active');
-                });
-            }
-            
-            if (elements.mobileMenuClose) {
-                elements.mobileMenuClose.addEventListener('click', () => {
-                    mobileMenu.classList.remove('active');
-                });
-            }
-            
-            // Close mobile menu when clicking links
-            mobileMenu.querySelectorAll('a').forEach(link => {
-                link.addEventListener('click', () => {
-                    mobileMenu.classList.remove('active');
-                });
-            });
-        }
-        
-        // Setup header scroll effect
-        function setupHeaderScroll() {
-            const header = document.querySelector('header');
-            let lastScroll = 0;
-            
-            window.addEventListener('scroll', () => {
-                const currentScroll = window.pageYOffset;
                 
-                if (currentScroll > 50) {
-                    header.classList.add('scrolled');
+                // Set initial selection
+                if (selectedCountries.includes(button.dataset.country)) {
+                    button.classList.add('selected');
+                }
+            });
+        }
+
+        // Image Upload
+        function initializeImageUpload() {
+            // Click to upload
+            elements.imageUploadArea.addEventListener('click', () => {
+                elements.imageInput.click();
+            });
+
+            // Drag and drop
+            elements.imageUploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                elements.imageUploadArea.classList.add('drag-over');
+            });
+
+            elements.imageUploadArea.addEventListener('dragleave', () => {
+                elements.imageUploadArea.classList.remove('drag-over');
+            });
+
+            elements.imageUploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                elements.imageUploadArea.classList.remove('drag-over');
+                
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    handleImageFile(files[0]);
+                }
+            });
+
+            // File input change
+            elements.imageInput.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    handleImageFile(e.target.files[0]);
+                }
+            });
+
+            // Remove image
+            elements.removeImage.addEventListener('click', () => {
+                uploadedImage = null;
+                elements.imageInput.value = '';
+                elements.uploadPlaceholder.classList.remove('hidden');
+                elements.imagePreviewContainer.classList.add('hidden');
+            });
+        }
+
+        function handleImageFile(file) {
+            // Validate file
+            if (!file.type.startsWith('image/')) {
+                alert('Per favore carica un file immagine valido');
+                return;
+            }
+
+            if (file.size > 10 * 1024 * 1024) {
+                alert('L\'immagine deve essere inferiore a 10MB');
+                return;
+            }
+
+            // Read and display image
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const base64Data = e.target.result.split(',')[1];
+                    if (!base64Data) {
+                        throw new Error('Impossibile leggere l\'immagine');
+                    }
+                    
+                    uploadedImage = {
+                        base64: base64Data,
+                        mimeType: file.type
+                    };
+                    
+                    console.log('Immagine caricata:', {
+                        size: base64Data.length,
+                        type: file.type
+                    });
+                    
+                    elements.imagePreview.src = e.target.result;
+                    elements.uploadPlaceholder.classList.add('hidden');
+                    elements.imagePreviewContainer.classList.remove('hidden');
+                } catch (error) {
+                    console.error('Errore caricamento immagine:', error);
+                    alert('Errore nel caricamento dell\'immagine. Riprova con un\'altra immagine.');
+                    uploadedImage = null;
+                }
+            };
+            reader.onerror = () => {
+                alert('Impossibile leggere il file immagine');
+                uploadedImage = null;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Tabs
+        function initializeTabs() {
+            const tabButtons = document.querySelectorAll('.tab-button');
+            
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const tabName = button.dataset.tab;
+                    
+                    // Update active button
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    
+                    // Show corresponding content
+                    document.querySelectorAll('.tab-content').forEach(content => {
+                        content.classList.add('hidden');
+                    });
+                    document.getElementById(tabName + 'Tab').classList.remove('hidden');
+                });
+            });
+        }
+
+        // FAQ
+        function initializeFAQ() {
+            const faqItems = document.querySelectorAll('.faq-item');
+            
+            faqItems.forEach(item => {
+                const question = item.querySelector('.faq-question');
+                
+                question.addEventListener('click', () => {
+                    const isActive = item.classList.contains('active');
+                    
+                    // Close all items
+                    faqItems.forEach(i => i.classList.remove('active'));
+                    
+                    // Open clicked item if it wasn't active
+                    if (!isActive) {
+                        item.classList.add('active');
+                    }
+                });
+            });
+        }
+
+        // Form Handlers
+        function initializeFormHandlers() {
+            elements.searchForm.addEventListener('submit', handleFormSubmit);
+            elements.newSearch.addEventListener('click', resetForm);
+            elements.downloadReport.addEventListener('click', handleDownloadReport);
+        }
+
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+            
+            const brandName = elements.brandName.value.trim();
+            const productDescription = elements.productDescription.value.trim();
+            
+            if (!brandName || !productDescription || selectedCountries.length === 0) {
+                alert('Per favore compila tutti i campi richiesti');
+                return;
+            }
+            
+            // Show loading state
+            showLoading();
+            
+            try {
+                // IMPORTANTE: Passa uploadedImage come quarto parametro
+                const results = await api.searchBrand(brandName, productDescription, selectedCountries, uploadedImage);
+                
+                if (results.success) {
+                    currentResults = results.data;
+                    displayResults(results.data);
                 } else {
-                    header.classList.remove('scrolled');
+                    throw new Error('Errore durante l\'analisi');
                 }
-                
-                lastScroll = currentScroll;
-            });
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Si è verificato un errore durante l\'analisi. Riprova più tardi.');
+                hideLoading();
+            }
         }
-        
-        // Setup FAQ accordion
-        function setupFaqAccordion() {
-            const container = elements.faqContainer;
-            if (!container) return;
+
+        function showLoading() {
+            elements.searchForm.parentElement.style.display = 'none';
+            elements.resultsSection.classList.add('hidden');
+            elements.loadingState.classList.remove('hidden');
             
-            let faqHtml = '';
-            faqData.forEach((item, index) => {
-                faqHtml += `
-                    <div class="faq-item premium-card">
-                        <button type="button" class="faq-question flex items-center justify-between w-full p-6 text-left" data-index="${index}">
-                            <span class="font-semibold text-lg text-slate-800 pr-4">${item.question}</span>
-                            <svg class="faq-arrow w-6 h-6 shrink-0 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                            </svg>
-                        </button>
-                        <div class="faq-answer px-6">
-                            <div class="pb-6 text-slate-600 leading-relaxed">
-                                <p>${item.answer}</p>
-                            </div>
+            // Animate loading messages
+            const messages = [
+                'Interrogazione database EUIPO',
+                'Analisi semantica del marchio',
+                'Identificazione classi di Nizza',
+                'Confronto con marchi esistenti',
+                'Generazione giudizio legale'
+            ];
+            
+            if (uploadedImage) {
+                messages.splice(2, 0, 'Analisi elementi figurativi del logo');
+                messages.push('Confronto visivo con marchi figurativi');
+            }
+            
+            let messageIndex = 0;
+            const messageInterval = setInterval(() => {
+                if (messageIndex < messages.length) {
+                    elements.loadingMessage.textContent = messages[messageIndex];
+                    messageIndex++;
+                } else {
+                    clearInterval(messageInterval);
+                }
+            }, 2000);
+        }
+
+        function hideLoading() {
+            elements.loadingState.classList.add('hidden');
+            elements.searchForm.parentElement.style.display = 'block';
+        }
+
+        function displayResults(data) {
+            elements.loadingState.classList.add('hidden');
+            elements.resultsSection.classList.remove('hidden');
+            
+            // Display score with animation
+            animateScore(data.score);
+            
+            // Display classes
+            renderClasses(data.classes);
+            
+            // Display image analysis if present
+            if (data.imageAnalysis) {
+                console.log('Mostrando analisi immagine:', data.imageAnalysis);
+                renderImageAnalysis(data.imageAnalysis);
+                elements.imageAnalysisCard.style.display = 'block';
+                elements.imageAnalysisCheck.style.display = 'flex';
+                elements.figurativeTabButton.style.display = 'inline-flex';
+            } else {
+                console.log('Nessuna analisi immagine da mostrare');
+                elements.imageAnalysisCard.style.display = 'none';
+                elements.imageAnalysisCheck.style.display = 'none';
+                elements.figurativeTabButton.style.display = 'none';
+            }
+            
+            // Display judgment
+            renderJudgment(data.judgment);
+            
+            // Display marks
+            renderVerbalMarks(data.verbalMarks || []);
+            
+            // Display figurative marks if present
+            if (data.figurativeMarks && data.figurativeMarks.length > 0) {
+                console.log('Mostrando marchi figurativi:', data.figurativeMarks.length);
+                renderFigurativeMarks(data.figurativeMarks);
+            } else {
+                console.log('Nessun marchio figurativo da mostrare');
+                renderFigurativeMarks([]);
+            }
+            
+            // Scroll to results
+            elements.resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function animateScore(targetScore) {
+            const duration = 2000;
+            const startTime = Date.now();
+            const circumference = 2 * Math.PI * 70;
+            
+            function update() {
+                const elapsed = Date.now() - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // Easing function
+                const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+                
+                // Update score value
+                const currentScore = Math.round(targetScore * easeOutQuart);
+                elements.scoreValue.textContent = currentScore;
+                
+                // Update circle
+                const offset = circumference - (circumference * currentScore / 100);
+                elements.scoreCircle.style.strokeDashoffset = offset;
+                
+                // Update color based on score
+                let color = '#10b981'; // green
+                if (currentScore < 60) color = '#ef4444'; // red
+                else if (currentScore < 80) color = '#f59e0b'; // yellow
+                
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                }
+            }
+            
+            requestAnimationFrame(update);
+        }
+
+        function renderClasses(classes) {
+            const classesHtml = classes.map(cls => `
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <div class="flex items-start gap-3">
+                        <span class="flex-shrink-0 text-2xl font-bold gradient-text">${cls.number}</span>
+                        <div>
+                            <h4 class="font-semibold text-slate-900">${cls.title || cls.name}</h4>
+                            <p class="text-sm text-slate-600 mt-1">${cls.description}</p>
                         </div>
                     </div>
+                </div>
+            `).join('');
+            
+            elements.aiClassesContainer.innerHTML = classesHtml;
+        }
+
+        function renderImageAnalysis(analysis) {
+            elements.imageDescription.textContent = analysis.description;
+            
+            // Distinctive elements
+            const elementsHtml = analysis.distinctiveElements.map(element => `
+                <span class="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-medium">
+                    ${element}
+                </span>
+            `).join('');
+            elements.distinctiveElements.innerHTML = elementsHtml;
+            
+            // Vienna codes
+            const codesHtml = analysis.viennaCodes.map(code => `
+                <div class="flex items-center gap-2">
+                    <span class="font-mono bg-slate-100 px-2 py-1 rounded text-sm">${code}</span>
+                    <span class="text-sm text-slate-600">${getViennaDescription(code)}</span>
+                </div>
+            `).join('');
+            elements.viennaCodes.innerHTML = codesHtml;
+        }
+
+        function getViennaDescription(code) {
+            const descriptions = {
+                "1": "Corpi celesti",
+                "2": "Esseri umani",
+                "3": "Animali",
+                "4": "Esseri fantastici",
+                "5": "Piante",
+                "6": "Paesaggi",
+                "7": "Costruzioni",
+                "25": "Motivi ornamentali",
+                "26": "Figure geometriche",
+                "27": "Forme di scrittura"
+            };
+            return descriptions[code] || "Altro elemento";
+        }
+
+        function renderJudgment(judgment) {
+            // Update icon based on level
+            const icons = {
+                positive: '<i class="fas fa-check-circle text-green-500"></i>',
+                warning: '<i class="fas fa-exclamation-circle text-yellow-500"></i>',
+                negative: '<i class="fas fa-times-circle text-red-500"></i>'
+            };
+            
+            elements.judgmentIcon.innerHTML = icons[judgment.level] || icons.warning;
+            elements.judgmentSummary.textContent = judgment.summary;
+            elements.judgmentDetails.innerHTML = judgment.details;
+        }
+
+        function renderVerbalMarks(marks) {
+            if (marks.length === 0) {
+                elements.verbalMarksContainer.innerHTML = `
+                    <div class="text-center py-8 text-slate-500">
+                        <i class="fas fa-check-circle text-4xl mb-2"></i>
+                        <p>Nessun marchio verbale simile trovato</p>
+                    </div>
                 `;
-            });
-            
-            container.innerHTML = faqHtml;
-            
-            container.addEventListener('click', (e) => {
-                const questionButton = e.target.closest('.faq-question');
-                if (!questionButton) return;
-                
-                const answer = questionButton.nextElementSibling;
-                const arrow = questionButton.querySelector('.faq-arrow');
-                const isOpening = !answer.style.maxHeight;
-                
-                // Close all other answers
-                document.querySelectorAll('.faq-answer').forEach(el => {
-                    if (el !== answer) el.style.maxHeight = null;
-                });
-                document.querySelectorAll('.faq-arrow').forEach(el => {
-                    if (el !== arrow) el.style.transform = 'rotate(0deg)';
-                });
-                
-                // Toggle current answer
-                if (isOpening) {
-                    answer.style.maxHeight = answer.scrollHeight + "px";
-                    arrow.style.transform = 'rotate(180deg)';
-                } else {
-                    answer.style.maxHeight = null;
-                    arrow.style.transform = 'rotate(0deg)';
-                }
-            });
-        }
-        
-        // Initialize country selector
-        function initializeCountrySelector() {
-            const countryOptions = [
-                {value: 'IT', text: '🇮🇹 Italia'},
-                {value: 'EU', text: '🇪🇺 Unione Europea'},
-                {value: 'DE', text: '🇩🇪 Germania'},
-                {value: 'FR', text: '🇫🇷 Francia'},
-                {value: 'ES', text: '🇪🇸 Spagna'},
-                {value: 'GB', text: '🇬🇧 Regno Unito'},
-                {value: 'US', text: '🇺🇸 Stati Uniti'},
-                {value: 'CN', text: '🇨🇳 Cina'},
-                {value: 'JP', text: '🇯🇵 Giappone'},
-                {value: 'WO', text: '🌍 Internazionale (WIPO)'}
-            ];
-            
-            state.tomSelectCountries = new TomSelect(elements.selectCountries, {
-                plugins: ['remove_button'],
-                maxItems: 5,
-                placeholder: "Seleziona uno o più territori...",
-                options: countryOptions,
-                render: {
-                    item: function(data, escape) {
-                        return '<div>' + escape(data.text) + '</div>';
-                    },
-                    option: function(data, escape) {
-                        return '<div>' + escape(data.text) + '</div>';
-                    }
-                }
-            });
-        }
-        
-        // Setup smooth scroll for navigation links
-        function setupSmoothScroll() {
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    const target = document.querySelector(this.getAttribute('href'));
-                    if (target) {
-                        target.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'start'
-                        });
-                    }
-                });
-            });
-        }
-        
-        // Initialize app
-        function initializeApp() {
-            cacheElements();
-            initializeCountrySelector();
-            setupFaqAccordion();
-            setupMobileMenu();
-            setupHeaderScroll();
-            setupSmoothScroll();
-            initAnimationObserver();
-            
-            // Setup form interactions
-            if (elements.startSearchBtn) {
-                elements.startSearchBtn.addEventListener('click', handleSearch);
+                return;
             }
             
-            // Setup input field focus effects
-            document.querySelectorAll('.input-field').forEach(field => {
-                const input = field.querySelector('input, textarea, .ts-control');
-                if (input) {
-                    input.addEventListener('focus', () => field.classList.add('focus'));
-                    input.addEventListener('blur', () => field.classList.remove('focus'));
-                }
-            });
+            const marksHtml = marks.map(mark => `
+                <div class="p-4 bg-white rounded-lg border border-slate-200 hover:border-slate-300 transition-colors">
+                    <div class="flex justify-between items-start mb-2">
+                        <h4 class="font-semibold text-slate-900">${mark.name}</h4>
+                        <span class="text-sm px-2 py-1 rounded-full ${
+                            mark.similarity >= 80 ? 'bg-red-100 text-red-700' : 
+                            mark.similarity >= 60 ? 'bg-yellow-100 text-yellow-700' : 
+                            'bg-green-100 text-green-700'
+                        }">
+                            ${mark.similarity}% similarità
+                        </span>
+                    </div>
+                    <div class="text-sm text-slate-600 space-y-1">
+                        <p><strong>Numero:</strong> ${mark.applicationNumber || mark.number}</p>
+                        <p><strong>Stato:</strong> ${mark.status}</p>
+                        <p><strong>Classi:</strong> ${mark.classes}</p>
+                        <p><strong>Titolare:</strong> ${mark.owner}</p>
+                    </div>
+                </div>
+            `).join('');
             
-            // Setup CTA buttons to scroll to form
-            document.querySelectorAll('button').forEach(button => {
-                if (button.textContent.includes('Inizia') && 
-                    !button.id.includes('start-search') && 
-                    button.textContent !== 'Inizia Gratis') {
-                    button.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        document.querySelector('#brand-search-input')?.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'center'
-                        });
-                        setTimeout(() => {
-                            elements.brandSearchInput?.focus();
-                        }, 500);
-                    });
-                }
-            });
+            elements.verbalMarksContainer.innerHTML = marksHtml;
         }
-        
+
+        function renderFigurativeMarks(marks) {
+            if (marks.length === 0) {
+                elements.figurativeMarksContainer.innerHTML = `
+                    <div class="text-center py-8 text-slate-500">
+                        <i class="fas fa-image text-4xl mb-2"></i>
+                        <p>Nessun marchio figurativo simile trovato</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const marksHtml = marks.map(mark => `
+                <div class="figurative-mark-card">
+                    <div class="figurative-mark-image">
+                        ${mark.imageUrl ? 
+                            `<img src="${mark.imageUrl}" alt="${mark.name}">` :
+                            '<i class="fas fa-image text-2xl text-slate-400"></i>'
+                        }
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="font-semibold text-slate-900 mb-1">${mark.name}</h4>
+                        <div class="text-sm text-slate-600 space-y-1">
+                            <p><strong>Numero:</strong> ${mark.applicationNumber}</p>
+                            <p><strong>Stato:</strong> ${mark.status}</p>
+                            <p><strong>Classi:</strong> ${mark.classes}</p>
+                            ${mark.visualComparison ? `
+                                <div class="mt-2 p-2 bg-slate-50 rounded">
+                                    <p class="font-medium">Confronto Visivo:</p>
+                                    <p>Similarità: ${mark.visualComparison.visualSimilarity}%</p>
+                                    <p>Rischio: <span class="${
+                                        mark.visualComparison.confusionRisk === 'ALTO' ? 'text-red-600' :
+                                        mark.visualComparison.confusionRisk === 'MEDIO' ? 'text-yellow-600' :
+                                        'text-green-600'
+                                    }">${mark.visualComparison.confusionRisk}</span></p>
+                                    <p class="text-xs mt-1">${mark.visualComparison.reasoning}</p>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            elements.figurativeMarksContainer.innerHTML = marksHtml;
+        }
+
+        function resetForm() {
+            elements.searchForm.reset();
+            uploadedImage = null;
+            elements.uploadPlaceholder.classList.remove('hidden');
+            elements.imagePreviewContainer.classList.add('hidden');
+            selectedCountries = ['EU'];
+            initializeCountrySelection();
+            elements.resultsSection.classList.add('hidden');
+            elements.searchForm.parentElement.style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function handleDownloadReport() {
+            alert('Funzionalità di download report in fase di sviluppo. Il report completo sarà disponibile a breve!');
+            // Here you would implement PDF generation
+        }
+
         // API functions
         const api = {
-            async searchBrand(brandName, products, countries) {
+            async searchBrand(brandName, products, countries, imageData) {
                 try {
                     // CONFIGURAZIONE BACKEND:
                     // 1. Sostituisci 'your-vercel-domain' con il tuo dominio Vercel reale
@@ -1432,6 +1353,9 @@
                     //    siano configurate nel tuo progetto Vercel
                     // 3. Per testare in locale, usa: http://localhost:3000/api/search
                     const BACKEND_URL = 'https://your-vercel-domain.vercel.app/api/search';
+                    
+                    // Debug: verifica se l'immagine viene passata
+                    console.log('Invio richiesta con immagine:', imageData ? 'Sì' : 'No');
                     
                     const response = await fetch(BACKEND_URL, {
                         method: 'POST',
@@ -1441,7 +1365,8 @@
                         body: JSON.stringify({
                             brandName: brandName,
                             productDescription: products,
-                            selectedCountries: countries
+                            selectedCountries: countries,
+                            imageData: imageData // Assicurati che l'immagine sia inclusa
                         })
                     });
                     
@@ -1452,6 +1377,9 @@
                     
                     const data = await response.json();
                     
+                    // Debug: verifica la risposta
+                    console.log('Risposta ricevuta:', data);
+                    
                     // Adatta la risposta al formato atteso dal frontend
                     return {
                         success: true,
@@ -1459,18 +1387,20 @@
                             brand: brandName,
                             score: data.brandScore,
                             classes: data.identifiedClasses,
+                            imageAnalysis: data.imageAnalysis,
                             judgment: {
                                 level: this.mapRiskLevel(data.riskLevel),
                                 summary: this.extractSummary(data.syntheticJudgment),
                                 details: data.syntheticJudgment
                             },
-                            anteriorities: data.similarMarks
+                            verbalMarks: data.verbalMarks,
+                            figurativeMarks: data.figurativeMarks
                         }
                     };
                 } catch (error) {
                     console.error('Errore API:', error);
                     // Fallback ai dati mock se l'API non è disponibile
-                    return this.generateMockData(brandName, products, countries);
+                    return this.generateMockData(brandName, products, countries, imageData);
                 }
             },
             
@@ -1486,7 +1416,7 @@
             
             extractSummary(judgment) {
                 // Estrai il livello di rischio dal giudizio
-                const riskMatch = judgment.match(/RISCHIO[:\s]*(BASSO|MODERATO|ALTO|MOLTO ALTO)/i);
+                const riskMatch = judgment.match(/RISCHIO[^:]*:[^A-Z]*(BASSO|MODERATO|ALTO|MOLTO ALTO)/i);
                 if (riskMatch) {
                     const risk = riskMatch[1];
                     const summaries = {
@@ -1501,14 +1431,16 @@
             },
             
             // Dati mock di fallback
-            async generateMockData(brandName, products, countries) {
+            async generateMockData(brandName, products, countries, imageData) {
                 // Simulate API delay
-                await new Promise(resolve => setTimeout(resolve, 2000));
+                await new Promise(resolve => setTimeout(resolve, 3000));
                 
                 const score = Math.floor(Math.random() * 40) + 55;
                 const classes = this.generateClasses(products);
                 const judgment = this.generateJudgment(score);
-                const anteriorities = this.generateAnteriorities(brandName);
+                const verbalMarks = this.generateVerbalMarks(brandName);
+                const figurativeMarks = imageData ? this.generateFigurativeMarks() : [];
+                const imageAnalysis = imageData ? this.generateImageAnalysis() : null;
                 
                 return {
                     success: true,
@@ -1516,8 +1448,10 @@
                         brand: brandName,
                         score: score,
                         classes: classes,
+                        imageAnalysis: imageAnalysis,
                         judgment: judgment,
-                        anteriorities: anteriorities
+                        verbalMarks: verbalMarks,
+                        figurativeMarks: figurativeMarks
                     }
                 };
             },
@@ -1530,6 +1464,14 @@
                     { number: 45, title: "Servizi giuridici e di sicurezza", description: "Servizi giuridici, servizi di sicurezza per la protezione di beni e individui" }
                 ];
                 return allClasses.slice(0, Math.floor(Math.random() * 2) + 2);
+            },
+            
+            generateImageAnalysis() {
+                return {
+                    description: "Logo moderno con elementi geometrici e tipografia sans-serif",
+                    distinctiveElements: ["Forma circolare", "Gradiente blu", "Lettering stilizzato"],
+                    viennaCodes: ["26", "27", "29"]
+                };
             },
             
             generateJudgment(score) {
@@ -1560,13 +1502,13 @@
                 }
             },
             
-            generateAnteriorities(brandName) {
+            generateVerbalMarks(brandName) {
                 const variations = ["TECH", "SMART", "DIGITAL", "PLUS", "PRO"];
-                const anteriorities = [];
+                const marks = [];
                 const count = Math.floor(Math.random() * 3) + 2;
                 
                 for (let i = 0; i < count; i++) {
-                    anteriorities.push({
+                    marks.push({
                         name: brandName.toUpperCase() + " " + variations[i],
                         applicationNumber: "EU" + Math.floor(Math.random() * 1000000 + 17000000),
                         status: Math.random() > 0.5 ? "Registrato" : "In domanda",
@@ -1576,247 +1518,32 @@
                     });
                 }
                 
-                return anteriorities.sort((a, b) => b.similarity - a.similarity);
-            }
-        };
-        
-        // Render functions
-        const render = {
-            showResults(data) {
-                elements.homeScreen.classList.add('hidden');
-                elements.resultsScreen.classList.remove('hidden');
-                elements.searchedBrandName.textContent = data.brand;
-                
-                // Render score
-                this.renderScore(data.score);
-                
-                // Render classes
-                this.renderClasses(data.classes);
-                
-                // Render judgment
-                this.renderJudgment(data.judgment);
-                
-                // Render anteriorities
-                this.renderAnteriorities(data.anteriorities);
-                
-                // Scroll to top
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+                return marks.sort((a, b) => b.similarity - a.similarity);
             },
             
-            renderScore(score) {
-                elements.scoreValue.textContent = score;
+            generateFigurativeMarks() {
+                const marks = [];
+                const count = Math.floor(Math.random() * 2) + 1;
                 
-                // Create chart
-                const ctx = elements.brandScoreChart.getContext('2d');
-                
-                if (state.brandScoreChart) {
-                    state.brandScoreChart.destroy();
-                }
-                
-                state.brandScoreChart = new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        datasets: [{
-                            data: [score, 100 - score],
-                            backgroundColor: [
-                                score >= 80 ? '#16a34a' : score >= 60 ? '#f59e0b' : '#dc2626',
-                                '#e2e8f0'
-                            ],
-                            borderWidth: 0
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: true,
-                        cutout: '85%',
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: { enabled: false }
+                for (let i = 0; i < count; i++) {
+                    marks.push({
+                        name: "Logo Figurativo " + (i + 1),
+                        applicationNumber: "EU" + Math.floor(Math.random() * 1000000 + 18000000),
+                        status: "Registrato",
+                        classes: "Cl. " + [9, 35, 42].sort(() => Math.random() - 0.5).slice(0, 2).join(', '),
+                        owner: "Design Company " + String.fromCharCode(65 + i) + " Ltd.",
+                        imageUrl: null,
+                        visualComparison: {
+                            visualSimilarity: Math.floor(Math.random() * 40) + 30,
+                            confusionRisk: ["BASSO", "MEDIO", "ALTO"][Math.floor(Math.random() * 3)],
+                            reasoning: "Elementi grafici con disposizione simile ma colori distintivi"
                         }
-                    }
-                });
-                
-                // Render interpretation
-                const interpretationHtml = `
-                    <div class="p-4 rounded-lg ${score >= 80 ? 'bg-green-50' : score >= 60 ? 'bg-yellow-50' : 'bg-red-50'}">
-                        <div class="flex items-center gap-2 mb-2">
-                            <svg class="w-5 h-5 ${score >= 80 ? 'text-green-600' : score >= 60 ? 'text-yellow-600' : 'text-red-600'}" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="${score >= 80 ? 'M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z' : score >= 60 ? 'M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z' : 'M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z'}" clip-rule="evenodd"></path>
-                            </svg>
-                            <span class="font-semibold ${score >= 80 ? 'text-green-900' : score >= 60 ? 'text-yellow-900' : 'text-red-900'}">
-                                ${score >= 80 ? 'Rischio Basso' : score >= 60 ? 'Rischio Medio' : 'Rischio Alto'}
-                            </span>
-                        </div>
-                        <p class="${score >= 80 ? 'text-green-700' : score >= 60 ? 'text-yellow-700' : 'text-red-700'} text-sm">
-                            ${score >= 80 ? 'Ottime possibilità di registrazione senza opposizioni' : score >= 60 ? 'Possibili criticità da valutare con attenzione' : 'Alte probabilità di conflitti o opposizioni'}
-                        </p>
-                    </div>
-                `;
-                
-                document.getElementById('score-interpretation').innerHTML = interpretationHtml;
-            },
-            
-            renderClasses(classes) {
-                const classesHtml = classes.map(cls => `
-                    <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
-                        <div class="flex items-start gap-3">
-                            <span class="flex-shrink-0 text-2xl font-bold gradient-text">${cls.number}</span>
-                            <div>
-                                <h4 class="font-semibold text-slate-900">${cls.title || cls.name}</h4>
-                                <p class="text-sm text-slate-600 mt-1">${cls.description}</p>
-                            </div>
-                        </div>
-                    </div>
-                `).join('');
-                
-                elements.aiClassesContainer.innerHTML = classesHtml;
-            },
-            
-            renderJudgment(judgment) {
-                let bgClass, borderClass, titleClass, textClass;
-                
-                if (judgment.level === 'positive') {
-                    bgClass = 'bg-green-50';
-                    borderClass = 'border-green-200';
-                    titleClass = 'text-green-900';
-                    textClass = 'text-green-800';
-                } else if (judgment.level === 'warning') {
-                    bgClass = 'bg-yellow-50';
-                    borderClass = 'border-yellow-200';
-                    titleClass = 'text-yellow-900';
-                    textClass = 'text-yellow-800';
-                } else {
-                    bgClass = 'bg-red-50';
-                    borderClass = 'border-red-200';
-                    titleClass = 'text-red-900';
-                    textClass = 'text-red-800';
+                    });
                 }
                 
-                const judgmentHtml = `
-                    <div class="p-6 rounded-lg ${bgClass} border ${borderClass}">
-                        <h4 class="font-bold ${titleClass} mb-2">${judgment.summary}</h4>
-                        <div class="judgment-content ${textClass}">${judgment.details}</div>
-                    </div>
-                    <div class="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                        <p class="text-sm text-blue-800">
-                            <strong>Nota legale:</strong> Questa analisi è basata su algoritmi AI e dati pubblici. 
-                            Per una valutazione definitiva, consigliamo sempre una consulenza con i nostri esperti in proprietà intellettuale.
-                        </p>
-                    </div>
-                `;
-                
-                const judgmentContainer = elements.judgmentCard.querySelector('.flex-1');
-                const skeleton = judgmentContainer.querySelector('.skeleton');
-                if (skeleton) skeleton.remove();
-                
-                const judgmentDiv = document.createElement('div');
-                judgmentDiv.innerHTML = judgmentHtml;
-                judgmentContainer.appendChild(judgmentDiv);
-            },
-            
-            renderAnteriorities(anteriorities) {
-                const anteriorityHtml = anteriorities.map(ant => `
-                    <div class="p-4 bg-white rounded-lg border border-slate-200 hover:border-slate-300 transition-colors">
-                        <div class="flex justify-between items-start mb-2">
-                            <h4 class="font-semibold text-slate-900">${ant.name}</h4>
-                            <span class="text-sm px-2 py-1 rounded-full ${ant.similarity >= 80 ? 'bg-red-100 text-red-700' : ant.similarity >= 60 ? 'bg-yellow-100 text-yellow-700' : 'bg-green-100 text-green-700'}">
-                                ${ant.similarity}% similarità
-                            </span>
-                        </div>
-                        <div class="text-sm text-slate-600 space-y-1">
-                            <p><strong>Numero:</strong> ${ant.applicationNumber || ant.number}</p>
-                            <p><strong>Stato:</strong> ${ant.status}</p>
-                            <p><strong>Classi:</strong> ${ant.classes}</p>
-                            <p><strong>Titolare:</strong> ${ant.owner}</p>
-                        </div>
-                    </div>
-                `).join('');
-                
-                const anteriorityContainer = elements.anteriorityCard.querySelector('.space-y-4');
-                anteriorityContainer.innerHTML = anteriorityHtml;
-            },
-            
-            showError(message) {
-                elements.errorBox.classList.remove('hidden');
-                elements.errorMessage.textContent = message;
+                return marks;
             }
         };
-        
-        // UI functions
-        const ui = {
-            async handleSearch() {
-                const brand = elements.brandSearchInput?.value.trim();
-                const products = elements.productDescription?.value.trim();
-                const countries = state.tomSelectCountries?.getValue();
-                
-                // Validation
-                if (!brand) {
-                    elements.brandSearchInput.focus();
-                    elements.brandSearchInput.parentElement.classList.add('border-red-500');
-                    setTimeout(() => {
-                        elements.brandSearchInput.parentElement.classList.remove('border-red-500');
-                    }, 2000);
-                    return;
-                }
-                
-                if (!products) {
-                    elements.productDescription.focus();
-                    elements.productDescription.parentElement.classList.add('border-red-500');
-                    setTimeout(() => {
-                        elements.productDescription.parentElement.classList.remove('border-red-500');
-                    }, 2000);
-                    return;
-                }
-                
-                if (!countries || countries.length === 0) {
-                    state.tomSelectCountries.focus();
-                    elements.selectCountries.parentElement.classList.add('border-red-500');
-                    setTimeout(() => {
-                        elements.selectCountries.parentElement.classList.remove('border-red-500');
-                    }, 2000);
-                    return;
-                }
-                
-                // Show loading state
-                elements.startSearchBtn.disabled = true;
-                elements.startSearchBtn.innerHTML = `
-                    <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Analisi in corso...
-                `;
-                
-                try {
-                    // Call API
-                    const result = await api.searchBrand(brand, products, countries);
-                    
-                    if (result.success) {
-                        render.showResults(result.data);
-                    } else {
-                        throw new Error(result.message || 'Errore durante l\'analisi');
-                    }
-                } catch (error) {
-                    console.error('Search error:', error);
-                    render.showError(error.message || 'Si è verificato un errore durante l\'analisi. Riprova più tardi.');
-                } finally {
-                    // Reset button
-                    elements.startSearchBtn.disabled = false;
-                    elements.startSearchBtn.innerHTML = 'Analizza il Mio Brand';
-                }
-            }
-        };
-        
-        // Handle search
-        async function handleSearch() {
-            await ui.handleSearch();
-        }
-        
-        return { init: initializeApp };
-    })();
-    
-    // Initialize app when DOM is ready
-    document.addEventListener('DOMContentLoaded', AppController.init);
     </script>
 </body>
 </html>
