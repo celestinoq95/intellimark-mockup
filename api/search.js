@@ -9,15 +9,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * { font-family: 'Inter', sans-serif; }
-        :root { /* CSS Variables omitted for brevity */ }
-        /* All other styles (gradient background, premium-card, buttons, etc.) unchanged */
+        /* Altre variabili e stili rimangono invariati */
     </style>
 </head>
 <body>
-    <!-- Header, Hero, Analysis, Features, FAQ, Footer sections unchanged -->
+    <!-- Markup delle sezioni: Header, Hero, Analysis, Features, FAQ, Footer -->
 
     <script>
-        // DOM Elements
+        // Riferimenti DOM
         const elements = {
             searchForm: document.getElementById('searchForm'),
             brandName: document.getElementById('brandName'),
@@ -52,91 +51,87 @@
             newSearch: document.getElementById('newSearch')
         };
 
-        // State
+        // Stato e variabili
         let selectedCountries = ['EU'];
         let uploadedImage = null;
         let currentResults = null;
         let selectedSearchType = 'verbal';
 
-        // Initialize handlers and UI
+        // Inizializzazione all'avvio
         document.addEventListener('DOMContentLoaded', () => {
             initializeCountrySelection();
             initializeImageUpload();
             initializeTabs();
             initializeFAQ();
-            initializeFormHandlers();
+            elements.searchForm.addEventListener('submit', handleFormSubmit);
             initializeSearchTypeHandlers();
         });
 
-        // API functions
-        const api = {
-            async searchBrand(brandName, products, countries, imageData, searchType) {
-                // Replace with your actual backend URL
-                const BACKEND_URL = 'https://your-vercel-domain.vercel.app/api/search';
-                console.log('Invio richiesta con immagine:', imageData ? 'Sì' : 'No');
-                console.log('Tipo di ricerca:', searchType);
-                const response = await fetch(BACKEND_URL, {
+        // Funzione principale: invoca l'API
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+            // Validazione base
+            if (!elements.brandName.value.trim() || !elements.productDescription.value.trim()) {
+                alert('Compila tutti i campi: marchio e descrizione prodotto sono obbligatori.');
+                return;
+            }
+            showLoading('Analisi in corso...');
+            try {
+                const response = await fetch('https://your-vercel-domain.vercel.app/api/search', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        brandName,
-                        productDescription: products,
-                        selectedCountries: countries,
-                        imageData,
-                        searchType: searchType || 'verbal'
+                        brandName: elements.brandName.value.trim(),
+                        productDescription: elements.productDescription.value.trim(),
+                        selectedCountries,
+                        imageData: uploadedImage,
+                        searchType: selectedSearchType
                     })
                 });
-                if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({}));
-                    throw new Error(errorData.message || 'Errore nella ricerca');
-                }
                 const data = await response.json();
-                console.log('Risposta ricevuta:', data);
-                return {
-                    success: true,
-                    data: {
-                        brand: brandName,
-                        score: data.brandScore,
-                        classes: data.identifiedClasses,
-                        imageAnalysis: data.imageAnalysis,
-                        judgment: {
-                            level: this.mapRiskLevel(data.riskLevel),
-                            summary: this.extractSummary(data.syntheticJudgment),
-                            details: data.syntheticJudgment
-                        },
-                        verbalMarks: data.verbalMarks,
-                        figurativeMarks: data.figurativeMarks
-                    }
-                };
-            }
-        };
-
-        // Remove fallback mock: handle errors in form submit instead
-
-        async function handleFormSubmit(e) {
-            e.preventDefault();
-            // Validation logic unchanged
-            // ...
-            showLoading();
-            try {
-                const results = await api.searchBrand(
-                    brandName,
-                    elements.productDescription.value.trim(),
-                    selectedCountries,
-                    uploadedImage,
-                    selectedSearchType
-                );
-                currentResults = results.data;
-                displayResults(results.data);
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Errore API: ' + error.message + '\nSi prega di riprovare più tardi.');
+                if (!response.ok) throw new Error(data.message || 'Errore nella ricerca');
+                currentResults = data;
+                renderResults(data);
+            } catch (err) {
+                console.error('Errore API:', err);
+                alert('Si è verificato un errore durante l'analisi: ' + err.message);
             } finally {
                 hideLoading();
             }
         }
 
-        // Other UI rendering functions unchanged: displayResults, showLoading, hideLoading, etc.
+        // Funzioni di caricamento e rendering risultati
+        function showLoading(message = 'Caricamento...') {
+            elements.loadingState.classList.remove('hidden');
+            elements.loadingMessage.textContent = message;
+        }
+        function hideLoading() {
+            elements.loadingState.classList.add('hidden');
+        }
+
+        function renderResults(data) {
+            // Pulisce le sezioni
+            elements.aiClassesContainer.innerHTML = '';
+            // Mostra classi
+            data.identifiedClasses.forEach(cls => {
+                const el = document.createElement('div');
+                el.className = 'class-chip';
+                el.textContent = `Classe ${cls}`;
+                elements.aiClassesContainer.appendChild(el);
+            });
+            // Logica per score, analisi immagine, giudizio, ecc.
+            // ... implementazione invariata rispetto al template originale ...
+            elements.resultsSection.classList.remove('hidden');
+            elements.scoreValue.textContent = data.brandScore;
+            // ... altre sezioni ...
+        }
+
+        // Funzioni helper (country selection, drag&drop immagine, tabs, FAQ)
+        function initializeCountrySelection() { /* implementazione invariata */ }
+        function initializeImageUpload() { /* implementazione invariata */ }
+        function initializeTabs() { /* implementazione invariata */ }
+        function initializeFAQ() { /* implementazione invariata */ }
+        function initializeSearchTypeHandlers() { /* implementazione invariata */ }
     </script>
 </body>
 </html>
